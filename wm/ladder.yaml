@@ -1,0 +1,110 @@
+# Experiment H quality ladder (§9-H).
+#
+# Rank disagreement is only measurable if there is quality variance to rank, so
+# the ladder must actually be a ladder.  `exp_h.py` VERIFIES that: privileged
+# ground-truth rollout error must be monotone across models 1-5, and if it is
+# not, the between-model C3(b) claims are void and are not reported.
+#
+# Models 2 and 3 are checkpoints of model 1 -- free, no extra training run.
+
+base:
+  name: WM-base
+  vae:
+    kind: compact          # trained on this project's own corpus frames
+    latent_channels: 4
+    downsample: 8          # 224 -> 28
+    ckpt: null             # set by wm_train.py
+  transformer:
+    params_millions: 75
+    dim: 768
+    depth: 12
+    heads: 12
+    patch: 2               # over the 28x28 latent grid
+    action_conditioning: adaln   # a in R^3 -> AdaLN scale/shift
+    context_frames: 2
+    predict_frames: 1      # autoregressive rollout
+  train:
+    corpus: INTERACT
+    fraction: 1.0
+    steps: 120000
+    batch_size: 32
+    lr: 1.0e-4
+    warmup: 2000
+    precision: bf16
+
+models:
+  - id: 1
+    name: WM-base-100
+    from: base
+    checkpoint_at: 120000
+    note: full training
+
+  - id: 2
+    name: WM-base-30
+    from: base
+    checkpoint_at: 36000
+    note: ~30% training -- a free checkpoint of model 1, not a separate run
+
+  - id: 3
+    name: WM-base-10
+    from: base
+    checkpoint_at: 12000
+    note: ~10% training -- free checkpoint
+
+  - id: 4
+    name: WM-data-poor
+    from: base
+    overrides:
+      train:
+        fraction: 0.10
+    note: trained on 10% of the corpus
+
+  - id: 5
+    name: WM-physics-corrupted
+    from: base
+    overrides:
+      train:
+        friction_mult: 3.0
+    note: >-
+      Trained on friction x3 rollouts (ties into Experiment F).  Renders the arm
+      perfectly, gets contact outcomes wrong.  THIS is the model the standard
+      metric should catch and, per hypothesis, cannot -- it is the sentence that
+      gets the paper accepted (C3(b)).
+
+# Controls (§9-H)
+controls:
+  appearance_gap:
+    name: free-space-motion
+    note: >-
+      Short free-space arm motions with no object contact, so physics divergence
+      is near zero by construction.  Separates domain gap from physics error.
+    n_rollouts: 300
+
+  domain_shift:
+    note: >-
+      Feature-space FID-style distance between generated and real renders.  Do
+      not assume it away; report it, and report clean-IDM vs augmented-IDM
+      deltas alongside.
+
+evaluation:
+  n_rollouts_per_model: 1500
+  held_out_action_set: test        # the same held-out actions for every model
+  metrics:
+    - id: standard
+      idm_variant: A-std
+      augmented: true
+    - id: ogaf
+      idm_variant: A-del
+      augmented: true
+    - id: dino_state_distance
+      horizon: s_del
+  also_report_clean_idm: true
+
+# S1 validators that must pass before any of this scales (§13.3)
+s1_checks:
+  - determinism: same seed twice -> identical output
+  - two_action_divergence: two different actions -> materially different video
+  - frame_count_exact
+  - frame0_matches_conditioning
+  - per_frame_pixel_std_above_floor
+  - consecutive_frame_difference_above_floor

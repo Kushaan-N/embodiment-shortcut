@@ -1,0 +1,17 @@
+[project]
+name = "embodiment-shortcut"
+version = "0.1.0"
+description = "The embodiment shortcut in action-following metrics (OG-AF)"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "mujoco", "numpy", "scipy", "scikit-learn", "statsmodels",
+  "imageio", "imageio-ffmpeg", "tqdm", "pyyaml",
+  "torch", "torchvision", "transformers", "timm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "modal"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
