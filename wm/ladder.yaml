@@ -15,9 +15,12 @@ base:
     downsample: 8          # 224 -> 28
     ckpt: null             # set by wm_train.py
   transformer:
-    params_millions: 75
+    # 87.0M measured, not estimated -- AdaLN conditioning costs 6*dim^2 per
+    # block on top of a standard ViT trunk, so dim=768/depth=12 is 129.5M and
+    # breaches §9-H's "~50-100M params". depth=8 lands at 87.0M.
+    params_millions: 87
     dim: 768
-    depth: 12
+    depth: 8
     heads: 12
     patch: 2               # over the 28x28 latent grid
     action_conditioning: adaln   # a in R^3 -> AdaLN scale/shift
