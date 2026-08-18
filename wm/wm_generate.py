@@ -30,36 +30,50 @@ import datasets as ds  # noqa: E402
 import provenance  # noqa: E402
 import scene  # noqa: E402
 from wm.vae import CompactVAE  # noqa: E402
-from wm.wm_train import ActionConditionedPredictor  # noqa: E402
+from wm.wm_train import VideoWorldModel  # noqa: E402
 
 
-def load_model(ckpt_path: Path, device):
+def load_model(ckpt_path: Path, device, vae_path: Path | None = None):
     ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    vck = torch.load(ck["vae"], map_location="cpu", weights_only=False)
+    vpath = vae_path or ck.get("extra", {}).get("vae") or (
+        C.CHECKPOINT_ROOT / "wm" / "vae" / "vae.pt")
+    vck = torch.load(vpath, map_location="cpu", weights_only=False)
     vae = CompactVAE(vck["latent_channels"]).to(device).eval()
     vae.load_state_dict(vck["state_dict"])
     t = ck["cfg"]["transformer"]
-    grid = C.RENDER_SIZE // vck.get("downsample", 8)
-    model = ActionConditionedPredictor(
+    grid = C.RENDER_SIZE // ck["cfg"]["vae"]["downsample"]
+    model = VideoWorldModel(
         latent_channels=vck["latent_channels"], grid=grid, patch=t["patch"],
         dim=t["dim"], depth=t["depth"], heads=t["heads"],
-        context_frames=t["context_frames"],
+        max_frames=t["max_frames"],
     ).to(device).eval()
     model.load_state_dict(ck["state_dict"])
     return model, vae, ck
 
 
 @torch.no_grad()
-def generate_one(model, vae, context_frames: np.ndarray, action: np.ndarray, device):
-    """context_frames: (ctx, H, W, 3) uint8 -> predicted settled frame (H, W, 3) uint8."""
-    x = torch.from_numpy(np.ascontiguousarray(context_frames))
+def generate_video(model, vae, first_frame: np.ndarray, action: np.ndarray,
+                   n_frames: int, device) -> np.ndarray:
+    """Autoregressive rollout: one conditioning frame -> (n_frames, H, W, 3) uint8.
+
+    Genuinely autoregressive -- each predicted latent is fed back in and the
+    next is predicted from the model's OWN output, never from ground truth.
+    Teacher-forcing here would make a broken model look good and is exactly the
+    failure the S1 two-action divergence check cannot catch on its own.
+    """
+    x = torch.from_numpy(np.ascontiguousarray(first_frame))[None]
     x = x.permute(0, 3, 1, 2).contiguous().float().to(device) / 255.0
-    mu, _ = vae.encode(x)
-    ctx = mu[None]                                        # (1, T, Cl, G, G)
+    mu, _ = vae.encode(x)                                  # (1, Cl, G, G)
+    seq = mu[None]                                         # (1, 1, Cl, G, G)
     a = torch.from_numpy(np.asarray(action, dtype=np.float32))[None].to(device)
-    z = model(ctx, a)
-    img = vae.decode(z)[0].permute(1, 2, 0).clamp(0, 1).cpu().numpy()
-    return (img * 255).round().astype(np.uint8)
+
+    for _ in range(n_frames - 1):
+        pred = model(seq, a)                               # (1, t, Cl, G, G)
+        seq = torch.cat([seq, pred[:, -1:]], dim=1)        # append the newest frame
+
+    lat = seq[0]                                           # (n_frames, Cl, G, G)
+    imgs = vae.decode(lat).permute(0, 2, 3, 1).clamp(0, 1).cpu().numpy()
+    return (imgs * 255).round().astype(np.uint8)
 
 
 # ==========================================================================
@@ -90,7 +104,7 @@ def validate_item(frames: np.ndarray, conditioning: np.ndarray, expected_count: 
     return checks
 
 
-def s1_checks(model, vae, context, action, device) -> dict:
+def s1_checks(model, vae, first_frame, action, n_frames, device) -> dict:
     """Determinism and two-action divergence -- run at S1, not S2 (§13.3).
 
     Action conditioning being silently unwired is the one bug that invalidates
@@ -98,14 +112,20 @@ def s1_checks(model, vae, context, action, device) -> dict:
     generations.  Catching it at S1 costs one salloc; catching it at S4 costs
     the whole allocation.
     """
-    a = generate_one(model, vae, context, action, device)
-    b = generate_one(model, vae, context, action, device)
+    a = generate_video(model, vae, first_frame, action, n_frames, device)
+    b = generate_video(model, vae, first_frame, action, n_frames, device)
     determinism = float(np.abs(a.astype(np.int32) - b.astype(np.int32)).mean())
 
     lo, hi = C.action_ranges_array()
     other = lo + (hi - lo) * 0.9 if float(action[0]) < 0.5 * (lo[0] + hi[0]) else lo
-    c = generate_one(model, vae, context, np.asarray(other, dtype=np.float32), device)
+    c = generate_video(model, vae, first_frame, np.asarray(other, dtype=np.float32),
+                       n_frames, device)
     divergence = float(np.abs(a.astype(np.int32) - c.astype(np.int32)).mean())
+
+    # A video model that ignores time would emit a still: every frame equal to
+    # the conditioning frame.  That passes determinism AND could pass action
+    # divergence, so it needs its own check.
+    motion = float(np.abs(a[1:].astype(np.int32) - a[:-1].astype(np.int32)).mean())
 
     return {
         "determinism": {"passed": determinism < 1e-6, "value": determinism,
@@ -116,6 +136,10 @@ def s1_checks(model, vae, context, action, device) -> dict:
             "note": "two different actions must give materially different video; "
                     "failing this means action conditioning is unwired and every "
                     "downstream H number is void (§13.3)"},
+        "temporal_motion": {
+            "passed": motion > 0.5, "value": motion, "threshold": 0.5,
+            "note": "generated video must actually move; a model emitting a still "
+                    "would pass both checks above"},
     }
 
 
@@ -132,25 +156,35 @@ def main() -> int:
     ap.add_argument("--s1", action="store_true", help="S1 ladder stage: 1 item + S1 checks")
     ap.add_argument("--out", type=Path, default=C.DATA_ROOT / "generated")
     ap.add_argument("--geometry", default="box", choices=C.GEOMETRIES)
+    ap.add_argument("--clips", type=Path, default=C.DATA_ROOT / "wm_clips")
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ckpt = args.ckpt or (C.CHECKPOINT_ROOT / "wm" / args.model / "final.pt")
     model, vae, ck = load_model(ckpt, dev)
-    ctxn = ck["cfg"]["transformer"]["context_frames"]
+    n_frames = int(ck["cfg"]["transformer"]["max_frames"])
 
-    # The SAME held-out action set for every model on the ladder (§9-H).
-    data = ds.load_split("test", geometry=args.geometry, condition="INTERACT",
-                         keys=["frames", "action", "tuple_index"])
-    frames, actions, tuples = data["frames"], data["action"], data["tuple_index"]
-    n = min(args.n, len(frames))
+    # The SAME held-out action set for every model on the ladder (§9-H), and the
+    # same REAL video to score against -- the WM clips, not the horizon frames.
+    clip_root = Path(args.clips) / args.geometry / "INTERACT"
+    items = sorted(clip_root.glob("*.npz"))
+    if not items:
+        raise SystemExit(f"no WM clips under {clip_root}; run wm/render_clips.py")
+    held_out = []
+    for f in items:
+        with np.load(f) as z:
+            if str(z["split"]) == "test":
+                held_out.append((f, z["action"].copy(), int(z["tuple_index"])))
+    n = min(args.n, len(held_out))
     idx = np.arange(n)[args.shard :: args.n_shards]
 
     outdir = Path(args.out) / args.model / args.geometry
     outdir.mkdir(parents=True, exist_ok=True)
 
     if args.s1:
-        res = s1_checks(model, vae, frames[0][:ctxn], actions[0], dev)
+        with np.load(held_out[0][0]) as z:
+            first = z["clip"][0].copy()
+        res = s1_checks(model, vae, first, held_out[0][1], n_frames, dev)
         print(json.dumps(res, indent=2))
         ok = all(v["passed"] for v in res.values())
         (outdir / "s1_checks.json").write_text(json.dumps(res, indent=2))
@@ -159,16 +193,18 @@ def main() -> int:
 
     manifest, n_fail, consecutive_fail = [], 0, 0
     for k, i in enumerate(idx):
-        item_id = f"{int(tuples[i]):07d}"
+        clip_path, action, tup = held_out[i]
+        item_id = f"{tup:07d}"
         path = outdir / f"{item_id}.npz"
         if path.exists():
             continue
-        gen = generate_one(model, vae, frames[i][:ctxn], actions[i], dev)
-        seq = np.stack([frames[i][0], gen])
-        checks = validate_item(seq, frames[i][0], expected_count=2)
+        with np.load(clip_path) as z:
+            real = z["clip"].copy()
+        gen = generate_video(model, vae, real[0], action, n_frames, dev)
+        checks = validate_item(gen, real[0], expected_count=n_frames)
         digest = hashlib.sha256(gen.tobytes()).hexdigest()
-        provenance.save_arrays(path, generated=gen, conditioning=frames[i][:ctxn],
-                               action=actions[i], real_target=frames[i][2])
+        provenance.save_arrays(path, generated=gen, conditioning=real[:1],
+                               action=action, real_target=real)
         manifest.append({"id": item_id, "sha256": digest,
                          "passed": checks["_all_passed"], "checks": checks})
         if not checks["_all_passed"]:
