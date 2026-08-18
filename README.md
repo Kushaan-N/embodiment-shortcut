@@ -28,7 +28,7 @@ occupied in RL.
 | 2. `scene.py` + validators + contact sheet | visual inspection | ✋ **awaiting human review** |
 | 3. Experiment 0 — state oracles | **Gate C0** | **PASS** |
 | 4. Experiment A — contact deltas | thresholds written | **done** |
-| 5. Experiment B — encoder floor | **Gate B** | not run (first GPU gate) |
+| 5. Experiment B — encoder floor | **Gate B** | **FAIL** — STOP, see below |
 | 6. Experiment C — injectivity | **Gate C** | **PASS** |
 | 7. Corpus + `validate_corpus.py` | T11, T7 | not run |
 | 8–12 | — | not run |
@@ -49,6 +49,43 @@ prior baseline, and does so **identically in INTERACT and DECOY** (difference
 0.000). At the delayed horizon the arm carries essentially nothing (97 % of
 prior) while the settled object still carries real signal. The shortcut channel
 exists, and OG-AF has something to measure. Established for **zero GPU-hours**.
+
+### Gate B (Experiment B), measured — **FAIL**
+
+DINOv2-ViT-L/14 cannot resolve a `delta_pos_min` object displacement above its
+own noise floor. Measured at the pre-declared 3σ bar:
+
+| encoder / pooling | translation @ δ_min | rotation @ δ_min | verdict |
+|---|---|---|---|
+| dinov2-large / CLS | **+0.55 σ** | −1.10 σ | fail |
+| dinov2-large / mean-patch | **+0.19 σ** | −1.08 σ | fail |
+| dinov3-vitl16 | — | — | **untested — gated repo, 401** |
+
+The translation sweep shows *where* the encoder does become sensitive:
+
+| displacement | ≈ px | σ over floor (CLS) |
+|---|---|---|
+| 4.8 mm (1× δ_min) | 1.7 | +0.55 |
+| 8.7 mm (1.8×) | 3.2 | +1.52 |
+| 14.2 mm (3.0×) | 5.1 | +2.90 |
+| **18.1 mm (3.8×)** | **6.5** | **+3.12 — crosses the bar** |
+| 47.6 mm (10×) | 17.2 | +4.07 |
+
+So the response is real and monotone, but the sensitivity threshold sits at
+**~3.8× the smallest per-video-frame contact displacement** — roughly 6 px of
+object motion. Below that, DINO cosine distance is indistinguishable from
+sub-pixel camera jitter.
+
+Two diagnostics a reviewer should weigh, neither of which is a licence to move
+the bar:
+
+- The noise floor is **heavy-tailed relative to its own mean** (sd/mean ≈ 0.85
+  on 20 samples), so a 3σ bar over it is a demanding test.
+- The floor perturbation is a **whole-image camera shift** (0.48 mm ≈ 0.17 px
+  across all 256 patches) while the signal is an **object-only shift** (4.8 mm
+  ≈ 1.7 px across ~4–9 patches). Per metre, camera jitter disturbs a global
+  feature far more. §9-B specifies this comparison; it was implemented
+  literally.
 
 ### Gate C (Experiment C), measured
 
