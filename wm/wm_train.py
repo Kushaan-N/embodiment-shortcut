@@ -1,17 +1,24 @@
-"""Action-conditioned latent video predictor for Experiment H (§9-H).
+"""Action-conditioned **video** world model for Experiment H (§9-H).
 
-WM-base: a frozen compact VAE plus a ~75M-parameter spatiotemporal transformer
-that predicts latent frames autoregressively, conditioned on ``a in R^3``
-via AdaLN.
+WM-base: a frozen compact VAE plus a factorised spatiotemporal transformer that
+predicts latent frames **autoregressively**, conditioned on ``a in R^3`` via
+AdaLN.
 
-Any substitute architecture is acceptable provided it (a) is action-conditioned,
-(b) trains on this corpus, and (c) passes the §13.3 S1 validators **including
-the two-action divergence check** -- action conditioning being silently unwired
-is the one bug that invalidates every downstream H number, and it is detectable
-with two generations.
+Why factorised attention.  Joint attention over all 16x196 = 3136 latent tokens
+is quadratic and would dominate the FLOP budget for no modelling benefit at this
+scale.  Each block instead does spatial attention *within* a frame (196 tokens,
+full) then temporal attention *across* frames (16 tokens, **causally masked**).
+Causal masking in time is what makes the model a generator rather than an
+interpolator -- without it, "predicting" frame t could just read frame t+1.
 
-    python wm/wm_train.py --model WM-base
-    python wm/wm_train.py --model WM-physics-corrupted
+Checkpoint / resume.  Training saves optimizer, scheduler, step and RNG state,
+resumes automatically from the newest checkpoint, exits cleanly at a wall-clock
+budget, and saves immediately on SIGTERM.  Unity's `gpu-preempt` can kill a job
+after 2 hours and `--requeue` then restarts it; without resume that is an
+infinite loop that never finishes a run.
+
+    python wm/wm_train.py --model WM-base --max-hours 1.8
+    python wm/wm_train.py --model WM-base --budget-only    # FLOPs, no training
 """
 
 from __future__ import annotations
@@ -19,7 +26,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
+import signal
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -31,7 +41,6 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import config as C  # noqa: E402
-import datasets as ds  # noqa: E402
 import provenance  # noqa: E402
 from wm.vae import CompactVAE  # noqa: E402
 
@@ -47,46 +56,67 @@ def modulate(x, shift, scale):
     return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)
 
 
-class AdaLNBlock(nn.Module):
-    """Transformer block with AdaLN action conditioning."""
+class SpatioTemporalBlock(nn.Module):
+    """Spatial (full) then temporal (causal) attention, both AdaLN-conditioned."""
 
     def __init__(self, dim: int, heads: int, mlp_ratio: float = 4.0):
         super().__init__()
-        self.n1 = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
-        self.attn = nn.MultiheadAttention(dim, heads, batch_first=True)
-        self.n2 = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
+        nrm = lambda: nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)  # noqa: E731
+        self.n_s, self.n_t, self.n_m = nrm(), nrm(), nrm()
+        self.attn_s = nn.MultiheadAttention(dim, heads, batch_first=True)
+        self.attn_t = nn.MultiheadAttention(dim, heads, batch_first=True)
         hidden = int(dim * mlp_ratio)
         self.mlp = nn.Sequential(nn.Linear(dim, hidden), nn.GELU(), nn.Linear(hidden, dim))
-        self.ada = nn.Sequential(nn.SiLU(), nn.Linear(dim, 6 * dim))
+        self.ada = nn.Sequential(nn.SiLU(), nn.Linear(dim, 9 * dim))
         nn.init.zeros_(self.ada[-1].weight)
         nn.init.zeros_(self.ada[-1].bias)
 
-    def forward(self, x, cond):
-        s1, sc1, g1, s2, sc2, g2 = self.ada(cond).chunk(6, dim=-1)
-        h = modulate(self.n1(x), s1, sc1)
-        h, _ = self.attn(h, h, h, need_weights=False)
-        x = x + g1.unsqueeze(1) * h
-        h = modulate(self.n2(x), s2, sc2)
-        x = x + g2.unsqueeze(1) * self.mlp(h)
-        return x
+    def forward(self, x, cond, causal_mask):
+        # x: (B, T, P, D)
+        B, T, P, D = x.shape
+        (ss, sc, sg, ts, tc, tg, ms, mc, mg) = self.ada(cond).chunk(9, dim=-1)
+
+        # ---- spatial: attend within each frame -------------------------
+        h = x.reshape(B * T, P, D)
+        hs = modulate(self.n_s(h), ss.repeat_interleave(T, 0), sc.repeat_interleave(T, 0))
+        hs, _ = self.attn_s(hs, hs, hs, need_weights=False)
+        h = h + sg.repeat_interleave(T, 0).unsqueeze(1) * hs
+        x = h.reshape(B, T, P, D)
+
+        # ---- temporal: attend across frames, CAUSALLY ------------------
+        h = x.permute(0, 2, 1, 3).reshape(B * P, T, D)
+        ht = modulate(self.n_t(h), ts.repeat_interleave(P, 0), tc.repeat_interleave(P, 0))
+        ht, _ = self.attn_t(ht, ht, ht, attn_mask=causal_mask, need_weights=False)
+        h = h + tg.repeat_interleave(P, 0).unsqueeze(1) * ht
+        x = h.reshape(B, P, T, D).permute(0, 2, 1, 3)
+
+        # ---- mlp -------------------------------------------------------
+        h = x.reshape(B * T, P, D)
+        hm = modulate(self.n_m(h), ms.repeat_interleave(T, 0), mc.repeat_interleave(T, 0))
+        h = h + mg.repeat_interleave(T, 0).unsqueeze(1) * self.mlp(hm)
+        return h.reshape(B, T, P, D)
 
 
-class ActionConditionedPredictor(nn.Module):
-    """Predicts the next latent frame from ``context_frames`` latents + action."""
+class VideoWorldModel(nn.Module):
+    """Given latent frames 0..T-1 and an action, predict frames 1..T."""
 
-    def __init__(self, latent_channels=4, grid=28, patch=2, dim=768, depth=12,
-                 heads=12, context_frames=2, n_actions=3):
+    def __init__(self, latent_channels=4, grid=28, patch=2, dim=768, depth=6,
+                 heads=12, max_frames=16, n_actions=3):
         super().__init__()
-        self.grid, self.patch, self.ctx = grid, patch, context_frames
+        self.grid, self.patch = grid, patch
         self.latent_channels = latent_channels
         self.n_patch = (grid // patch) ** 2
         in_dim = latent_channels * patch * patch
-        self.embed = nn.Linear(in_dim * context_frames, dim)
-        self.pos = nn.Parameter(torch.zeros(1, self.n_patch, dim))
-        nn.init.trunc_normal_(self.pos, std=0.02)
+        self.embed = nn.Linear(in_dim, dim)
+        self.pos_s = nn.Parameter(torch.zeros(1, 1, self.n_patch, dim))
+        self.pos_t = nn.Parameter(torch.zeros(1, max_frames, 1, dim))
+        nn.init.trunc_normal_(self.pos_s, std=0.02)
+        nn.init.trunc_normal_(self.pos_t, std=0.02)
         self.action_mlp = nn.Sequential(nn.Linear(n_actions, dim), nn.SiLU(),
                                         nn.Linear(dim, dim))
-        self.blocks = nn.ModuleList([AdaLNBlock(dim, heads) for _ in range(depth)])
+        self.blocks = nn.ModuleList(
+            [SpatioTemporalBlock(dim, heads) for _ in range(depth)]
+        )
         self.norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
         self.ada_out = nn.Sequential(nn.SiLU(), nn.Linear(dim, 2 * dim))
         self.head = nn.Linear(dim, in_dim)
@@ -96,31 +126,39 @@ class ActionConditionedPredictor(nn.Module):
         nn.init.zeros_(self.head.bias)
 
     def _patchify(self, z):
-        # z: (B, T, Cl, G, G) -> (B, n_patch, T*Cl*p*p)
         B, T, Cl, G, _ = z.shape
         p = self.patch
-        z = z.reshape(B, T * Cl, G, G)
-        z = z.unfold(2, p, p).unfold(3, p, p)             # (B, TC, G/p, G/p, p, p)
-        z = z.permute(0, 2, 3, 1, 4, 5).reshape(B, self.n_patch, -1)
+        z = z.reshape(B * T, Cl, G, G)
+        z = z.unfold(2, p, p).unfold(3, p, p)          # (BT, Cl, G/p, G/p, p, p)
+        z = z.permute(0, 2, 3, 1, 4, 5).reshape(B, T, self.n_patch, -1)
         return z
 
     def _unpatchify(self, x):
-        B = x.shape[0]
+        B, T = x.shape[:2]
         p, g = self.patch, self.grid // self.patch
-        x = x.reshape(B, g, g, self.latent_channels, p, p)
-        x = x.permute(0, 3, 1, 4, 2, 5).reshape(B, self.latent_channels, self.grid, self.grid)
+        x = x.reshape(B * T, g, g, self.latent_channels, p, p)
+        x = x.permute(0, 3, 1, 4, 2, 5).reshape(B, T, self.latent_channels,
+                                                self.grid, self.grid)
         return x
 
-    def forward(self, context, action):
-        h = self.embed(self._patchify(context)) + self.pos
+    def forward(self, latents, action):
+        """latents: (B, T, Cl, G, G) -> predicted NEXT latent for each t."""
+        B, T = latents.shape[:2]
+        h = self.embed(self._patchify(latents))
+        h = h + self.pos_s + self.pos_t[:, :T]
         cond = self.action_mlp(action)
+        mask = torch.triu(torch.ones(T, T, device=h.device, dtype=torch.bool), 1)
         for blk in self.blocks:
-            h = blk(h, cond)
+            h = blk(h, cond, mask)
         shift, scale = self.ada_out(cond).chunk(2, dim=-1)
-        h = modulate(self.norm(h), shift, scale)
-        return self._unpatchify(self.head(h))
+        h = h.reshape(B * T, self.n_patch, -1)
+        h = modulate(self.norm(h), shift.repeat_interleave(T, 0),
+                     scale.repeat_interleave(T, 0))
+        return self._unpatchify(self.head(h).reshape(B, T, self.n_patch, -1))
 
 
+# ==========================================================================
+# Config
 # ==========================================================================
 
 
@@ -139,48 +177,230 @@ def resolve_model(name: str) -> dict:
                      f"{[m['name'] for m in doc['models']]}")
 
 
-def load_latents(vae: CompactVAE, geometries, friction_mult: float, fraction: float,
-                 device, seed: int):
-    """Encode the corpus's stored horizon frames into VAE latents.
+def flop_budget(model: nn.Module, cfg: dict, n_frames: int, n_patch: int) -> dict:
+    """Forward+backward FLOPs per step and the resulting GPU-hour estimate.
 
-    The stored frames are the four horizons, which is the sequence the world
-    model is asked to predict: conditioning on (s_0, s_std) and predicting the
-    settled frame is exactly the contact outcome under test.
+    Reported, not assumed: §13.3's S2 stage measures real wall-clock and sets
+    S4's --time from it.  This exists so the plan is checkable before spending.
     """
-    data = ds.load_split("train", condition="INTERACT", friction_mult=friction_mult,
-                         keys=["frames", "action", "tuple_index"])
-    frames = data["frames"]          # (N, 4, H, W, 3)
-    actions = data["action"]
-    n = len(frames)
+    n = sum(p.numel() for p in model.parameters())
+    bs = cfg["train"]["batch_size"]
+    steps = cfg["train"]["steps"]
+    tokens = n_frames * n_patch
+    dim = cfg["transformer"]["dim"]
+    depth = cfg["transformer"]["depth"]
+
+    linear = 6 * n * bs * tokens
+    attn_s = 12 * depth * dim * (n_patch ** 2) * n_frames * bs
+    attn_t = 12 * depth * dim * (n_frames ** 2) * n_patch * bs
+    total = linear + attn_s + attn_t
+    out = {"params_M": n / 1e6, "tokens_per_sample": tokens,
+           "tflop_per_step": total / 1e12,
+           "attention_share": (attn_s + attn_t) / total,
+           "steps": steps, "batch_size": bs}
+    for name, tflops in (("a100", 125.0), ("l40s", 65.0)):
+        out[f"gpu_hours_{name}"] = steps * (total / (tflops * 1e12)) / 3600
+    return out
+
+
+# ==========================================================================
+# Latent cache
+# ==========================================================================
+
+
+def build_latent_cache(vae: CompactVAE, clip_root: Path, geometries, cache_path: Path,
+                       device, fraction: float, seed: int, split: str = "train",
+                       overwrite: bool = False) -> tuple:
+    """Encode every WM clip once and memmap the result.
+
+    Cached deliberately: a preempted job that had to re-encode the corpus on
+    every restart would spend most of its wall-clock budget encoding rather
+    than training, and under a 2-hour preemption window it might never make
+    progress at all.
+    """
+    cache_path = Path(cache_path)
+    meta_path = cache_path.with_suffix(".meta.json")
+    if meta_path.exists() and not overwrite:
+        meta = json.loads(meta_path.read_text())
+        lat = np.load(cache_path, mmap_mode="r")
+        act = np.load(cache_path.with_suffix(".actions.npy"))
+        print(f"  latent cache hit: {lat.shape} from {cache_path}")
+        return lat, act, meta
+
+    files = []
+    for g in geometries:
+        files.extend(sorted((Path(clip_root) / g / "INTERACT").glob("*.npz")))
+    if not files:
+        raise FileNotFoundError(f"no WM clips under {clip_root}; run wm/render_clips.py")
+
+    keep = []
+    for f in files:
+        with np.load(f) as z:
+            if str(z["split"]) == split:
+                keep.append(f)
     if fraction < 1.0:
         rng = np.random.default_rng(seed)
-        keep = rng.choice(n, size=max(1, int(n * fraction)), replace=False)
-        frames, actions = frames[keep], actions[keep]
-    lat = []
+        idx = rng.choice(len(keep), size=max(1, int(len(keep) * fraction)), replace=False)
+        keep = [keep[i] for i in sorted(idx)]
+    print(f"  encoding {len(keep)} clips (split={split}, fraction={fraction})", flush=True)
+
+    lat_list, act_list = [], []
     with torch.no_grad():
-        for i in range(0, len(frames), 32):
-            x = torch.from_numpy(np.ascontiguousarray(frames[i : i + 32]))
-            B, T = x.shape[:2]
-            x = x.reshape(B * T, *x.shape[2:]).permute(0, 3, 1, 2).contiguous().float().to(device) / 255.0
+        for i in range(0, len(keep), 8):
+            batch, acts = [], []
+            for f in keep[i : i + 8]:
+                with np.load(f) as z:
+                    batch.append(z["clip"])
+                    acts.append(z["action"])
+            x = torch.from_numpy(np.stack(batch))            # (b, T, H, W, 3)
+            b, T = x.shape[:2]
+            x = x.reshape(b * T, *x.shape[2:]).permute(0, 3, 1, 2)
+            x = x.contiguous().float().to(device) / 255.0
             mu, _ = vae.encode(x)
-            lat.append(mu.reshape(B, T, *mu.shape[1:]).cpu())
-    return torch.cat(lat), torch.from_numpy(actions).float()
+            lat_list.append(mu.reshape(b, T, *mu.shape[1:]).cpu().numpy().astype(np.float16))
+            act_list.append(np.stack(acts))
+            if i % 400 == 0:
+                print(f"    {i}/{len(keep)}", flush=True)
+
+    lat = np.concatenate(lat_list)
+    act = np.concatenate(act_list).astype(np.float32)
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    np.save(cache_path, lat)
+    np.save(cache_path.with_suffix(".actions.npy"), act)
+    meta = {"n": int(lat.shape[0]), "frames": int(lat.shape[1]),
+            "latent_channels": int(lat.shape[2]), "grid": int(lat.shape[-1]),
+            "fraction": fraction, "split": split, "geometries": list(geometries)}
+    meta_path.write_text(json.dumps(meta))
+    return np.load(cache_path, mmap_mode="r"), act, meta
+
+
+# ==========================================================================
+# Checkpointing
+# ==========================================================================
+
+
+class Trainer:
+    """Training loop with wall-clock-budgeted, signal-safe checkpointing."""
+
+    def __init__(self, outdir: Path, max_hours: float | None):
+        self.outdir = Path(outdir)
+        self.outdir.mkdir(parents=True, exist_ok=True)
+        self.deadline = None if not max_hours else time.time() + max_hours * 3600
+        self._stop = False
+        for sig in (signal.SIGTERM, signal.SIGUSR1, signal.SIGINT):
+            try:
+                signal.signal(sig, self._on_signal)
+            except (ValueError, OSError):  # not in main thread / unsupported
+                pass
+
+    def _on_signal(self, signum, frame):
+        print(f"\n[trainer] signal {signum} received; checkpointing and exiting cleanly",
+              flush=True)
+        self._stop = True
+
+    def should_stop(self) -> tuple[bool, str]:
+        if self._stop:
+            return True, "signal"
+        if self.deadline and time.time() > self.deadline:
+            return True, "wall-clock budget"
+        return False, ""
+
+    def latest(self) -> Path | None:
+        cks = sorted(self.outdir.glob("ckpt_step*.pt"))
+        return cks[-1] if cks else None
+
+    def save(self, step: int, model, opt, sched, scaler, cfg, extra=None,
+             tag: str | None = None) -> Path:
+        """Atomic (tmp -> fsync -> rename); a half-written checkpoint on
+        preemption would be worse than none."""
+        path = self.outdir / (tag or f"ckpt_step{step:07d}.pt")
+        tmp = path.with_suffix(".pt.tmp")
+        payload = {
+            "step": step,
+            "state_dict": model.state_dict(),
+            "optimizer": opt.state_dict(),
+            "scheduler": sched.state_dict(),
+            "scaler": scaler.state_dict() if scaler is not None else None,
+            "cfg": cfg,
+            "torch_rng": torch.get_rng_state(),
+            "numpy_rng": np.random.get_state(),
+            "extra": extra or {},
+        }
+        with open(tmp, "wb") as fh:
+            torch.save(payload, fh)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+        return path
+
+    def load(self, model, opt, sched, scaler) -> int:
+        ck_path = self.latest()
+        if ck_path is None:
+            return 0
+        ck = torch.load(ck_path, map_location="cpu", weights_only=False)
+        model.load_state_dict(ck["state_dict"])
+        opt.load_state_dict(ck["optimizer"])
+        sched.load_state_dict(ck["scheduler"])
+        if scaler is not None and ck.get("scaler"):
+            scaler.load_state_dict(ck["scaler"])
+        torch.set_rng_state(ck["torch_rng"])
+        np.random.set_state(ck["numpy_rng"])
+        print(f"[trainer] resumed from {ck_path.name} at step {ck['step']}", flush=True)
+        return int(ck["step"])
+
+
+# ==========================================================================
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--model", default="WM-base")
     ap.add_argument("--vae", type=Path, default=C.CHECKPOINT_ROOT / "wm" / "vae" / "vae.pt")
+    ap.add_argument("--clips", type=Path, default=C.DATA_ROOT / "wm_clips")
     ap.add_argument("--steps", type=int, default=None)
     ap.add_argument("--out", type=Path, default=C.CHECKPOINT_ROOT / "wm")
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--checkpoint-every", type=int, default=12000,
-                    help="model 2 and 3 of the ladder are checkpoints of model 1 -- free")
+    ap.add_argument("--geometries", nargs="+", default=list(C.GEOMETRIES))
+    ap.add_argument("--max-hours", type=float,
+                    default=float(os.environ.get("OGAF_MAX_HOURS", "0")) or None,
+                    help="exit cleanly with a checkpoint after this much wall clock")
+    ap.add_argument("--ckpt-every", type=int, default=2000)
+    ap.add_argument("--budget-only", action="store_true",
+                    help="print the FLOP/GPU-hour budget and exit without training")
     args = ap.parse_args()
 
     cfg = resolve_model(args.model)
+    if args.steps:
+        cfg["train"]["steps"] = args.steps
+    t = cfg["transformer"]
+    v = cfg["vae"]
+    grid = C.RENDER_SIZE // v["downsample"]
+    n_patch = (grid // t["patch"]) ** 2
+
     torch.manual_seed(args.seed)
-    dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    np.random.seed(args.seed)
+    dev = torch.device("cuda" if torch.cuda.is_available() else
+                       ("mps" if torch.backends.mps.is_available() else "cpu"))
+
+    model = VideoWorldModel(
+        latent_channels=v["latent_channels"], grid=grid, patch=t["patch"],
+        dim=t["dim"], depth=t["depth"], heads=t["heads"],
+        max_frames=t["max_frames"],
+    ).to(dev)
+
+    budget = flop_budget(model, cfg, t["max_frames"], n_patch)
+    print(f"=== {args.model} ===")
+    print(f"  params            {budget['params_M']:.1f}M")
+    print(f"  tokens/sample     {budget['tokens_per_sample']} "
+          f"({t['max_frames']} frames x {n_patch} patches)")
+    print(f"  TFLOP/step        {budget['tflop_per_step']:.2f} "
+          f"(attention share {budget['attention_share']:.1%})")
+    print(f"  steps             {budget['steps']}")
+    print(f"  est. GPU-hours    A100 {budget['gpu_hours_a100']:.1f}  "
+          f"L40S {budget['gpu_hours_l40s']:.1f}")
+    if args.budget_only:
+        print(json.dumps(budget, indent=2))
+        return 0
 
     vck = torch.load(args.vae, map_location="cpu", weights_only=False)
     vae = CompactVAE(vck["latent_channels"]).to(dev).eval()
@@ -190,63 +410,74 @@ def main() -> int:
 
     fm = float(cfg["train"].get("friction_mult", 1.0))
     frac = float(cfg["train"].get("fraction", 1.0))
-    print(f"{args.model}: friction_mult={fm}, corpus fraction={frac}, device={dev}")
-    latents, actions = load_latents(vae, C.GEOMETRIES, fm, frac, dev, args.seed)
-    print(f"  encoded {len(latents)} rollouts -> latents {tuple(latents.shape)}")
-
-    t = cfg["transformer"]
-    grid = latents.shape[-1]
-    model = ActionConditionedPredictor(
-        latent_channels=latents.shape[2], grid=grid, patch=t["patch"], dim=t["dim"],
-        depth=t["depth"], heads=t["heads"], context_frames=t["context_frames"],
-    ).to(dev)
-    n_params = sum(p.numel() for p in model.parameters())
-    print(f"  predictor: {n_params / 1e6:.1f}M params")
-
-    steps = args.steps or cfg["train"]["steps"]
-    bs = cfg["train"]["batch_size"]
-    opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"], weight_decay=0.01)
-    warm = cfg["train"]["warmup"]
-    sched = torch.optim.lr_scheduler.LambdaLR(
-        opt, lambda s: min(1.0, (s + 1) / warm) *
-        0.5 * (1 + math.cos(math.pi * min(1.0, max(0, s - warm) / max(1, steps - warm)))))
+    clip_root = Path(args.clips)
+    if abs(fm - 1.0) > 1e-9:
+        clip_root = clip_root.parent / f"{clip_root.name}_fm{fm:g}"
+    cache = C.DATA_ROOT / "wm_latents" / f"{args.model}.npy"
+    latents, actions, meta = build_latent_cache(
+        vae, clip_root, args.geometries, cache, dev, frac, args.seed
+    )
+    print(f"  latents {latents.shape}  actions {actions.shape}", flush=True)
 
     outdir = Path(args.out) / args.model
-    outdir.mkdir(parents=True, exist_ok=True)
-    rng = np.random.default_rng(args.seed)
-    hist = []
-    ctx = t["context_frames"]
+    trainer = Trainer(outdir, args.max_hours)
+    opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"], weight_decay=0.01)
+    steps = cfg["train"]["steps"]
+    warm = cfg["train"]["warmup"]
+    sched = torch.optim.lr_scheduler.LambdaLR(
+        opt, lambda s: min(1.0, (s + 1) / warm) * 0.5 *
+        (1 + math.cos(math.pi * min(1.0, max(0, s - warm) / max(1, steps - warm)))))
+    use_amp = dev.type == "cuda"
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+
+    start = trainer.load(model, opt, sched, scaler)
+    if start >= steps:
+        print(f"  already complete at step {start}")
+        return 0
+
+    bs = cfg["train"]["batch_size"]
+    rng = np.random.default_rng(args.seed + start)
+    hist, t0 = [], time.time()
 
     model.train()
-    for step in range(steps):
-        idx = rng.integers(0, len(latents), size=bs)
-        z = latents[idx].to(dev)                    # (B, 4, Cl, G, G)
-        a = actions[idx].to(dev)
-        # Condition on (s_0, s_std); predict s_del -- the contact outcome.
-        context = z[:, :ctx]
-        target = z[:, ctx]
-        pred = model(context, a)
-        loss = F.mse_loss(pred, target)
+    for step in range(start, steps):
+        idx = np.sort(rng.integers(0, len(latents), size=bs))
+        z = torch.from_numpy(np.asarray(latents[idx]).astype(np.float32)).to(dev)
+        a = torch.from_numpy(actions[idx]).to(dev)
+        with torch.amp.autocast("cuda", enabled=use_amp):
+            pred = model(z[:, :-1], a)          # predict frames 1..T-1
+            loss = F.mse_loss(pred, z[:, 1:])
         opt.zero_grad(set_to_none=True)
-        loss.backward()
+        scaler.scale(loss).backward()
+        scaler.unscale_(opt)
         nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        opt.step()
+        scaler.step(opt)
+        scaler.update()
         sched.step()
-        if step % 500 == 0:
-            hist.append({"step": step, "loss": float(loss)})
-            print(f"  step {step:6d}  loss={float(loss):.6f}", flush=True)
-        if args.checkpoint_every and step > 0 and step % args.checkpoint_every == 0:
-            torch.save({"state_dict": model.state_dict(), "step": step,
-                        "cfg": cfg, "vae": str(args.vae)},
-                       outdir / f"step{step:06d}.pt")
 
-    torch.save({"state_dict": model.state_dict(), "step": steps, "cfg": cfg,
-                "vae": str(args.vae)}, outdir / "final.pt")
+        if step % 200 == 0:
+            hist.append({"step": step, "loss": float(loss)})
+            el = time.time() - t0
+            rate = (step - start + 1) / max(el, 1e-9)
+            print(f"  step {step:7d}/{steps}  loss={float(loss):.6f}  "
+                  f"{rate:.2f} it/s  eta {(steps - step) / max(rate, 1e-9) / 3600:.2f} h",
+                  flush=True)
+
+        stop, why = trainer.should_stop()
+        if stop or (step > start and step % args.ckpt_every == 0):
+            p = trainer.save(step, model, opt, sched, scaler, cfg)
+            if stop:
+                print(f"[trainer] stopped at step {step} ({why}); saved {p.name}.\n"
+                      f"[trainer] re-run the SAME command to resume -- SLURM --requeue "
+                      f"does exactly that.", flush=True)
+                return 0
+
+    trainer.save(steps, model, opt, sched, scaler, cfg, tag="final.pt")
     provenance.save_run(outdir, f"wm_train::{args.model}",
                         {"loss": np.asarray([h["loss"] for h in hist])},
                         seeds={"seed": args.seed},
-                        extra={"config": cfg, "n_params": n_params, "steps": steps,
-                               "friction_mult": fm, "corpus_fraction": frac},
+                        extra={"config": cfg, "budget": budget, "latent_meta": meta,
+                               "vae": str(args.vae)},
                         arrays_name="history.npz")
     print(f"wrote {outdir}")
     return 0

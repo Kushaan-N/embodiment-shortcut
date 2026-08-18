@@ -15,25 +15,41 @@ base:
     downsample: 8          # 224 -> 28
     ckpt: null             # set by wm_train.py
   transformer:
-    # 87.0M measured, not estimated -- AdaLN conditioning costs 6*dim^2 per
-    # block on top of a standard ViT trunk, so dim=768/depth=12 is 129.5M and
-    # breaches §9-H's "~50-100M params". depth=8 lands at 87.0M.
-    params_millions: 87
+    # 90.5M MEASURED (not estimated) for depth=6/dim=768 with factorised
+    # spatiotemporal attention.  AdaLN modulation costs 9*dim^2 per block on
+    # top of the trunk, so depth=8 would be 120.1M and breach §9-H's
+    # "~50-100M params".  depth=6 lands at 90.5M.
+    params_millions: 90.5
     dim: 768
-    depth: 8
+    depth: 6
     heads: 12
-    patch: 2               # over the 28x28 latent grid
-    action_conditioning: adaln   # a in R^3 -> AdaLN scale/shift
-    context_frames: 2
-    predict_frames: 1      # autoregressive rollout
+    patch: 2                   # over the 28x28 latent grid -> 196 patches/frame
+    action_conditioning: adaln  # a in R^3 -> AdaLN scale/shift on all 3 sublayers
+    max_frames: 16              # clip length spanning [0, s_del]
+    attention: factorised       # spatial (full, 196) then temporal (CAUSAL, 16)
+    #: Causal temporal masking is what makes this a GENERATOR rather than an
+    #: interpolator: without it, "predicting" frame t could simply read frame
+    #: t+1, and every Experiment H number would be meaningless.
+    autoregressive: true
   train:
     corpus: INTERACT
     fraction: 1.0
-    steps: 120000
-    batch_size: 32
+    #: 27.85 TFLOP/step measured at batch 16 (attention is only 2.1% of it --
+    #: factorising is what keeps it there).  150k steps ~ 9.3 A100-hours per run
+    #: at ~40% MFU; x3 full runs ~ 28 GPU-h nominal, ~85 GPU-h at realistic MFU
+    #: once the VAE, latent encoding, generation and IDM scoring are included.
+    #: Inside the ~100 GPU-hour budget.  §13.3's S2 stage measures the real rate
+    #: and S4's --time is set from it -- do not trust this arithmetic over that.
+    steps: 150000
+    batch_size: 16
     lr: 1.0e-4
     warmup: 2000
     precision: bf16
+    #: Wall-clock budget per job.  Training checkpoints, exits cleanly, and
+    #: resumes on the next launch, so the run survives gpu-preempt's 2-hour
+    #: kill and any partition time limit.
+    max_hours_per_job: 1.8
+    ckpt_every_steps: 2000
 
 models:
   - id: 1
