@@ -298,3 +298,62 @@ def test_decoy_placement_is_outside_every_push_corridor():
     for g in C.GEOMETRIES:
         out = scene.assert_corridor_decoy_disjoint(g)
         assert out["passed"], out
+
+
+# ==========================================================================
+# Masking decomposition (§8.4)
+# ==========================================================================
+
+
+def test_composite_mask_keeps_only_the_requested_label():
+    import idm
+
+    frames = np.full((4, 2, 8, 8, 3), 200, np.uint8)
+    masks = np.zeros((4, 2, 8, 8), np.uint8)
+    masks[..., 2:5, 2:5] = C.SEG_OBJECT
+    bg = np.full((8, 8, 3), 30, np.uint8)
+    out = idm.composite_mask(frames, masks, bg, C.SEG_OBJECT)
+    assert out.shape == frames.shape
+    assert (out[..., 2:5, 2:5, :] == 200).all()      # kept region survives
+    assert (out[..., 0, 0, :] == 30).all()           # elsewhere is background
+
+
+def test_composite_mask_accepts_mask_with_or_without_channel_axis():
+    """Boolean fancy-indexing does not broadcast a trailing size-1 axis."""
+    import idm
+
+    frames = np.full((2, 4, 4, 3), 100, np.uint8)
+    masks = np.zeros((2, 4, 4), np.uint8)
+    masks[:, 1, 1] = C.SEG_ARM
+    bg = np.zeros((4, 4, 3), np.uint8)
+    a = idm.composite_mask(frames, masks, bg, C.SEG_ARM)
+    b = idm.composite_mask(frames, masks[..., None], bg, C.SEG_ARM)
+    assert np.array_equal(a, b)
+
+
+def test_composite_mask_fills_with_background_not_black():
+    """§8.4: a black fill lets the probe read mask SHAPE instead of content."""
+    import idm
+
+    frames = np.full((1, 4, 4, 3), 250, np.uint8)
+    masks = np.zeros((1, 4, 4), np.uint8)
+    bg = np.full((4, 4, 3), 77, np.uint8)
+    out = idm.composite_mask(frames, masks, bg, C.SEG_OBJECT)
+    assert (out == 77).all() and not (out == 0).any()
+
+
+def test_masked_frames_modes_are_complementary():
+    import idm_data as idd
+
+    frames = np.full((1, 2, 6, 6, 3), 200, np.uint8)
+    masks = np.zeros((1, 2, 6, 6), np.uint8)
+    masks[..., 0:2, :] = C.SEG_ARM
+    masks[..., 4:6, :] = C.SEG_OBJECT
+    bg = np.zeros((6, 6, 3), np.uint8)
+    arm_masked = idd.masked_frames(frames, masks, "arm_masked", bg)      # object only
+    obj_masked = idd.masked_frames(frames, masks, "object_masked", bg)   # arm only
+    assert (arm_masked[..., 4:6, :, :] == 200).all()
+    assert (arm_masked[..., 0:2, :, :] == 0).all()
+    assert (obj_masked[..., 0:2, :, :] == 200).all()
+    assert (obj_masked[..., 4:6, :, :] == 0).all()
+    assert np.array_equal(idd.masked_frames(frames, masks, "full", bg), frames)

@@ -122,8 +122,7 @@ def masked_frames(frames: np.ndarray, masks: np.ndarray, mode: str,
         return frames
     if mode not in _MASK_KEEP:
         raise ValueError(f"unknown mask mode {mode!r}")
-    return idm.composite_mask(frames, masks[..., None], background[None, ...],
-                              _MASK_KEEP[mode])
+    return idm.composite_mask(frames, masks, background, _MASK_KEEP[mode])
 
 
 # ==========================================================================

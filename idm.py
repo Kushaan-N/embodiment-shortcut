@@ -131,9 +131,23 @@ def composite_mask(frames: np.ndarray, masks: np.ndarray, background: np.ndarray
     Filling with the empty-scene render rather than black is what stops the
     probe from reading the *shape of the mask* instead of the content it was
     supposed to isolate (§8.4).
+
+    ``masks`` may be given with or without a trailing channel axis.  Boolean
+    fancy-indexing does NOT broadcast a trailing size-1 axis -- it raises --
+    so the selector is explicitly broadcast to the frame shape here rather
+    than relying on numpy to do it.
     """
+    frames = np.asarray(frames)
+    masks = np.asarray(masks)
+    background = np.asarray(background)
+    if masks.ndim == frames.ndim - 1:
+        masks = masks[..., None]
+    if masks.ndim != frames.ndim:
+        raise ValueError(
+            f"mask ndim {masks.ndim} incompatible with frames ndim {frames.ndim}"
+        )
     out = np.broadcast_to(background, frames.shape).copy()
-    sel = masks == keep
+    sel = np.broadcast_to(masks == keep, frames.shape)
     out[sel] = frames[sel]
     return out
 
