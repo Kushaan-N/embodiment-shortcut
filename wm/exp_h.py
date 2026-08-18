@@ -118,10 +118,17 @@ def dino_state_distance(generated: np.ndarray, real: np.ndarray, encoder_name: s
 
 
 def ground_truth_error(generated: np.ndarray, real: np.ndarray) -> np.ndarray:
-    """Privileged comparison against the simulator's own settled frame."""
+    """Privileged comparison against the simulator's own video.
+
+    Averaged over the whole clip, not just the final frame: a model that
+    happens to land the settled pose after diverging wildly mid-rollout is not
+    a good world model, and the ladder-monotonicity check depends on this
+    number ordering the models honestly.
+    """
     g = generated.astype(np.float64)
     r = real.astype(np.float64)
-    return np.abs(g - r).mean(axis=(1, 2, 3)) / 255.0
+    axes = tuple(range(1, g.ndim))
+    return np.abs(g - r).mean(axis=axes) / 255.0
 
 
 def main() -> int:
@@ -149,7 +156,10 @@ def main() -> int:
         except FileNotFoundError as exc:
             print(f"  {name}: {exc}")
             continue
-        pairs = np.stack([g["conditioning"][:, 0], g["generated"]], axis=1)
+        # The IDM scores an (s_0, s_del) pair.  s_0 is the conditioning frame;
+        # s_del is the LAST generated frame, since WM clips span [0, s_del].
+        gen_last = g["generated"][:, -1] if g["generated"].ndim == 5 else g["generated"]
+        pairs = np.stack([g["conditioning"][:, 0], gen_last], axis=1)
 
         std_e = np.mean([score_with_idm("A-std", s, pairs, g["action"], augmented=True,
                                         ckpt_root=args.ckpt_root, device=dev)
@@ -160,7 +170,8 @@ def main() -> int:
         std_clean = np.mean([score_with_idm("A-std", s, pairs, g["action"], augmented=False,
                                             ckpt_root=args.ckpt_root, device=dev)
                              for s in args.seeds], axis=0)
-        dino = dino_state_distance(g["generated"], g["real"], args.encoder, dev)
+        real_last = g["real"][:, -1] if g["real"].ndim == 5 else g["real"]
+        dino = dino_state_distance(gen_last, real_last, args.encoder, dev)
         gt = ground_truth_error(g["generated"], g["real"])
 
         for k, v in [("standard", std_e), ("ogaf", del_e), ("standard_clean", std_clean),
