@@ -74,7 +74,7 @@ def main() -> int:
     ap.add_argument("--seeds", type=int, default=len(C.MASKING_SEEDS))
     ap.add_argument("--variants", nargs="+", default=list(PROBE_VARIANTS))
     ap.add_argument("--mask-modes", nargs="+", default=list(idd.MASK_MODES))
-    ap.add_argument("--encoder", default=C.ENCODERS[0])
+    ap.add_argument("--encoder", default=C.GATE_B_SELECTED_ENCODER)
     ap.add_argument("--geometries", nargs="+", default=list(C.GEOMETRIES))
     ap.add_argument("--ckpt-root", type=Path, default=C.CHECKPOINT_ROOT)
     ap.add_argument("--out", type=Path, default=C.RESULTS_ROOT / "exp_masking")

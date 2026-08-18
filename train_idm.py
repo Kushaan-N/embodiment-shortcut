@@ -35,7 +35,8 @@ import protocol as proto_mod
 import provenance
 import scene
 
-DEFAULT_ENCODER = C.ENCODERS[0]
+#: Gate B selected this; see config.GATE_B_EVIDENCE for the measurement.
+DEFAULT_ENCODER = C.GATE_B_SELECTED_ENCODER
 
 
 # ==========================================================================

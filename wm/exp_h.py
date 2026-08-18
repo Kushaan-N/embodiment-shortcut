@@ -130,7 +130,7 @@ def main() -> int:
     ap.add_argument("--ckpt-root", type=Path, default=C.CHECKPOINT_ROOT)
     ap.add_argument("--geometry", default="box", choices=C.GEOMETRIES)
     ap.add_argument("--seeds", type=int, nargs="+", default=[0])
-    ap.add_argument("--encoder", default=C.ENCODERS[0])
+    ap.add_argument("--encoder", default=C.GATE_B_SELECTED_ENCODER)
     ap.add_argument("--out", type=Path, default=C.RESULTS_ROOT / "exp_h")
     args = ap.parse_args()
 

@@ -274,8 +274,29 @@ CLIP_VARIANTS: tuple[str, ...] = ("A-std", "A-clip-del")
 #: file for the provenance record and justification.
 CLIP_LENGTH = 16
 
+#: Encoders that Experiment B *tests*.  Both are swept; neither is assumed.
 ENCODERS = ("facebook/dinov2-large", "facebook/dinov3-vitl16-pretrain-lvd1689m")
 ENCODER_POOLINGS = ("cls", "mean_patch")
+
+#: The encoder/pooling Gate B SELECTED, and the measurement that selected it.
+#: Set from results/exp_b/results.json after the gate ran -- not chosen a priori.
+#: DINOv2 failed the same gate on the same renders (+0.55 sigma), so this is a
+#: measured selection, not a preference.
+GATE_B_SELECTED_ENCODER = "facebook/dinov3-vitl16-pretrain-lvd1689m"
+GATE_B_SELECTED_POOLING = "cls"
+GATE_B_EVIDENCE = {
+    "translation_at_delta_min_sigma": 13.90,
+    "rejected": {"facebook/dinov2-large/cls": 0.55,
+                 "facebook/dinov2-large/mean_patch": 0.19},
+    "threshold_sigma": 3.0,
+    #: The rotation channel does NOT pass at delta_rot_min for ANY encoder
+    #: tested: DINOv3/CLS is -1.50 sigma there and only crosses 3 sigma at
+    #: ~7.9x delta_rot_min (~1.11 deg).  Gate B passes on translation, and the
+    #: rotation limit is a stated caveat on every rotation-bearing distance
+    #: (the DINO state distance in H, and the box/cylinder probes).
+    "rotation_resolvable_from_deg": 1.11,
+    "rotation_at_delta_rot_min_sigma": -1.50,
+}
 
 # --------------------------------------------------------------------------
 # Statistics (§10, pre-registered)
@@ -503,6 +524,9 @@ def as_dict() -> dict:
         "clip_variants": list(CLIP_VARIANTS),
         "clip_length": CLIP_LENGTH,
         "encoders": list(ENCODERS),
+        "gate_b_selected_encoder": GATE_B_SELECTED_ENCODER,
+        "gate_b_selected_pooling": GATE_B_SELECTED_POOLING,
+        "gate_b_evidence": GATE_B_EVIDENCE,
         "n_bootstrap": N_BOOTSTRAP,
         "bootstrap_ci": BOOTSTRAP_CI,
         "bootstrap_seed": BOOTSTRAP_SEED,

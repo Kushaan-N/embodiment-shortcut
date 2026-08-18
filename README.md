@@ -28,7 +28,7 @@ occupied in RL.
 | 2. `scene.py` + validators + contact sheet | visual inspection | ✋ **awaiting human review** |
 | 3. Experiment 0 — state oracles | **Gate C0** | **PASS** |
 | 4. Experiment A — contact deltas | thresholds written | **done** |
-| 5. Experiment B — encoder floor | **Gate B** | **FAIL** — STOP, see below |
+| 5. Experiment B — encoder floor | **Gate B** | **PASS** (DINOv3; DINOv2 fails) |
 | 6. Experiment C — injectivity | **Gate C** | **PASS** |
 | 7. Corpus + `validate_corpus.py` | T11, T7 | not run |
 | 8–12 | — | not run |
@@ -50,42 +50,31 @@ prior baseline, and does so **identically in INTERACT and DECOY** (difference
 prior) while the settled object still carries real signal. The shortcut channel
 exists, and OG-AF has something to measure. Established for **zero GPU-hours**.
 
-### Gate B (Experiment B), measured — **FAIL**
-
-DINOv2-ViT-L/14 cannot resolve a `delta_pos_min` object displacement above its
-own noise floor. Measured at the pre-declared 3σ bar:
+### Gate B (Experiment B), measured — **PASS**, on one encoder only
 
 | encoder / pooling | translation @ δ_min | rotation @ δ_min | verdict |
 |---|---|---|---|
-| dinov2-large / CLS | **+0.55 σ** | −1.10 σ | fail |
-| dinov2-large / mean-patch | **+0.19 σ** | −1.08 σ | fail |
-| dinov3-vitl16 | — | — | **untested — gated repo, 401** |
+| dinov2-large / CLS | +0.55 σ | −1.10 σ | **fail** |
+| dinov2-large / mean-patch | +0.19 σ | −1.08 σ | **fail** |
+| **dinov3-vitl16 / CLS** | **+13.90 σ** | −1.50 σ | **PASS** |
+| dinov3-vitl16 / mean-patch | +7.00 σ | −1.56 σ | PASS |
 
-The translation sweep shows *where* the encoder does become sensitive:
+Gate B requires ≥3 σ for *at least one* encoder/pooling. It is met, but the
+headline is the **25× gap between two encoders evaluated on byte-identical
+renders**. DINOv2 cannot see a 1.7 px object displacement; DINOv3 sees it at
+13.9 σ, and is still at +2.41 σ for a **0.17 px** displacement — its true floor
+is below the swept range. Encoder choice is not a detail for anyone building a
+feature-space metric on contact-scale geometry.
 
-| displacement | ≈ px | σ over floor (CLS) |
-|---|---|---|
-| 4.8 mm (1× δ_min) | 1.7 | +0.55 |
-| 8.7 mm (1.8×) | 3.2 | +1.52 |
-| 14.2 mm (3.0×) | 5.1 | +2.90 |
-| **18.1 mm (3.8×)** | **6.5** | **+3.12 — crosses the bar** |
-| 47.6 mm (10×) | 17.2 | +4.07 |
+**Caveat that must travel with every rotation-bearing distance:** the rotation
+channel fails at `δ_rot_min` for *every* encoder tested (DINOv3/CLS: −1.50 σ).
+It first clears 3 σ at ~**1.11°**, about 7.9× `δ_rot_min`. So the DINO state
+distance in Experiment H, and the box/cylinder probes, are effectively blind to
+sub-degree reorientation. Gate B passes on translation; this limit is recorded
+in `config.GATE_B_EVIDENCE` and belongs in `prereg.md`.
 
-So the response is real and monotone, but the sensitivity threshold sits at
-**~3.8× the smallest per-video-frame contact displacement** — roughly 6 px of
-object motion. Below that, DINO cosine distance is indistinguishable from
-sub-pixel camera jitter.
-
-Two diagnostics a reviewer should weigh, neither of which is a licence to move
-the bar:
-
-- The noise floor is **heavy-tailed relative to its own mean** (sd/mean ≈ 0.85
-  on 20 samples), so a 3σ bar over it is a demanding test.
-- The floor perturbation is a **whole-image camera shift** (0.48 mm ≈ 0.17 px
-  across all 256 patches) while the signal is an **object-only shift** (4.8 mm
-  ≈ 1.7 px across ~4–9 patches). Per metre, camera jitter disturbs a global
-  feature far more. §9-B specifies this comparison; it was implemented
-  literally.
+Selection is recorded as a measurement, not a preference:
+`config.GATE_B_SELECTED_ENCODER` with the rejected alternatives and their σ.
 
 ### Gate C (Experiment C), measured
 
