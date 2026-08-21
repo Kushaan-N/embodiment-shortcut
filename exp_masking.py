@@ -63,9 +63,17 @@ def train_all(variants, seeds, mask_modes, encoder, geometries, python=sys.execu
                        "--mask-mode", mode, "--encoder", encoder,
                        "--geometries", *geometries]
                 print(f"  train {tag}", flush=True)
-                r = subprocess.run(cmd, cwd=C.REPO_ROOT)
+                # Capture the child's output so a failure surfaces its actual
+                # traceback.  Inheriting stderr loses it whenever this runs
+                # under a job runner that buffers per-process, which turns a
+                # one-line bug into a blind re-run.
+                r = subprocess.run(cmd, cwd=C.REPO_ROOT, text=True,
+                                   capture_output=True)
+                if r.stdout:
+                    print(r.stdout, flush=True)
                 if r.returncode != 0:
-                    raise RuntimeError(f"training failed for {tag}")
+                    print(f"--- stderr of {tag} ---\n{r.stderr}", flush=True)
+                    raise RuntimeError(f"training failed for {tag}; see stderr above")
 
 
 def main() -> int:
