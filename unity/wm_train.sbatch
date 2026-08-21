@@ -37,21 +37,20 @@
 
 set -euo pipefail
 
-export MUJOCO_GL=egl
-export PYOPENGL_PLATFORM=egl
-export HF_HUB_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
-export OGAF_DATA=${OGAF_DATA:?set OGAF_DATA to your ws_allocate workspace}
-export OGAF_RESULTS=${OGAF_RESULTS:-$OGAF_DATA/results}
-export OGAF_CKPT=${OGAF_CKPT:-$OGAF_DATA/checkpoints}
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
-export TOKENIZERS_PARALLELISM=false
+# --- environment -----------------------------------------------------------
+# SLURM spools a COPY of this script to the node, so ${BASH_SOURCE[0]} does not
+# point into the repo under sbatch; SLURM_SUBMIT_DIR does (submit from the repo
+# root).  The fallback covers interactive `bash unity/*.sbatch` runs.
+_OGAF_REPO="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+if [[ ! -f "$_OGAF_REPO/unity/env.sh" ]]; then
+  echo "cannot find unity/env.sh under $_OGAF_REPO; submit from the repo root" >&2
+  exit 1
+fi
+source "$_OGAF_REPO/unity/env.sh"
 
 # Stop ~10 min before the SLURM limit so the final checkpoint always lands.
 # Read from the ladder so the two cannot drift apart.
 export OGAF_MAX_HOURS=${OGAF_MAX_HOURS:-1.8}
-
-mkdir -p logs "$OGAF_CKPT"
 
 MODELS=(WM-base WM-data-poor WM-physics-corrupted)
 
