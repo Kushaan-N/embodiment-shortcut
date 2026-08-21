@@ -2,7 +2,14 @@
 __pycache__/
 *.pyc
 data/
-results/
+# Results: version the small JSON records (the measured gate values are the
+# evidence the pre-registration discipline rests on); keep arrays and figures out.
+results/*
+!results/*/
+results/*/*
+!results/*/results.json
+!results/*/thresholds.json
+!results/*/report.json
 logs/
 *.npz
 *.npy
