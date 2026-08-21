@@ -32,18 +32,15 @@
 set -euo pipefail
 
 # --- environment -----------------------------------------------------------
-export MUJOCO_GL=egl            # MUST be set before the first `import mujoco`
-export PYOPENGL_PLATFORM=egl
-export HF_HUB_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
-export HF_HOME=${HF_HOME:-/datasets/ai/dinov2}
-export OGAF_DATA=${OGAF_DATA:?set OGAF_DATA to your ws_allocate workspace}
-export OGAF_RESULTS=${OGAF_RESULTS:-$OGAF_DATA/results}
-export OGAF_CKPT=${OGAF_CKPT:-$OGAF_DATA/checkpoints}
-export TOKENIZERS_PARALLELISM=false
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
-
-mkdir -p logs "$OGAF_RESULTS" "$OGAF_CKPT"
+# SLURM spools a COPY of this script to the node, so ${BASH_SOURCE[0]} does not
+# point into the repo under sbatch; SLURM_SUBMIT_DIR does (submit from the repo
+# root).  The fallback covers interactive `bash unity/*.sbatch` runs.
+_OGAF_REPO="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+if [[ ! -f "$_OGAF_REPO/unity/env.sh" ]]; then
+  echo "cannot find unity/env.sh under $_OGAF_REPO; submit from the repo root" >&2
+  exit 1
+fi
+source "$_OGAF_REPO/unity/env.sh"
 
 # --- clean SIGTERM so --requeue resumes rather than corrupting --------------
 trap 'echo "SIGTERM received; exiting cleanly for requeue"; exit 143' TERM
