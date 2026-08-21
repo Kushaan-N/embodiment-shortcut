@@ -1,0 +1,895 @@
+{
+  "_gate_B": {
+    "passed": true,
+    "report": "GATE B: PASS  (need >= 3.0 sigma above the noise floor at delta_min, for at least one encoder/pooling)\n  facebook/dinov2-large / cls: translation 0.55 sigma, rotation -1.10 sigma -> fail\n  facebook/dinov2-large / mean_patch: translation 0.19 sigma, rotation -1.08 sigma -> fail\n  facebook/dinov3-vitl16-pretrain-lvd1689m / cls: translation 13.90 sigma, rotation -1.50 sigma -> PASS\n  facebook/dinov3-vitl16-pretrain-lvd1689m / mean_patch: translation 7.00 sigma, rotation -1.56 sigma -> PASS\n\n  Use facebook/dinov3-vitl16-pretrain-lvd1689m / cls for Architecture B and the DINO state distance.\n  Record its noise floor as the T9 arm-deviation tolerance target (\u00a74-T9).",
+    "winners": [
+      [
+        "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "cls",
+        13.903454456992138,
+        -1.4984442688498922
+      ],
+      [
+        "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "mean_patch",
+        7.003489777631329,
+        -1.558196421456467
+      ]
+    ]
+  },
+  "delta_pos_min": 0.004759986888016724,
+  "delta_rot_min": 0.0024666134668313304,
+  "encoders": {
+    "facebook/dinov2-large": {
+      "cls": {
+        "gate_threshold": 0.004119341145269573,
+        "noise_floor_mean": 0.0011565238237380981,
+        "noise_floor_std": 0.0009876057738438249,
+        "passed": false,
+        "passed_rotation": false,
+        "passed_translation": false,
+        "rotation_at_delta_min_mean": 6.927848153281957e-05,
+        "rotation_at_delta_min_sigma": -1.1008900221124165,
+        "rotation_curve": [
+          {
+            "magnitude_rad": 0.00024666134668313317,
+            "mean_distance": 8.445977982773911e-06,
+            "sigma_over_floor": -1.162485959642512
+          },
+          {
+            "magnitude_rad": 0.00031431438401816514,
+            "mean_distance": 8.088350114121567e-06,
+            "sigma_over_floor": -1.162848075658967
+          },
+          {
+            "magnitude_rad": 0.00040052295720103664,
+            "mean_distance": 9.405613127455581e-06,
+            "sigma_over_floor": -1.1615142812966606
+          },
+          {
+            "magnitude_rad": 0.0005103763855611282,
+            "mean_distance": 1.3315677279024385e-05,
+            "sigma_over_floor": -1.1575551467359637
+          },
+          {
+            "magnitude_rad": 0.0006503598614141235,
+            "mean_distance": 2.0831823348999023e-05,
+            "sigma_over_floor": -1.1499446747551032
+          },
+          {
+            "magnitude_rad": 0.0008287373031053741,
+            "mean_distance": 2.1141768229426816e-05,
+            "sigma_over_floor": -1.1496308401374484
+          },
+          {
+            "magnitude_rad": 0.001056039215066255,
+            "mean_distance": 2.2971629732637666e-05,
+            "sigma_over_floor": -1.1477780142916771
+          },
+          {
+            "magnitude_rad": 0.0013456843556805004,
+            "mean_distance": 2.3472308384953067e-05,
+            "sigma_over_floor": -1.1472710522370035
+          },
+          {
+            "magnitude_rad": 0.0017147719130956999,
+            "mean_distance": 3.348588870721869e-05,
+            "sigma_over_floor": -1.1371318037762619
+          },
+          {
+            "magnitude_rad": 0.0021850909550441577,
+            "mean_distance": 4.156231807428412e-05,
+            "sigma_over_floor": -1.1289540170713184
+          },
+          {
+            "magnitude_rad": 0.0027844067454989405,
+            "mean_distance": 6.927848153281957e-05,
+            "sigma_over_floor": -1.1008900221124165
+          },
+          {
+            "magnitude_rad": 0.0035480998658123744,
+            "mean_distance": 0.000126892322441563,
+            "sigma_over_floor": -1.0425531407022293
+          },
+          {
+            "magnitude_rad": 0.004521254905781353,
+            "mean_distance": 0.00019403695478104055,
+            "sigma_over_floor": -0.9745658586127915
+          },
+          {
+            "magnitude_rad": 0.005761322030424756,
+            "mean_distance": 0.00023878217325545847,
+            "sigma_over_floor": -0.9292590978996917
+          },
+          {
+            "magnitude_rad": 0.007341508547950661,
+            "mean_distance": 0.0003586888196878135,
+            "sigma_over_floor": -0.8078476505306968
+          },
+          {
+            "magnitude_rad": 0.00935510069997926,
+            "mean_distance": 0.0003899693547282368,
+            "sigma_over_floor": -0.7761745519433147
+          },
+          {
+            "magnitude_rad": 0.011920970810717444,
+            "mean_distance": 0.00048511027125641704,
+            "sigma_over_floor": -0.6798396387138328
+          },
+          {
+            "magnitude_rad": 0.015190594909394443,
+            "mean_distance": 0.0006899774307385087,
+            "sigma_over_floor": -0.47240144332465883
+          },
+          {
+            "magnitude_rad": 0.019356995110990705,
+            "mean_distance": 0.0009503543260507286,
+            "sigma_over_floor": -0.20875687764050296
+          },
+          {
+            "magnitude_rad": 0.024666134668313303,
+            "mean_distance": 0.0012712717289105058,
+            "sigma_over_floor": 0.11618796508833827
+          }
+        ],
+        "translation_at_delta_min_mean": 0.0016967892879620194,
+        "translation_at_delta_min_sigma": 0.5470456720004517,
+        "translation_curve": [
+          {
+            "magnitude_m": 0.00047599868880167265,
+            "mean_distance": 0.0005083978176116943,
+            "sigma_over_floor": -0.6562598389880366
+          },
+          {
+            "magnitude_m": 0.0006065532223674617,
+            "mean_distance": 0.0007073998567648232,
+            "sigma_over_floor": -0.45476036984398716
+          },
+          {
+            "magnitude_m": 0.0007729155987604875,
+            "mean_distance": 0.0007435738807544112,
+            "sigma_over_floor": -0.41813237014244997
+          },
+          {
+            "magnitude_m": 0.000984907013560249,
+            "mean_distance": 0.0009377539390698075,
+            "sigma_over_floor": -0.2215153965907107
+          },
+          {
+            "magnitude_m": 0.0012550423706234022,
+            "mean_distance": 0.0011005044216290116,
+            "sigma_over_floor": -0.05672243276895336
+          },
+          {
+            "magnitude_m": 0.0015992690988829625,
+            "mean_distance": 0.0014722466003149748,
+            "sigma_over_floor": 0.3196850250764163
+          },
+          {
+            "magnitude_m": 0.00203790860811455,
+            "mean_distance": 0.0016018688911572099,
+            "sigma_over_floor": 0.45093404596633757
+          },
+          {
+            "magnitude_m": 0.002596855962469464,
+            "mean_distance": 0.0017089664470404387,
+            "sigma_over_floor": 0.5593756516349621
+          },
+          {
+            "magnitude_m": 0.0033091085944488728,
+            "mean_distance": 0.001352500868961215,
+            "sigma_over_floor": 0.19843651223338
+          },
+          {
+            "magnitude_m": 0.004216714306881453,
+            "mean_distance": 0.0014741302002221346,
+            "sigma_over_floor": 0.3215922637307922
+          },
+          {
+            "magnitude_m": 0.005373253563115568,
+            "mean_distance": 0.0016967892879620194,
+            "sigma_over_floor": 0.5470456720004517
+          },
+          {
+            "magnitude_m": 0.006847002607318401,
+            "mean_distance": 0.001918834401294589,
+            "sigma_over_floor": 0.7718774006246737
+          },
+          {
+            "magnitude_m": 0.008724964149549973,
+            "mean_distance": 0.002658545970916748,
+            "sigma_over_floor": 1.5208721809439039
+          },
+          {
+            "magnitude_m": 0.011118003566928143,
+            "mean_distance": 0.0033565640915185213,
+            "sigma_over_floor": 2.227650269011415
+          },
+          {
+            "magnitude_m": 0.014167393836294753,
+            "mean_distance": 0.004020971246063709,
+            "sigma_over_floor": 2.9003955811001374
+          },
+          {
+            "magnitude_m": 0.018053155578195167,
+            "mean_distance": 0.004238539841026068,
+            "sigma_over_floor": 3.120694612074377
+          },
+          {
+            "magnitude_m": 0.02300468456630109,
+            "mean_distance": 0.005271696951240301,
+            "sigma_over_floor": 4.166817607278343
+          },
+          {
+            "magnitude_m": 0.029314294096828414,
+            "mean_distance": 0.005132895894348621,
+            "sigma_over_floor": 4.026274628928331
+          },
+          {
+            "magnitude_m": 0.0373544716911335,
+            "mean_distance": 0.003988009877502918,
+            "sigma_over_floor": 2.8670205549168624
+          },
+          {
+            "magnitude_m": 0.04759986888016724,
+            "mean_distance": 0.005178189370781183,
+            "sigma_over_floor": 4.072136528111319
+          }
+        ]
+      },
+      "mean_patch": {
+        "gate_threshold": 0.0018699828942772,
+        "noise_floor_mean": 0.000516936182975769,
+        "noise_floor_std": 0.00045101557043381035,
+        "passed": false,
+        "passed_rotation": false,
+        "passed_translation": false,
+        "rotation_at_delta_min_mean": 3.176331665599719e-05,
+        "rotation_at_delta_min_sigma": -1.0757341833079226,
+        "rotation_curve": [
+          {
+            "magnitude_rad": 0.00024666134668313317,
+            "mean_distance": 3.0040741876291577e-06,
+            "sigma_over_floor": -1.13949970351093
+          },
+          {
+            "magnitude_rad": 0.00031431438401816514,
+            "mean_distance": 2.968311264339718e-06,
+            "sigma_over_floor": -1.1395789977207842
+          },
+          {
+            "magnitude_rad": 0.00040052295720103664,
+            "mean_distance": 3.254413513786858e-06,
+            "sigma_over_floor": -1.138944646562637
+          },
+          {
+            "magnitude_rad": 0.0005103763855611282,
+            "mean_distance": 4.374981017463142e-06,
+            "sigma_over_floor": -1.136460103728343
+          },
+          {
+            "magnitude_rad": 0.0006503598614141235,
+            "mean_distance": 6.961822691664565e-06,
+            "sigma_over_floor": -1.1307245108934587
+          },
+          {
+            "magnitude_rad": 0.0008287373031053741,
+            "mean_distance": 6.753206434950698e-06,
+            "sigma_over_floor": -1.131187058686461
+          },
+          {
+            "magnitude_rad": 0.001056039215066255,
+            "mean_distance": 9.620189302950166e-06,
+            "sigma_over_floor": -1.1248303316554145
+          },
+          {
+            "magnitude_rad": 0.0013456843556805004,
+            "mean_distance": 1.2075901395292021e-05,
+            "sigma_over_floor": -1.1193854817359765
+          },
+          {
+            "magnitude_rad": 0.0017147719130956999,
+            "mean_distance": 1.761913335940335e-05,
+            "sigma_over_floor": -1.1070949260933418
+          },
+          {
+            "magnitude_rad": 0.0021850909550441577,
+            "mean_distance": 2.2733211153536104e-05,
+            "sigma_over_floor": -1.0957558989524079
+          },
+          {
+            "magnitude_rad": 0.0027844067454989405,
+            "mean_distance": 3.176331665599719e-05,
+            "sigma_over_floor": -1.0757341833079226
+          },
+          {
+            "magnitude_rad": 0.0035480998658123744,
+            "mean_distance": 4.839897155761719e-05,
+            "sigma_over_floor": -1.0388493039552675
+          },
+          {
+            "magnitude_rad": 0.004521254905781353,
+            "mean_distance": 8.091926429187879e-05,
+            "sigma_over_floor": -0.9667447140782887
+          },
+          {
+            "magnitude_rad": 0.005761322030424756,
+            "mean_distance": 9.700060036266223e-05,
+            "sigma_over_floor": -0.931088880610465
+          },
+          {
+            "magnitude_rad": 0.007341508547950661,
+            "mean_distance": 0.00013397335715126246,
+            "sigma_over_floor": -0.8491122057186472
+          },
+          {
+            "magnitude_rad": 0.00935510069997926,
+            "mean_distance": 0.0001310110092163086,
+            "sigma_over_floor": -0.8556803779263262
+          },
+          {
+            "magnitude_rad": 0.011920970810717444,
+            "mean_distance": 0.00015022158913780004,
+            "sigma_over_floor": -0.8130863275634669
+          },
+          {
+            "magnitude_rad": 0.015190594909394443,
+            "mean_distance": 0.0002220332680735737,
+            "sigma_over_floor": -0.6538641551078653
+          },
+          {
+            "magnitude_rad": 0.019356995110990705,
+            "mean_distance": 0.0002862870751414448,
+            "sigma_over_floor": -0.5113994348631331
+          },
+          {
+            "magnitude_rad": 0.024666134668313303,
+            "mean_distance": 0.0003692031023092568,
+            "sigma_over_floor": -0.3275564977156218
+          }
+        ],
+        "translation_at_delta_min_mean": 0.0006025374168530107,
+        "translation_at_delta_min_sigma": 0.18979662674374162,
+        "translation_curve": [
+          {
+            "magnitude_m": 0.00047599868880167265,
+            "mean_distance": 0.00018512606038711965,
+            "sigma_over_floor": -0.735695493327419
+          },
+          {
+            "magnitude_m": 0.0006065532223674617,
+            "mean_distance": 0.00023516415967606008,
+            "sigma_over_floor": -0.6247501012629917
+          },
+          {
+            "magnitude_m": 0.0007729155987604875,
+            "mean_distance": 0.0002474784851074219,
+            "sigma_over_floor": -0.5974465529187134
+          },
+          {
+            "magnitude_m": 0.000984907013560249,
+            "mean_distance": 0.0003304779529571533,
+            "sigma_over_floor": -0.41341860955991044
+          },
+          {
+            "magnitude_m": 0.0012550423706234022,
+            "mean_distance": 0.00039961934089660645,
+            "sigma_over_floor": -0.26011705530769397
+          },
+          {
+            "magnitude_m": 0.0015992690988829625,
+            "mean_distance": 0.00048775674076750875,
+            "sigma_over_floor": -0.06469719477798512
+          },
+          {
+            "magnitude_m": 0.00203790860811455,
+            "mean_distance": 0.0005216539138928056,
+            "sigma_over_floor": 0.010460239571105657
+          },
+          {
+            "magnitude_m": 0.002596855962469464,
+            "mean_distance": 0.0005079865222796798,
+            "sigma_over_floor": -0.019843351943439592
+          },
+          {
+            "magnitude_m": 0.0033091085944488728,
+            "mean_distance": 0.0004446089151315391,
+            "sigma_over_floor": -0.16036534564574298
+          },
+          {
+            "magnitude_m": 0.004216714306881453,
+            "mean_distance": 0.0005455493810586631,
+            "sigma_over_floor": 0.06344170791126438
+          },
+          {
+            "magnitude_m": 0.005373253563115568,
+            "mean_distance": 0.0006025374168530107,
+            "sigma_over_floor": 0.18979662674374162
+          },
+          {
+            "magnitude_m": 0.006847002607318401,
+            "mean_distance": 0.0006715714698657393,
+            "sigma_over_floor": 0.3428601960265673
+          },
+          {
+            "magnitude_m": 0.008724964149549973,
+            "mean_distance": 0.0008772134897299111,
+            "sigma_over_floor": 0.79881345650131
+          },
+          {
+            "magnitude_m": 0.011118003566928143,
+            "mean_distance": 0.0010624646674841642,
+            "sigma_over_floor": 1.2095557676283268
+          },
+          {
+            "magnitude_m": 0.014167393836294753,
+            "mean_distance": 0.0013591765891760588,
+            "sigma_over_floor": 1.8674308857899937
+          },
+          {
+            "magnitude_m": 0.018053155578195167,
+            "mean_distance": 0.0014152824878692627,
+            "sigma_over_floor": 1.9918299140524511
+          },
+          {
+            "magnitude_m": 0.02300468456630109,
+            "mean_distance": 0.0018335938220843673,
+            "sigma_over_floor": 2.9193174813059515
+          },
+          {
+            "magnitude_m": 0.029314294096828414,
+            "mean_distance": 0.0017381131183356047,
+            "sigma_over_floor": 2.7076159126507404
+          },
+          {
+            "magnitude_m": 0.0373544716911335,
+            "mean_distance": 0.0018490850925445557,
+            "sigma_over_floor": 2.953665010472823
+          },
+          {
+            "magnitude_m": 0.04759986888016724,
+            "mean_distance": 0.002648222493007779,
+            "sigma_over_floor": 4.725527120897461
+          }
+        ]
+      }
+    },
+    "facebook/dinov3-vitl16-pretrain-lvd1689m": {
+      "cls": {
+        "gate_threshold": 0.0020172783406451344,
+        "noise_floor_mean": 0.0008239179733209312,
+        "noise_floor_std": 0.00039778678910806775,
+        "passed": true,
+        "passed_rotation": false,
+        "passed_translation": true,
+        "rotation_at_delta_min_mean": 0.00022785663895774633,
+        "rotation_at_delta_min_sigma": -1.4984442688498922,
+        "rotation_curve": [
+          {
+            "magnitude_rad": 0.00024666134668313317,
+            "mean_distance": 3.8141013646963984e-05,
+            "sigma_over_floor": -1.9753721872862229
+          },
+          {
+            "magnitude_rad": 0.00031431438401816514,
+            "mean_distance": 4.028081821161322e-05,
+            "sigma_over_floor": -1.9699929121990656
+          },
+          {
+            "magnitude_rad": 0.00040052295720103664,
+            "mean_distance": 4.25875186920166e-05,
+            "sigma_over_floor": -1.964194075878796
+          },
+          {
+            "magnitude_rad": 0.0005103763855611282,
+            "mean_distance": 5.282163692754693e-05,
+            "sigma_over_floor": -1.9384664285165554
+          },
+          {
+            "magnitude_rad": 0.0006503598614141235,
+            "mean_distance": 6.492734246421605e-05,
+            "sigma_over_floor": -1.9080337800019755
+          },
+          {
+            "magnitude_rad": 0.0008287373031053741,
+            "mean_distance": 6.360411498462781e-05,
+            "sigma_over_floor": -1.9113602541731143
+          },
+          {
+            "magnitude_rad": 0.001056039215066255,
+            "mean_distance": 7.119178917491809e-05,
+            "sigma_over_floor": -1.8922855277165025
+          },
+          {
+            "magnitude_rad": 0.0013456843556805004,
+            "mean_distance": 7.535815529990941e-05,
+            "sigma_over_floor": -1.8818116602099086
+          },
+          {
+            "magnitude_rad": 0.0017147719130956999,
+            "mean_distance": 9.416342072654516e-05,
+            "sigma_over_floor": -1.8345369242419254
+          },
+          {
+            "magnitude_rad": 0.0021850909550441577,
+            "mean_distance": 0.00013763309107162058,
+            "sigma_over_floor": -1.725258105700604
+          },
+          {
+            "magnitude_rad": 0.0027844067454989405,
+            "mean_distance": 0.00022785663895774633,
+            "sigma_over_floor": -1.4984442688498922
+          },
+          {
+            "magnitude_rad": 0.0035480998658123744,
+            "mean_distance": 0.00042873024358414114,
+            "sigma_over_floor": -0.9934661998778155
+          },
+          {
+            "magnitude_rad": 0.004521254905781353,
+            "mean_distance": 0.0006917357677593827,
+            "sigma_over_floor": -0.3322941062420205
+          },
+          {
+            "magnitude_rad": 0.005761322030424756,
+            "mean_distance": 0.0008864641422405839,
+            "sigma_over_floor": 0.15723541010473482
+          },
+          {
+            "magnitude_rad": 0.007341508547950661,
+            "mean_distance": 0.0010437011951580644,
+            "sigma_over_floor": 0.5525151358845759
+          },
+          {
+            "magnitude_rad": 0.00935510069997926,
+            "mean_distance": 0.0010381042957305908,
+            "sigma_over_floor": 0.5384450370760581
+          },
+          {
+            "magnitude_rad": 0.011920970810717444,
+            "mean_distance": 0.0011318981414660811,
+            "sigma_over_floor": 0.7742342797148052
+          },
+          {
+            "magnitude_rad": 0.015190594909394443,
+            "mean_distance": 0.001456779194995761,
+            "sigma_over_floor": 1.5909558562612263
+          },
+          {
+            "magnitude_rad": 0.019356995110990705,
+            "mean_distance": 0.002074968768283725,
+            "sigma_over_floor": 3.14502851582363
+          },
+          {
+            "magnitude_rad": 0.024666134668313303,
+            "mean_distance": 0.002402788493782282,
+            "sigma_over_floor": 3.969137647837809
+          }
+        ],
+        "translation_at_delta_min_mean": 0.006354528479278088,
+        "translation_at_delta_min_sigma": 13.903454456992138,
+        "translation_curve": [
+          {
+            "magnitude_m": 0.00047599868880167265,
+            "mean_distance": 0.0017806708347052336,
+            "sigma_over_floor": 2.4051901359760315
+          },
+          {
+            "magnitude_m": 0.0006065532223674617,
+            "mean_distance": 0.0023799657355993986,
+            "sigma_over_floor": 3.911763298543663
+          },
+          {
+            "magnitude_m": 0.0007729155987604875,
+            "mean_distance": 0.0027679740451276302,
+            "sigma_over_floor": 4.8871810855401545
+          },
+          {
+            "magnitude_m": 0.000984907013560249,
+            "mean_distance": 0.003024923847988248,
+            "sigma_over_floor": 5.5331296436528055
+          },
+          {
+            "magnitude_m": 0.0012550423706234022,
+            "mean_distance": 0.003235346172004938,
+            "sigma_over_floor": 6.062112329298317
+          },
+          {
+            "magnitude_m": 0.0015992690988829625,
+            "mean_distance": 0.003625559853389859,
+            "sigma_over_floor": 7.043074221622274
+          },
+          {
+            "magnitude_m": 0.00203790860811455,
+            "mean_distance": 0.004163974430412054,
+            "sigma_over_floor": 8.396599757825847
+          },
+          {
+            "magnitude_m": 0.002596855962469464,
+            "mean_distance": 0.00426515331491828,
+            "sigma_over_floor": 8.650954319808895
+          },
+          {
+            "magnitude_m": 0.0033091085944488728,
+            "mean_distance": 0.004585432820022106,
+            "sigma_over_floor": 9.456108019915348
+          },
+          {
+            "magnitude_m": 0.004216714306881453,
+            "mean_distance": 0.0055495379492640495,
+            "sigma_over_floor": 11.87978109212495
+          },
+          {
+            "magnitude_m": 0.005373253563115568,
+            "mean_distance": 0.006354528479278088,
+            "sigma_over_floor": 13.903454456992138
+          },
+          {
+            "magnitude_m": 0.006847002607318401,
+            "mean_distance": 0.01167902909219265,
+            "sigma_over_floor": 27.288767289661504
+          },
+          {
+            "magnitude_m": 0.008724964149549973,
+            "mean_distance": 0.011118399910628796,
+            "sigma_over_floor": 25.87939624739809
+          },
+          {
+            "magnitude_m": 0.011118003566928143,
+            "mean_distance": 0.012187724933028221,
+            "sigma_over_floor": 28.567582611749472
+          },
+          {
+            "magnitude_m": 0.014167393836294753,
+            "mean_distance": 0.012981986626982689,
+            "sigma_over_floor": 30.564284653401963
+          },
+          {
+            "magnitude_m": 0.018053155578195167,
+            "mean_distance": 0.013154077343642712,
+            "sigma_over_floor": 30.996905146017845
+          },
+          {
+            "magnitude_m": 0.02300468456630109,
+            "mean_distance": 0.015062088146805763,
+            "sigma_over_floor": 35.79347168720757
+          },
+          {
+            "magnitude_m": 0.029314294096828414,
+            "mean_distance": 0.016034770756959915,
+            "sigma_over_floor": 38.23870777042475
+          },
+          {
+            "magnitude_m": 0.0373544716911335,
+            "mean_distance": 0.017358403652906418,
+            "sigma_over_floor": 41.5662011216102
+          },
+          {
+            "magnitude_m": 0.04759986888016724,
+            "mean_distance": 0.017537986859679222,
+            "sigma_over_floor": 42.017657056523156
+          }
+        ]
+      },
+      "mean_patch": {
+        "gate_threshold": 0.0010379722370998934,
+        "noise_floor_mean": 0.0003887861967086792,
+        "noise_floor_std": 0.0002163953467970714,
+        "passed": true,
+        "passed_rotation": false,
+        "passed_translation": true,
+        "rotation_at_delta_min_mean": 5.1599741709651425e-05,
+        "rotation_at_delta_min_sigma": -1.558196421456467,
+        "rotation_curve": [
+          {
+            "magnitude_rad": 0.00024666134668313317,
+            "mean_distance": 9.149312973022461e-06,
+            "sigma_over_floor": -1.7543671310625177
+          },
+          {
+            "magnitude_rad": 0.00031431438401816514,
+            "mean_distance": 9.834766387939453e-06,
+            "sigma_over_floor": -1.7511995333065467
+          },
+          {
+            "magnitude_rad": 0.00040052295720103664,
+            "mean_distance": 1.0526180631131865e-05,
+            "sigma_over_floor": -1.7480043895410904
+          },
+          {
+            "magnitude_rad": 0.0005103763855611282,
+            "mean_distance": 1.3214349564805161e-05,
+            "sigma_over_floor": -1.7355818999937798
+          },
+          {
+            "magnitude_rad": 0.0006503598614141235,
+            "mean_distance": 1.6862153643160127e-05,
+            "sigma_over_floor": -1.718724771906937
+          },
+          {
+            "magnitude_rad": 0.0008287373031053741,
+            "mean_distance": 1.4895200365572236e-05,
+            "sigma_over_floor": -1.7278144002501585
+          },
+          {
+            "magnitude_rad": 0.001056039215066255,
+            "mean_distance": 1.620054172235541e-05,
+            "sigma_over_floor": -1.7217821940308293
+          },
+          {
+            "magnitude_rad": 0.0013456843556805004,
+            "mean_distance": 1.683831214904785e-05,
+            "sigma_over_floor": -1.718834947539016
+          },
+          {
+            "magnitude_rad": 0.0017147719130956999,
+            "mean_distance": 2.1147727238712832e-05,
+            "sigma_over_floor": -1.6989204015312118
+          },
+          {
+            "magnitude_rad": 0.0021850909550441577,
+            "mean_distance": 3.067254874622449e-05,
+            "sigma_over_floor": -1.6549045682497145
+          },
+          {
+            "magnitude_rad": 0.0027844067454989405,
+            "mean_distance": 5.1599741709651425e-05,
+            "sigma_over_floor": -1.558196421456467
+          },
+          {
+            "magnitude_rad": 0.0035480998658123744,
+            "mean_distance": 9.582638449501246e-05,
+            "sigma_over_floor": -1.3538175221872726
+          },
+          {
+            "magnitude_rad": 0.004521254905781353,
+            "mean_distance": 0.0001609325408935547,
+            "sigma_over_floor": -1.0529508105772643
+          },
+          {
+            "magnitude_rad": 0.005761322030424756,
+            "mean_distance": 0.00020865797705482692,
+            "sigma_over_floor": -0.832403387226116
+          },
+          {
+            "magnitude_rad": 0.007341508547950661,
+            "mean_distance": 0.00024796725483611226,
+            "sigma_over_floor": -0.6507484747563561
+          },
+          {
+            "magnitude_rad": 0.00935510069997926,
+            "mean_distance": 0.0002632915857248008,
+            "sigma_over_floor": -0.5799321142591998
+          },
+          {
+            "magnitude_rad": 0.011920970810717444,
+            "mean_distance": 0.00027031899662688375,
+            "sigma_over_floor": -0.5474572435833853
+          },
+          {
+            "magnitude_rad": 0.015190594909394443,
+            "mean_distance": 0.0003424406168051064,
+            "sigma_over_floor": -0.21417087099859958
+          },
+          {
+            "magnitude_rad": 0.019356995110990705,
+            "mean_distance": 0.00048109889030456543,
+            "sigma_over_floor": 0.42659278474436935
+          },
+          {
+            "magnitude_rad": 0.024666134668313303,
+            "mean_distance": 0.0005542278522625566,
+            "sigma_over_floor": 0.7645342564090494
+          }
+        ],
+        "translation_at_delta_min_mean": 0.001904308795928955,
+        "translation_at_delta_min_sigma": 7.003489777631329,
+        "translation_curve": [
+          {
+            "magnitude_m": 0.00047599868880167265,
+            "mean_distance": 0.0004192113992758095,
+            "sigma_over_floor": 0.14060007767016405
+          },
+          {
+            "magnitude_m": 0.0006065532223674617,
+            "mean_distance": 0.0005694151041097939,
+            "sigma_over_floor": 0.8347171511525278
+          },
+          {
+            "magnitude_m": 0.0007729155987604875,
+            "mean_distance": 0.0006345391157083213,
+            "sigma_over_floor": 1.1356663747030629
+          },
+          {
+            "magnitude_m": 0.000984907013560249,
+            "mean_distance": 0.0007291793590411544,
+            "sigma_over_floor": 1.5730151658560614
+          },
+          {
+            "magnitude_m": 0.0012550423706234022,
+            "mean_distance": 0.0008088648319244385,
+            "sigma_over_floor": 1.941255398664813
+          },
+          {
+            "magnitude_m": 0.0015992690988829625,
+            "mean_distance": 0.0009486675262451172,
+            "sigma_over_floor": 2.587307619241354
+          },
+          {
+            "magnitude_m": 0.00203790860811455,
+            "mean_distance": 0.001116722822189331,
+            "sigma_over_floor": 3.3639199560205304
+          },
+          {
+            "magnitude_m": 0.002596855962469464,
+            "mean_distance": 0.0010634064674377441,
+            "sigma_over_floor": 3.1175359392626043
+          },
+          {
+            "magnitude_m": 0.0033091085944488728,
+            "mean_distance": 0.001248735236003995,
+            "sigma_over_floor": 3.9739719546823173
+          },
+          {
+            "magnitude_m": 0.004216714306881453,
+            "mean_distance": 0.0015322684776037931,
+            "sigma_over_floor": 5.2842276778134
+          },
+          {
+            "magnitude_m": 0.005373253563115568,
+            "mean_distance": 0.001904308795928955,
+            "sigma_over_floor": 7.003489777631329
+          },
+          {
+            "magnitude_m": 0.006847002607318401,
+            "mean_distance": 0.003118962049484253,
+            "sigma_over_floor": 12.61661072285369
+          },
+          {
+            "magnitude_m": 0.008724964149549973,
+            "mean_distance": 0.0028385878540575504,
+            "sigma_over_floor": 11.320953493728386
+          },
+          {
+            "magnitude_m": 0.011118003566928143,
+            "mean_distance": 0.002997279167175293,
+            "sigma_over_floor": 12.054293260348036
+          },
+          {
+            "magnitude_m": 0.014167393836294753,
+            "mean_distance": 0.00318356161005795,
+            "sigma_over_floor": 12.915136368297796
+          },
+          {
+            "magnitude_m": 0.018053155578195167,
+            "mean_distance": 0.0033032179344445467,
+            "sigma_over_floor": 13.4680887591771
+          },
+          {
+            "magnitude_m": 0.02300468456630109,
+            "mean_distance": 0.0038814127910882235,
+            "sigma_over_floor": 16.140026327159507
+          },
+          {
+            "magnitude_m": 0.029314294096828414,
+            "mean_distance": 0.004107934422791004,
+            "sigma_over_floor": 17.186821625929056
+          },
+          {
+            "magnitude_m": 0.0373544716911335,
+            "mean_distance": 0.004153788089752197,
+            "sigma_over_floor": 17.39871928287911
+          },
+          {
+            "magnitude_m": 0.04759986888016724,
+            "mean_distance": 0.004680216312408447,
+            "sigma_over_floor": 19.831434359464918
+          }
+        ]
+      }
+    }
+  },
+  "gate_sigma": 3.0,
+  "geometry": "box",
+  "unavailable_encoders": []
+}

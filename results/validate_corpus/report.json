@@ -1,0 +1,293 @@
+{
+  "all_per_rollout_validators_clean": true,
+  "geometry_checks": [
+    {
+      "clearance_m": 0.014227251902965449,
+      "corridor_radius_m": 0.10649071579427946,
+      "geometry": "box",
+      "name": "T11_corridor_decoy_disjoint",
+      "nearest_decoy_surface_m": 0.12071796769724491,
+      "passed": true,
+      "threshold_m": 0.005
+    },
+    {
+      "clearance_m": 0.014227251902965449,
+      "corridor_radius_m": 0.10649071579427946,
+      "geometry": "sphere",
+      "name": "T11_corridor_decoy_disjoint",
+      "nearest_decoy_surface_m": 0.12071796769724491,
+      "passed": true,
+      "threshold_m": 0.005
+    },
+    {
+      "clearance_m": 0.014227251902965449,
+      "corridor_radius_m": 0.10649071579427946,
+      "geometry": "cylinder",
+      "name": "T11_corridor_decoy_disjoint",
+      "nearest_decoy_surface_m": 0.12071796769724491,
+      "passed": true,
+      "threshold_m": 0.005
+    }
+  ],
+  "passed": true,
+  "split_integrity": {
+    "counts_by_geometry": {
+      "box": {
+        "test": 18,
+        "train": 144,
+        "val": 18
+      }
+    },
+    "n_tuples_checked": 60,
+    "name": "T7_no_tuple_spans_splits",
+    "note": "split unit is (geometry, tuple_index); NEVER the rollout, NEVER the frame",
+    "offenders": [],
+    "passed": true,
+    "threshold": 0.0,
+    "value": 0.0
+  },
+  "t11_gate": {
+    "name": "T11_decoy_placement_independent_of_action",
+    "note": "cross-validated ridge R^2 from DECOY placement to each action dim; run BEFORE any IDM trains (\u00a74-T11)",
+    "passed": true,
+    "per_geometry": {
+      "box": {
+        "approach_angle": {
+          "n": 60,
+          "r2": -0.13950539073921897
+        },
+        "contact_offset": {
+          "n": 60,
+          "r2": -0.13099448744503728
+        },
+        "push_speed": {
+          "n": 60,
+          "r2": -0.20626894515014427
+        }
+      },
+      "cylinder": {
+        "skipped": "no DECOY rollouts found"
+      },
+      "sphere": {
+        "skipped": "no DECOY rollouts found"
+      }
+    },
+    "threshold": 0.01,
+    "value": 0.0
+  },
+  "validators": {
+    "box/ABSENT": {
+      "checks": {
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": -1.0,
+          "value_median": -1.0,
+          "value_p95": -1.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 60,
+      "n_rollouts": 60
+    },
+    "box/DECOY": {
+      "checks": {
+        "T10_decoy_no_contact": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.182548794489093,
+          "value_median": 0.0,
+          "value_p95": 0.09066385723702786
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": -8.815350748893536,
+          "value_median": -29.994644283662588,
+          "value_p95": -10.754884663863708
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 475.0,
+          "value_median": 475.0,
+          "value_p95": 475.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 60,
+      "n_rollouts": 60
+    },
+    "box/INTERACT": {
+      "checks": {
+        "T10_contact_before_sstd": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 401.0,
+          "value_median": 353.5,
+          "value_p95": 390.15
+        },
+        "T10_interact_contact": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 474.0,
+          "value_median": 474.0,
+          "value_p95": 474.0
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.2593144560357675,
+          "value_median": 0.0,
+          "value_p95": 0.08648608306624483
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": -51.15815232246587,
+          "value_median": -67.61407213354006,
+          "value_p95": -57.248934296293974
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 523.0,
+          "value_median": 506.0,
+          "value_p95": 521.1
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 60,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 60,
+      "n_rollouts": 60
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "delta_pos_min": {
+    "box": 0.004759986888016724,
+    "cylinder": 0.0053678080674543225,
+    "sphere": 0.004516091197434792
+  },
+  "delta_rot_min": {
+    "box": 0.0024666134668313304,
+    "cylinder": 0.0003562946479274778,
+    "sphere": null
+  },
+  "delta_rot_raw_min": {
+    "box": 0.0024666134668313304,
+    "cylinder": 0.001331859089595751,
+    "sphere": 0.02966890071695131
+  },
+  "frame_stride": 25,
+  "per_geometry_detail": {
+    "box": {
+      "delta_pos_median": 0.009991443171392892,
+      "delta_pos_min": 0.004759986888016724,
+      "delta_pos_p95": 0.016694151876939477,
+      "delta_rot_min": 0.0024666134668313304,
+      "delta_rot_min_quotient_defined": true,
+      "delta_rot_raw_median": 0.03267448585363483,
+      "delta_rot_raw_min": 0.0024666134668313304,
+      "delta_rot_raw_p95": 0.09639061362549159,
+      "n_deltas": 14570,
+      "n_rollouts": 120,
+      "peak_ang_speed_median": 2.280234237783376,
+      "peak_lin_speed_median": 0.2680558717582391,
+      "settle_ang_speed": 0.04933226933662661,
+      "settle_lin_speed": 0.09519973776033448
+    },
+    "cylinder": {
+      "delta_pos_median": 0.01189437962891814,
+      "delta_pos_min": 0.0053678080674543225,
+      "delta_pos_p95": 0.017852853616591405,
+      "delta_rot_min": 0.0003562946479274778,
+      "delta_rot_min_quotient_defined": true,
+      "delta_rot_raw_median": 0.008317228667149736,
+      "delta_rot_raw_min": 0.001331859089595751,
+      "delta_rot_raw_p95": 0.03609185562470606,
+      "n_deltas": 12209,
+      "n_rollouts": 119,
+      "peak_ang_speed_median": 2.3134759852674134,
+      "peak_lin_speed_median": 0.31797044149142534,
+      "settle_ang_speed": 0.02663718179191502,
+      "settle_lin_speed": 0.10735616134908645
+    },
+    "sphere": {
+      "delta_pos_median": 0.011666113866144396,
+      "delta_pos_min": 0.004516091197434792,
+      "delta_pos_p95": 0.017130507168832944,
+      "delta_rot_min": null,
+      "delta_rot_min_quotient_defined": false,
+      "delta_rot_raw_median": 0.05655661281099483,
+      "delta_rot_raw_min": 0.02966890071695131,
+      "delta_rot_raw_p95": 0.0985519998519791,
+      "n_deltas": 13677,
+      "n_rollouts": 120,
+      "peak_ang_speed_median": 2.051172403217362,
+      "peak_lin_speed_median": 0.3103776371004709,
+      "settle_ang_speed": 0.5933780143390261,
+      "settle_lin_speed": 0.09032182394869584
+    }
+  },
+  "percentile": 5.0,
+  "pooled_delta_pos_min": 0.004841690316229101,
+  "pooled_delta_rot_min": 0.0006028127555435076,
+  "rotation_pooling_includes": [
+    "box",
+    "cylinder"
+  ],
+  "settle_ang_speed": {
+    "box": 0.04933226933662661,
+    "cylinder": 0.02663718179191502,
+    "sphere": 0.5933780143390261
+  },
+  "settle_lin_speed": {
+    "box": 0.09519973776033448,
+    "cylinder": 0.10735616134908645,
+    "sphere": 0.09032182394869584
+  },
+  "source_run": "exp_a_deltas",
+  "video_fps": 20.0
+}
