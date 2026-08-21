@@ -76,6 +76,50 @@ def c_hf_token():
     return len(tok) > 20, f"present, length {len(tok)}"
 
 
+def c_encoder_cache():
+    """The Gate B encoder must resolve from cache.
+
+    Every sbatch script runs with HF_HUB_OFFLINE=1, so a cache miss is not a
+    slow download -- it is a hard failure at model load, after the job has
+    queued and been allocated a GPU.  Unity's /datasets/ai/dinov2 mirror does
+    NOT satisfy this: DINOv2 was measured and rejected at 0.55 sigma against a
+    3 sigma threshold (config.GATE_B_EVIDENCE).
+    """
+    import config as C
+
+    repo = C.GATE_B_SELECTED_ENCODER
+    where = os.environ.get("HF_HOME") or "(HF_HOME unset -> $HOME/.cache)"
+    try:
+        from huggingface_hub import try_to_load_from_cache
+    except ImportError:
+        return False, "huggingface_hub not importable"
+
+    def cached(fname):
+        return isinstance(try_to_load_from_cache(repo, fname), str)
+
+    if not cached("config.json"):
+        return False, f"{repo} not cached under HF_HOME={where}; pre-stage it"
+    weights = [f for f in ("model.safetensors", "pytorch_model.bin")
+               if cached(f)]
+    if not weights:
+        return False, (f"{repo}: config.json cached but no weight file under "
+                       f"HF_HOME={where} (a config-only cache still fails offline)")
+    return True, f"{repo} [{weights[0]}] cached under HF_HOME={where}"
+
+
+def c_caches_off_home():
+    """Caches under $HOME will fill a shared group quota (see unity/env.sh)."""
+    home = str(Path.home())
+    offenders = {v: os.environ.get(v) for v in
+                 ("HF_HOME", "TORCH_HOME", "XDG_CACHE_HOME", "PIP_CACHE_DIR",
+                  "UV_CACHE_DIR", "TRITON_CACHE_DIR")
+                 if not os.environ.get(v) or os.environ.get(v, "").startswith(home)}
+    if offenders:
+        return False, (f"unset or under $HOME: {sorted(offenders)}; "
+                       f"`source unity/env.sh` first")
+    return True, "all caches point off $HOME"
+
+
 def c_cuda():
     import torch
 
@@ -177,6 +221,8 @@ def main() -> int:
     check("weight checksums vs manifest", lambda: c_weight_checksums(args.manifest),
           required=False)
     check("HF_TOKEN validity", c_hf_token, required=False)
+    check("Gate B encoder cached (offline-ready)", c_encoder_cache)
+    check("caches point off $HOME", c_caches_off_home, required=False)
     check("CUDA device / VRAM / torch.version.cuda", c_cuda)
     check("REAL one-frame MuJoCo EGL render", c_egl_render)
     check("offline operation (HF_HUB_OFFLINE=1)", c_offline_ok)
