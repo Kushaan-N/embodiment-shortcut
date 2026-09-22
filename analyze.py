@@ -323,6 +323,30 @@ def analyze_g(root: Path) -> None:
           "  matter most in the HIGH one.")
 
 
+def analyze_subset(root: Path) -> None:
+    """Descriptive: what a manipulator-only verification subset costs (§9-0b)."""
+    res = _load(root / "verification_subset" / "results.json")
+    rule("VERIFICATION SUBSET -- arXiv:2604.01985 Prop. 3.1 conditions, descriptive")
+    if res is None:
+        print("  not run")
+        return
+    summ = res["_summary"]
+    print(f"  {'geometry':10s} {'horizon':8s} {'(i) scene-indep':>16s} "
+          f"{'(iii) subset':>13s} {'object-only':>12s}")
+    for r in summ["rows"]:
+        print(f"  {r['geometry']:10s} {r['horizon']:8s} {str(r['cond_i']):>16s} "
+              f"{r['subset_over_prior'] * 100:12.1f}% "
+              f"{r['object_only_over_prior'] * 100:11.1f}%")
+    both = summ["horizons_where_both_hold"]
+    print(f"\n  Both (i) and (iii) hold at: {', '.join(both) if both else 'no horizon'}")
+    print("\n  Read: the conditions that make a manipulator-only subset a sound\n"
+          "  VERIFIER are satisfied exactly at the horizon the standard metric uses,\n"
+          "  and fail at the OG-AF horizon.  Condition (i) IS object-blindness, so a\n"
+          "  score built on that subset has G = 0 by construction.  The guarantee and\n"
+          "  the confound are the same property read for different purposes.")
+    print(f"\n  (ii) {summ['condition_ii_status']}")
+
+
 def analyze_masking(root: Path) -> None:
     res = _load(root / "exp_masking" / "results.json")
     rule("MASKING DECOMPOSITION (§8.4) -- Architecture B, descriptive support")
@@ -391,9 +415,9 @@ ANALYSES = {
     "0": analyze_0, "a": analyze_a, "b": analyze_b, "c": analyze_c,
     "corpus": analyze_corpus, "d": analyze_d, "power": analyze_power,
     "e": analyze_e, "f": analyze_f, "g": analyze_g,
-    "masking": analyze_masking, "h": analyze_h,
+    "masking": analyze_masking, "subset": analyze_subset, "h": analyze_h,
 }
-UNSEALED_ORDER = ["0", "a", "b", "c", "corpus", "d", "power", "masking"]
+UNSEALED_ORDER = ["0", "a", "b", "c", "subset", "corpus", "d", "power", "masking"]
 SEALED_ORDER = ["e", "f", "g", "h"]
 
 
