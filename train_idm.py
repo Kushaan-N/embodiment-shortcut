@@ -88,9 +88,14 @@ def embed_stores(stores, split, horizon, encoder_name, *, mask_mode="full",
         m_local = {k: [] for k in meta}
         for start in range(0, len(rows), 64):
             batch_rows = rows[start : start + 64]
-            imgs = np.asarray(st.frames[batch_rows][:, pos])          # (B, 2, H, W, 3)
+            # np.ix_ reads ONLY the two horizons wanted.  `frames[rows][:, pos]`
+            # materialises all four first and throws half away -- measured 2.7x
+            # slower on a 1.1 GB store, and the corpus store is ~11 GB.  The
+            # selected pixels are identical, so this is a pure I/O change.
+            sel = np.ix_(batch_rows, pos)
+            imgs = np.asarray(st.frames[sel])                         # (B, 2, H, W, 3)
             if mask_mode != "full":
-                msk = np.asarray(st.masks[batch_rows][:, pos])
+                msk = np.asarray(st.masks[sel])
                 imgs = idd.masked_frames(imgs, msk, mask_mode, background)
             B = imgs.shape[0]
             flat = imgs.reshape(B * 2, *imgs.shape[2:])
