@@ -135,6 +135,20 @@ measured number against its threshold.
 #    Architecture A trainings.
 ```
 
+### Verification-subset audit — CPU, seconds, zero GPU
+
+Reruns nothing; recomputes from the arrays Experiment 0 already wrote. Needs
+`results/exp_0/oracle_errors.npz`, which is **gitignored** — so run
+`exp_0_oracles.py` on Unity first (~25 min CPU) rather than expecting the clone
+to carry it.
+
+```bash
+.venv/bin/python verification_subset.py
+.venv/bin/python analyze.py --exp subset
+```
+
+See §5 for why this exists and what it buys the paper.
+
 ### Corpus — CPU, ~2-3 node-hours
 
 `--clips` is required: A-std is a clip model (MultiWorld §B.2 trains a
@@ -267,27 +281,60 @@ downstream H data, and two generations are enough to detect it.
 - **The DINO rotation blindness above.** State it wherever a rotation-bearing
   distance appears.
 
-## 5. Related work — one thing to check before writing
+## 5. Related work, and the verification-subset result
 
-Novelty was surveyed 2026-09-21 and the core contribution is unpublished: no
-paper claims action-following is confounded by embodiment rendering, uses a
-DECOY-style control, or proposes a delayed-horizon object-grounded variant.
+Surveyed 2026-09-21, re-read from source 2026-09-22. **The core contribution is
+unpublished**: no paper claims action-following is confounded by embodiment
+rendering, uses a DECOY-style control, or proposes a delayed-horizon
+object-grounded variant.
 
-- **arXiv 2608.24885**, "Do Robotic World Models Really Follow Actions?"
-  (Aug 2026) — diagnoses action-following, but its metric is pose-aware NDTW on
-  **end-effector trajectories**. It measures arm kinematics deliberately. Cite
-  it as the live example of the practice being critiqued.
-- **arXiv 2606.15032**, decision-making-centric position paper — argues
-  "pipeline entanglement": an IDM-based action-recovery claim is a claim about
-  the whole pipeline, not the world model. Argues abstractly what this project
-  measures concretely.
-- **arXiv 2604.01985**, World Action Verifier — **READ IN FULL before writing
-  related work.** It uses a sparse IDM with feature masking and its
-  Proposition 3.1 reportedly argues this keeps verification on "genuine action
-  imprints rather than pose artifacts." It points the other way (restricting to
-  *agent-centric* features rather than removing the arm) and is a method paper,
-  not a measurement critique — but if it already names the pose shortcut, the
-  framing shifts from "we identified this" to "we measured and corrected it."
+**arXiv 2608.24885**, "Do Robotic World Models Really Follow Actions?"
+(Aug 2026) — diagnoses action-following, but its metric is pose-aware NDTW on
+**end-effector trajectories**. It measures arm kinematics deliberately. Cite it
+as the live example of the practice being critiqued.
+
+**arXiv 2606.15032**, decision-making-centric position paper — argues "pipeline
+entanglement": an IDM-based action-recovery claim is a claim about the whole
+pipeline, not the world model. Argues abstractly what this project measures.
+
+**arXiv 2604.01985**, World Action Verifier — **read in full 2026-09-22. It is
+not prior art, it is the best available foil.** An earlier automated summary of
+this paper claimed it "prevents the IDM from exploiting robot pose as a
+shortcut" and spoke of "pose artifacts". Those phrases are not in the paper:
+`shortcut`, `artifact`, `confound`, `spurious`, `embodiment` and `object
+physics` each occur **zero** times. What the paper actually does is assume an
+"identifiable verification subset" S and prove (Prop. 3.1) that a sparse inverse
+model transfers out-of-support provided
+
+  (i) `z_S^{t+1}` depends only on `(z_S^t, a^t)` **and not on the rest of the
+      scene**; (ii) the subset stays on-support when the full transition is not;
+  (iii) the action is identifiable from `(z_S^t, z_S^{t+1})`.
+
+Their own reading of S is "the agent's own motion pattern (e.g. joint-angle
+trajectories)" — the manipulator channel. So a 2026 paper states the embodiment
+shortcut as a **theorem** and builds a method on it, treating it as a robustness
+guarantee. For verification it is one. For evaluation, condition (i) *is*
+object-blindness.
+
+`verification_subset.py` turns that into a measurement, from Experiment 0's
+existing arrays at zero cost. Measured:
+
+| horizon | (i) scene-independent | (iii) subset recovers action | object-only |
+|---|---|---|---|
+| `s_0` | yes | 97-98 % of prior (fails) | 99-102 % |
+| `s_std` | yes | **1.0-1.2 % (holds)** | 11-46 % |
+| `s_del` | yes | 97-98 % (fails) | 11-45 % |
+| `s_time` | yes | **1.0-1.2 % (holds)** | 11-45 % |
+
+Both conditions hold at **`s_std`** — the horizon the standard metric uses — and
+fail at **`s_del`**, the horizon OG-AF proposes. The guarantee and the confound
+are the same property read for different purposes, and the two horizons are
+formally complementary. Condition (ii) is **not measurable** in this corpus (it
+concerns out-of-support transitions the corpus does not contain) and is reported
+as unmeasured rather than estimated.
+
+This is descriptive support, never the basis of a confirmatory claim — same
+standing as the masking decomposition (§6 of the prereg).
 
 Adjacent papers appeared in 2602, 2603, 2604, 2605, 2606, 2607 and 2608 —
 roughly one a month. Novelty is intact; it will not stay that way indefinitely.
@@ -303,3 +350,14 @@ roughly one a month. Novelty is intact; it will not stay that way indefinitely.
   and is on the critical path (§2).
 - `README.md`'s status table still lists stage 7 as "not run". Fix it when you
   re-run `validate_corpus.py`.
+- **Encoder precision is deliberately left at fp32.** `exp_b_resolution.FrozenEncoder`
+  runs the ViT in fp32 at batch 32. bf16 autocast would be roughly 2-3x faster on
+  an A100, but Gate B's measured sigmas were obtained in fp32 and the embeddings
+  feeding every Architecture B probe would no longer be the ones the gate
+  validated. If you want the speed, treat it as a protocol change: re-run
+  Experiment B first and record the new sigmas. Do not flip it quietly.
+- The one optimisation taken (2026-09-22) is in `embed_stores`: `np.ix_` reads
+  only the two horizons needed instead of materialising all four, measured 2.7x
+  faster on a 1.1 GB store against an ~11 GB corpus store, with bitwise
+  identical output. `tests/test_frame_selection.py` pins it. The ViT forward
+  still dominates, so expect a few per cent end-to-end, not 2.7x.
