@@ -1,0 +1,521 @@
+{
+  "_summary": {
+    "condition_ii_status": "NOT MEASURABLE in this corpus: (ii) concerns out-of-support transitions, which this corpus does not contain by construction. Reported as unmeasured rather than estimated.",
+    "horizons_where_both_hold": [
+      "s_std",
+      "s_time"
+    ],
+    "rows": [
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "box",
+        "horizon": "s_0",
+        "object_only_over_prior": 0.9858525946773627,
+        "subset_over_prior": 0.972405750448909
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "box",
+        "horizon": "s_std",
+        "object_only_over_prior": 0.4589756629678007,
+        "subset_over_prior": 0.011768957518884415
+      },
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "box",
+        "horizon": "s_del",
+        "object_only_over_prior": 0.44532798840850574,
+        "subset_over_prior": 0.9724057728926333
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "box",
+        "horizon": "s_time",
+        "object_only_over_prior": 0.44532798840850574,
+        "subset_over_prior": 0.011784591091252709
+      },
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "sphere",
+        "horizon": "s_0",
+        "object_only_over_prior": 1.0097709411090177,
+        "subset_over_prior": 0.9709497774040564
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "sphere",
+        "horizon": "s_std",
+        "object_only_over_prior": 0.11365224933532354,
+        "subset_over_prior": 0.010818792795894242
+      },
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "sphere",
+        "horizon": "s_del",
+        "object_only_over_prior": 0.11210480647458713,
+        "subset_over_prior": 0.970949759743421
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "sphere",
+        "horizon": "s_time",
+        "object_only_over_prior": 0.11210480647458713,
+        "subset_over_prior": 0.010732825703519036
+      },
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "cylinder",
+        "horizon": "s_0",
+        "object_only_over_prior": 1.021237102076605,
+        "subset_over_prior": 0.9842662885944907
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "cylinder",
+        "horizon": "s_std",
+        "object_only_over_prior": 0.46325679485998733,
+        "subset_over_prior": 0.01030588584192915
+      },
+      {
+        "both_conditions_hold": false,
+        "cond_i": true,
+        "cond_iii": false,
+        "geometry": "cylinder",
+        "horizon": "s_del",
+        "object_only_over_prior": 0.41450063508306073,
+        "subset_over_prior": 0.9842662817710636
+      },
+      {
+        "both_conditions_hold": true,
+        "cond_i": true,
+        "cond_iii": true,
+        "geometry": "cylinder",
+        "horizon": "s_time",
+        "object_only_over_prior": 0.41450063508306073,
+        "subset_over_prior": 0.010393907475143365
+      }
+    ]
+  },
+  "box": {
+    "condition_i_detail": {
+      "s_0": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_del": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_std": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_time": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "per_horizon": {
+      "s_0": {
+        "arm_plus_object_over_prior": 0.9778622735448746,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.014147405322637252,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.005456523095965671,
+        "object_only_over_prior": 0.9858525946773627,
+        "subset_recovers_action_over_prior": 0.972405750448909,
+        "subset_scene_independent": true
+      },
+      "s_del": {
+        "arm_plus_object_over_prior": 0.44810387329347173,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.5546720115914943,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": 0.5243018995991615,
+        "object_only_over_prior": 0.44532798840850574,
+        "subset_recovers_action_over_prior": 0.9724057728926333,
+        "subset_scene_independent": true
+      },
+      "s_std": {
+        "arm_plus_object_over_prior": 0.0424528644282788,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.5410243370321993,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.030683906909394387,
+        "object_only_over_prior": 0.4589756629678007,
+        "subset_recovers_action_over_prior": 0.011768957518884415,
+        "subset_scene_independent": true
+      },
+      "s_time": {
+        "arm_plus_object_over_prior": 0.03941589178170987,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.5546720115914943,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.02763130069045716,
+        "object_only_over_prior": 0.44532798840850574,
+        "subset_recovers_action_over_prior": 0.011784591091252709,
+        "subset_scene_independent": true
+      }
+    }
+  },
+  "cylinder": {
+    "condition_i_detail": {
+      "s_0": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_del": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_std": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_time": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "per_horizon": {
+      "s_0": {
+        "arm_plus_object_over_prior": 1.0070204195164412,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.0,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.022754130921950444,
+        "object_only_over_prior": 1.021237102076605,
+        "subset_recovers_action_over_prior": 0.9842662885944907,
+        "subset_scene_independent": true
+      },
+      "s_del": {
+        "arm_plus_object_over_prior": 0.41781103963897637,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.5854993649169393,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": 0.5664552421320872,
+        "object_only_over_prior": 0.41450063508306073,
+        "subset_recovers_action_over_prior": 0.9842662817710636,
+        "subset_scene_independent": true
+      },
+      "s_std": {
+        "arm_plus_object_over_prior": 0.034939171403810684,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.5367432051400127,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.024633285561881532,
+        "object_only_over_prior": 0.46325679485998733,
+        "subset_recovers_action_over_prior": 0.01030588584192915,
+        "subset_scene_independent": true
+      },
+      "s_time": {
+        "arm_plus_object_over_prior": 0.03392454260109895,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.5854993649169393,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.023530635125955587,
+        "object_only_over_prior": 0.41450063508306073,
+        "subset_recovers_action_over_prior": 0.010393907475143365,
+        "subset_scene_independent": true
+      }
+    }
+  },
+  "sphere": {
+    "condition_i_detail": {
+      "s_0": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_del": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_std": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "s_time": {
+        "bitwise_identical": true,
+        "dof_units": [
+          "m",
+          "m",
+          "m",
+          "rad"
+        ],
+        "max_abs_dev": 0.0,
+        "max_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_abs_dev_per_dof": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "per_horizon": {
+      "s_0": {
+        "arm_plus_object_over_prior": 1.0024589570594695,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.0,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.03150917965541311,
+        "object_only_over_prior": 1.0097709411090177,
+        "subset_recovers_action_over_prior": 0.9709497774040564,
+        "subset_scene_independent": true
+      },
+      "s_del": {
+        "arm_plus_object_over_prior": 0.11545308066728359,
+        "condition_iii_holds": false,
+        "discarded_object_signal": 0.8878951935254129,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": 0.8554966790761375,
+        "object_only_over_prior": 0.11210480647458713,
+        "subset_recovers_action_over_prior": 0.970949759743421,
+        "subset_scene_independent": true
+      },
+      "s_std": {
+        "arm_plus_object_over_prior": 0.03751363294956031,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.8863477506646764,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.02669484015366607,
+        "object_only_over_prior": 0.11365224933532354,
+        "subset_recovers_action_over_prior": 0.010818792795894242,
+        "subset_scene_independent": true
+      },
+      "s_time": {
+        "arm_plus_object_over_prior": 0.040840065112150575,
+        "condition_iii_holds": true,
+        "discarded_object_signal": 0.8878951935254129,
+        "max_abs_arm_deviation": 0.0,
+        "object_adds_over_subset": -0.03010723940863154,
+        "object_only_over_prior": 0.11210480647458713,
+        "subset_recovers_action_over_prior": 0.010732825703519036,
+        "subset_scene_independent": true
+      }
+    }
+  }
+}
