@@ -83,13 +83,13 @@ OGAF_WM_MODEL=WM-base-10 bash unity/wm_generate.sbatch --s1   # determinism + di
 sbatch --array=0-4 -p gpu unity/train_idm.sbatch
 sacct -j <jobid> --format=JobID,Elapsed,State,MaxRSS
 
-# S3 — invite preemption, then verify resume BY BEING PREEMPTED.  Only the
-# stages with a real resume belong here (wm_train, wm_generate, corpus);
-# train_idm.py has none, so Architecture A stays on -p gpu.
+# S3 — invite preemption, then verify resume BY BEING PREEMPTED (every stage
+# resumes: train_idm per epoch, wm_train per checkpoint, generate/corpus per item)
+sbatch --array=0-9  -p gpu,gpu-preempt --time=02:00:00 unity/train_idm.sbatch
 sbatch --array=0-2  -p gpu,gpu-preempt unity/wm_train.sbatch
 
-# S4 — full sweep, --time = 3x the S2 median (Arch A: 30 items, 0-19 + 10 augmented)
-sbatch --array=0-29 -p gpu --time=<3x S2 median> unity/train_idm.sbatch
+# S4 — full sweep (Arch A: 30 items, 0-19 + 10 augmented)
+sbatch --array=0-29 -p gpu,gpu-preempt --time=02:00:00 unity/train_idm.sbatch
 ```
 
 ## Monitoring
