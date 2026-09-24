@@ -222,10 +222,18 @@ def build_latent_cache(vae: CompactVAE, clip_root: Path, geometries, cache_path:
     meta_path = cache_path.with_suffix(".meta.json")
     if meta_path.exists() and not overwrite:
         meta = json.loads(meta_path.read_text())
-        lat = np.load(cache_path, mmap_mode="r")
-        act = np.load(cache_path.with_suffix(".actions.npy"))
-        print(f"  latent cache hit: {lat.shape} from {cache_path}")
-        return lat, act, meta
+        want = {"geometries": list(geometries), "fraction": float(fraction),
+                "split": split, "seed": int(seed)}
+        have = {k: meta.get(k) for k in want}
+        if have == want:
+            lat = np.load(cache_path, mmap_mode="r")
+            act = np.load(cache_path.with_suffix(".actions.npy"))
+            print(f"  latent cache hit: {lat.shape} from {cache_path}")
+            return lat, act, meta
+        # A cache from an earlier invocation (box-only, other fraction/seed)
+        # must never be silently reused: it would train the wrong model.
+        print(f"  latent cache at {cache_path} was built for {have}, need {want}; "
+              f"rebuilding", flush=True)
 
     files = []
     for g in geometries:
@@ -257,7 +265,9 @@ def build_latent_cache(vae: CompactVAE, clip_root: Path, geometries, cache_path:
             x = x.reshape(b * T, *x.shape[2:]).permute(0, 3, 1, 2)
             x = x.contiguous().float().to(device) / 255.0
             mu, _ = vae.encode(x)
-            lat_list.append(mu.reshape(b, T, *mu.shape[1:]).cpu().numpy().astype(np.float16))
+            # fp32: verify_fidelity certifies the delta_pos_min latent shift in
+            # fp32, and fp16 resolution (~1e-3 at |mu|~2) can eat it.  ~4 GB.
+            lat_list.append(mu.reshape(b, T, *mu.shape[1:]).cpu().numpy().astype(np.float32))
             act_list.append(np.stack(acts))
             if i % 400 == 0:
                 print(f"    {i}/{len(keep)}", flush=True)
@@ -269,7 +279,8 @@ def build_latent_cache(vae: CompactVAE, clip_root: Path, geometries, cache_path:
     np.save(cache_path.with_suffix(".actions.npy"), act)
     meta = {"n": int(lat.shape[0]), "frames": int(lat.shape[1]),
             "latent_channels": int(lat.shape[2]), "grid": int(lat.shape[-1]),
-            "fraction": fraction, "split": split, "geometries": list(geometries)}
+            "fraction": float(fraction), "split": split, "geometries": list(geometries),
+            "seed": int(seed)}
     meta_path.write_text(json.dumps(meta))
     return np.load(cache_path, mmap_mode="r"), act, meta
 
@@ -413,22 +424,32 @@ def main() -> int:
     clip_root = Path(args.clips)
     if abs(fm - 1.0) > 1e-9:
         clip_root = clip_root.parent / f"{clip_root.name}_fm{fm:g}"
+    # Start the wall-clock budget NOW, before the latent cache is (re)built: a
+    # first window that spends minutes encoding and only then starts its 1.8 h
+    # budget would overrun the 2 h SLURM limit and be killed mid-checkpoint.
+    outdir = Path(args.out) / args.model
+    trainer = Trainer(outdir, args.max_hours)
+
     cache = C.DATA_ROOT / "wm_latents" / f"{args.model}.npy"
     latents, actions, meta = build_latent_cache(
         vae, clip_root, args.geometries, cache, dev, frac, args.seed
     )
     print(f"  latents {latents.shape}  actions {actions.shape}", flush=True)
-
-    outdir = Path(args.out) / args.model
-    trainer = Trainer(outdir, args.max_hours)
     opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"], weight_decay=0.01)
     steps = cfg["train"]["steps"]
     warm = cfg["train"]["warmup"]
     sched = torch.optim.lr_scheduler.LambdaLR(
         opt, lambda s: min(1.0, (s + 1) / warm) * 0.5 *
         (1 + math.cos(math.pi * min(1.0, max(0, s - warm) / max(1, steps - warm)))))
+    # ladder.yaml registers precision: bf16.  autocast's default is fp16,
+    # which would be a different (unregistered) precision and can overflow the
+    # 18-sublayer residual stream; bf16 needs no loss scaling at all.
     use_amp = dev.type == "cuda"
-    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+    amp_dtype = (torch.bfloat16 if (use_amp and torch.cuda.is_bf16_supported())
+                 else torch.float16)
+    scaler = torch.amp.GradScaler("cuda", enabled=bool(use_amp and amp_dtype == torch.float16))
+    print(f"  autocast: {'off' if not use_amp else str(amp_dtype).replace('torch.', '')}"
+          f"  grad-scaler: {scaler.is_enabled()}", flush=True)
 
     start = trainer.load(model, opt, sched, scaler)
     if start >= steps:
@@ -444,9 +465,13 @@ def main() -> int:
         idx = np.sort(rng.integers(0, len(latents), size=bs))
         z = torch.from_numpy(np.asarray(latents[idx]).astype(np.float32)).to(dev)
         a = torch.from_numpy(actions[idx]).to(dev)
-        with torch.amp.autocast("cuda", enabled=use_amp):
+        with torch.amp.autocast("cuda", dtype=amp_dtype, enabled=use_amp):
             pred = model(z[:, :-1], a)          # predict frames 1..T-1
             loss = F.mse_loss(pred, z[:, 1:])
+        if not torch.isfinite(loss):
+            # Stop rather than burn the allocation: a stalled run would print
+            # NaN losses for hours and still "exit 0".
+            raise RuntimeError(f"non-finite loss at step {step}")
         opt.zero_grad(set_to_none=True)
         scaler.scale(loss).backward()
         scaler.unscale_(opt)
