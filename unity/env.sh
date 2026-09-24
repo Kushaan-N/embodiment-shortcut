@@ -15,16 +15,43 @@
 # colleagues down with you.  Every one of them is pointed at the workspace
 # below.
 
+# The repo this file lives in.  Reliable under `source` from anywhere: sbatch
+# spools only the *.sbatch script to the node, never this file.
+_OGAF_ENV_REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # The workspace (ws_allocate) that holds corpus, checkpoints and caches.  Hard
 # error rather than silently falling back to $HOME, which is the failure this
 # file exists to prevent.
 export OGAF_DATA=${OGAF_DATA:?set OGAF_DATA to your ws_allocate workspace}
+
+# --- interpreter -----------------------------------------------------------
+# Every sbatch script calls bare `python`.  Nothing else activates the venv,
+# and the module python has neither torch nor mujoco, so without this every
+# array task died with ImportError after its GPU was allocated.  OGAF_PYTHON
+# overrides; otherwise the repo venv wins when it exists.
+if [[ -n "${OGAF_PYTHON:-}" ]]; then
+  export PATH="$(dirname "$OGAF_PYTHON"):$PATH"
+elif [[ -x "$_OGAF_ENV_REPO/.venv/bin/python" ]]; then
+  export PATH="$_OGAF_ENV_REPO/.venv/bin:$PATH"
+fi
 
 # --- data roots (§13.1) ----------------------------------------------------
 export OGAF_RESULTS=${OGAF_RESULTS:-$OGAF_DATA/results}
 export OGAF_CKPT=${OGAF_CKPT:-$OGAF_DATA/checkpoints}
 export OGAF_CORPUS=${OGAF_CORPUS:-$OGAF_DATA/corpus}
 export OGAF_CLIPS=${OGAF_CLIPS:-$OGAF_DATA/clips}
+
+# --- committed evidence (§0.3) ---------------------------------------------
+# The thresholds were MEASURED ONCE (Experiment A) and every later gate was
+# certified against that file.  config.py resolves THRESHOLDS_PATH under
+# OGAF_RESULTS -- which now points at an (initially empty) workspace -- so
+# every script raised ThresholdsMissing, and the error's suggested fix
+# (re-run exp_a) would silently re-measure the thresholds Gates B/C were
+# evaluated against.  Pin them to the committed file.  The workspace results
+# tree is seeded from the committed gate records below (no-clobber) so
+# analyze.py sees Exp 0/A/B/C on Unity; copy NEW results back to the repo
+# (results/*/results.json is versioned) before the workspace expires.
+export OGAF_THRESHOLDS=${OGAF_THRESHOLDS:-$_OGAF_ENV_REPO/results/exp_a/thresholds.json}
 
 # --- caches: NEVER $HOME ---------------------------------------------------
 # HF_HOME covers the hub snapshot cache at $HF_HOME/hub.  It must already
@@ -59,8 +86,13 @@ export PYOPENGL_PLATFORM=${PYOPENGL_PLATFORM:-egl}
 export OMP_NUM_THREADS=${OMP_NUM_THREADS:-${SLURM_CPUS_PER_TASK:-8}}
 export TOKENIZERS_PARALLELISM=${TOKENIZERS_PARALLELISM:-false}
 
-# Data roots must exist and be writable -- fail loudly if not.
-mkdir -p "$OGAF_RESULTS" "$OGAF_CKPT" logs
+# Data roots must exist and be writable -- fail loudly if not.  logs/ must
+# exist in the SUBMIT dir before sbatch runs (#SBATCH --output=logs/...), so
+# create it in the repo too, not only under the job's cwd.
+mkdir -p "$OGAF_RESULTS" "$OGAF_CKPT" logs "$_OGAF_ENV_REPO/logs"
+if [[ -d "$_OGAF_ENV_REPO/results" ]]; then
+  cp -rn "$_OGAF_ENV_REPO/results/." "$OGAF_RESULTS/" 2>/dev/null || true
+fi
 
 # Caches are different: HF_HOME may legitimately point at a read-only
 # pre-staged mirror, and under `set -e` a failed mkdir would kill the job
