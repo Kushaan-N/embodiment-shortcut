@@ -21,6 +21,8 @@ pretending to have verified it.
 from __future__ import annotations
 
 import hashlib
+import os
+import re
 import subprocess
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -107,8 +109,25 @@ def _committed_blob(path: Path, sha: str, repo: Path) -> bytes | None:
     return r.stdout if r.returncode == 0 else None
 
 
+def _https_form(url: str) -> str | None:
+    """``git@host:owner/repo(.git)`` / ``ssh://git@host/owner/repo`` -> https URL."""
+    if not url:
+        return None
+    if url.startswith(("https://", "http://")):
+        return url
+    m = re.match(r"^(?:ssh://)?git@([^:/]+)[:/](.+)$", url)
+    return f"https://{m.group(1)}/{m.group(2)}" if m else None
+
+
 def _push_evidence(sha: str, repo: Path) -> tuple[bool, dict]:
-    """Best-effort evidence that the commit reached a public remote."""
+    """Evidence that the commit reached a PUBLIC remote (§3.7).
+
+    Two independent facts, BOTH required: the commit is an ancestor of the
+    configured upstream, and that upstream answers an anonymous HTTPS
+    ``ls-remote`` (credential helpers disabled for the probe, so a private
+    remote cannot pass through a cached login).  A local or private commit is
+    rewritable and is not a pre-registration; this used to be a warning only.
+    """
     ev: dict = {}
     up = _git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}", repo=repo)
     if up.returncode != 0:
@@ -118,11 +137,28 @@ def _push_evidence(sha: str, repo: Path) -> tuple[bool, dict]:
     ev["upstream"] = up.stdout.strip()
     anc = _git("merge-base", "--is-ancestor", sha, ev["upstream"], repo=repo)
     ev["commit_is_ancestor_of_upstream"] = anc.returncode == 0
-    remote = _git("config", "--get", f"branch.{_git('rev-parse', '--abbrev-ref', 'HEAD', repo=repo).stdout.strip()}.remote", repo=repo)
-    if remote.stdout.strip():
-        url = _git("remote", "get-url", remote.stdout.strip(), repo=repo)
-        ev["remote_url"] = url.stdout.strip() or None
-    return bool(anc.returncode == 0), ev
+    branch = _git("rev-parse", "--abbrev-ref", "HEAD", repo=repo).stdout.strip()
+    remote = _git("config", "--get", f"branch.{branch}.remote", repo=repo).stdout.strip()
+    url = _git("remote", "get-url", remote, repo=repo).stdout.strip() if remote else ""
+    ev["remote_url"] = url or None
+    probe = _https_form(url)
+    ev["public_probe_url"] = probe
+    ev["public_anonymous_https"] = False
+    if probe:
+        env = dict(os.environ, GIT_TERMINAL_PROMPT="0", GIT_ASKPASS="/bin/false",
+                   GIT_CONFIG_GLOBAL="/dev/null", GIT_CONFIG_SYSTEM="/dev/null")
+        try:
+            r = subprocess.run(["git", "-c", "credential.helper=", "ls-remote", "--exit-code",
+                                probe, "HEAD"], capture_output=True, text=True,
+                               timeout=60, env=env)
+            ev["public_anonymous_https"] = r.returncode == 0
+            if r.returncode != 0:
+                ev["probe_error"] = (r.stderr or r.stdout).strip()[:160]
+        except (OSError, subprocess.TimeoutExpired) as exc:  # no network, etc.
+            ev["probe_error"] = f"{type(exc).__name__}: {exc}"
+    else:
+        ev["probe_error"] = "remote URL is not a recognised git/https form"
+    return bool(anc.returncode == 0 and ev["public_anonymous_https"]), ev
 
 
 def _artifact_times(artifacts) -> tuple[list, float | None]:
@@ -170,11 +206,19 @@ def check(artifacts=(), *, repo: Path | None = None,
 
     pushed, push_ev = _push_evidence(sha, repo) if committed else (False, {})
     if committed and not pushed:
-        messages.append("could not verify that the prereg commit was pushed to a public "
-                        "remote (§3.7); a local commit is rewritable and is weak "
-                        "pre-registration -- verify by hand")
+        messages.append("the prereg commit is NOT verifiably on a PUBLIC remote (§3.7): "
+                        f"{push_ev}. `gh repo edit --visibility public && git push`, "
+                        "then re-run; a local or private commit is rewritable and is "
+                        "not a pre-registration")
 
-    passed = bool(exists and committed and identical and precedes)
+    placeholders = bool(exists and "<<" in prereg.read_text(errors="replace"))
+    if placeholders:
+        messages.append("prereg.md still contains <<...>> template placeholders; every "
+                        "field must be filled from the A/C/D/power outputs BEFORE it "
+                        "is committed as the registration")
+
+    passed = bool(exists and committed and identical and precedes and pushed
+                  and not placeholders)
     return LockReport(
         passed=passed, prereg_path=str(prereg), exists_in_worktree=exists,
         committed=committed, commit_sha=sha, commit_unix=ct, commit_iso=iso,
