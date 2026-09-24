@@ -52,6 +52,7 @@ source "$_OGAF_REPO/unity/env.sh"
 
 MODEL=${OGAF_WM_MODEL:-WM-base-100}
 GEOMETRY=${OGAF_WM_GEOMETRY:-box}
+CONDITION=${OGAF_WM_CONDITION:-INTERACT}   # ABSENT = appearance-gap control (300/model)
 N=${OGAF_WM_N:-1500}
 FRAMES=${OGAF_WM_FRAMES:-16}     # ladder.yaml transformer.max_frames
 
@@ -81,7 +82,7 @@ date
 # defers traps while a foreground command runs).  Items are skip-if-exists,
 # so a requeued shard resumes where it stopped.
 srun python wm/wm_generate.py \
-    --model "$MODEL" --geometry "$GEOMETRY" --n "$N" \
+    --model "$MODEL" --geometry "$GEOMETRY" --condition "$CONDITION" --n "$N" \
     --shard "$IDX" --n-shards "$NSHARDS" &
 PID=$!
 trap 'echo "SIGTERM; forwarding to the generator"; kill -TERM $PID 2>/dev/null || true' TERM
@@ -96,6 +97,7 @@ done
 # concurrent shards do not overwrite one manifest.json; the final, whole-set
 # manifest is written once after the array (see unity/HANDOFF.md).
 GEN_DIR="$OGAF_DATA/generated/$MODEL/$GEOMETRY"
+[[ "$CONDITION" == "INTERACT" ]] || GEN_DIR="${GEN_DIR}__${CONDITION}"
 python unity/validate.py --dir "$GEN_DIR" --expected-frames "$FRAMES" \
     --manifest "$GEN_DIR/manifest_validate_shard$(printf '%03d' "$IDX").json"
 
