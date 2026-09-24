@@ -472,8 +472,20 @@ def analyze_h(root: Path) -> None:
             continue
         print(f"  C3(b) {name}: standard d={v['standard_effect']:+.3f}, "
               f"OG-AF d={v['ogaf_effect']:+.3f}, DINO d={v['dino_effect']:+.3f}")
-    if "domain_gap" in res:
-        print(f"\n  sim->generated feature distance: {res['domain_gap']}")
+    if res.get("domain_shift"):
+        print("\n  domain shift (INTERACT generations): DINO(gen, real), clean-vs-augmented IDM delta")
+        for n, v in res["domain_shift"].items():
+            print(f"    {n:24s} dino={v['dino_generated_vs_real']:.5f}  "
+                  f"std_aug={v['standard_augmented']:.5f}  std_clean={v['standard_clean']:.5f}  "
+                  f"delta={v['clean_minus_augmented']:+.5f}")
+    if res.get("domain_gap"):
+        print("\n  appearance-gap control (ABSENT: no object, physics divergence = 0 by construction)")
+        for n, v in res["domain_gap"].items():
+            if "missing" in v:
+                print(f"    {n:24s} {v['missing']}")
+                continue
+            print(f"    {n:24s} n={v['n']:4d} standard={v['standard']:.5f}  ogaf={v['ogaf']:.5f}  "
+                  f"dino={v['dino']:.5f}  gt={v['ground_truth']:.5f}")
 
 
 _PREREG_NUMBER = r"\s*[:=]\s*(?:<<)?\s*([0-9]*\.?[0-9]+)"
