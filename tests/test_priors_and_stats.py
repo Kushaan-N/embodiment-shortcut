@@ -219,3 +219,38 @@ def test_holm_single_test_is_unchanged():
 def test_effect_size_requires_positive_floor():
     with pytest.raises(ValueError):
         stats.cohen_style_effect(1.0, 0.0)
+
+
+# ==========================================================================
+# Pair ids must be unique once geometries are pooled
+
+
+def test_pair_ids_are_unique_across_pooled_geometries_and_decode():
+    import stats
+
+    g = np.array(["box", "sphere", "cylinder", "box"])
+    t = np.array([7, 7, 7, 8])
+    ids = stats.pair_id(g, t)
+    assert ids.dtype == np.int64
+    assert len(set(ids.tolist())) == 4          # box/7 != sphere/7 != cylinder/7
+    assert (stats.pair_id_geometry(ids) == g).all()
+    assert (ids % stats._PAIR_ID_STRIDE == t).all()
+
+
+def test_paired_gap_accepts_pooled_geometries_via_pair_id():
+    """The pooled INTERACT/DECOY arrays of Experiment E repeat tuple_index
+    across geometries; bare indices made paired_gap raise 'duplicate pair
+    ids'.  Composite ids pair box/7 with box/7 only."""
+    import stats
+
+    g = np.array(["box", "sphere", "box", "sphere"])
+    t = np.array([7, 7, 8, 8])
+    ids = stats.pair_id(g, t)
+    with pytest.raises(ValueError):
+        stats.paired_gap({"DECOY": np.ones(4), "INTERACT": np.zeros(4)},
+                         {"DECOY": t, "INTERACT": t})
+    diffs, out_ids = stats.paired_gap({"DECOY": np.array([1., 2., 3., 4.]),
+                                       "INTERACT": np.array([0., 0., 0., 0.])},
+                                      {"DECOY": ids, "INTERACT": ids})
+    assert len(diffs) == 4
+    assert sorted(out_ids.tolist()) == sorted(ids.tolist())
