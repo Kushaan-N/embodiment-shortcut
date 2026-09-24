@@ -35,12 +35,17 @@ base:
     corpus: INTERACT
     fraction: 1.0
     #: 27.85 TFLOP/step measured at batch 16 (attention is only 2.1% of it --
-    #: factorising is what keeps it there).  150k steps ~ 9.3 A100-hours per run
-    #: at ~40% MFU; x3 full runs ~ 28 GPU-h nominal, ~85 GPU-h at realistic MFU
+    #: factorising is what keeps it there).  120k steps ~ 7.4 A100-hours per run
+    #: at ~40% MFU; x3 full runs ~ 22 GPU-h nominal, ~70 GPU-h at realistic MFU
     #: once the VAE, latent encoding, generation and IDM scoring are included.
     #: Inside the ~100 GPU-hour budget.  §13.3's S2 stage measures the real rate
     #: and S4's --time is set from it -- do not trust this arithmetic over that.
-    steps: 150000
+    #:
+    #: 120 000 is the run: model 1 ("100%") is its final state, and 36 000 /
+    #: 12 000 are 30% / 10% of it.  (An earlier draft trained to 150k and
+    #: called 120k "100%", spending 20% of the budget on steps no ladder model
+    #: used.  Decided 2026-09-24.)
+    steps: 120000
     batch_size: 16
     lr: 1.0e-4
     warmup: 2000
@@ -55,7 +60,7 @@ models:
   - id: 1
     name: WM-base-100
     from: base
-    checkpoint_at: 120000
+    checkpoint_at: 120000        # == train.steps -> resolves to final.pt
     note: full training
 
   - id: 2
