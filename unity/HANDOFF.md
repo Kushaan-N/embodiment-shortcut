@@ -222,11 +222,13 @@ sbatch --array=0-4  -p gpu unity/train_idm.sbatch     # S2: record Elapsed with 
 sbatch --array=0-29 -p gpu unity/train_idm.sbatch     # full
 ```
 
-`train_idm.py` has **no mid-run resume**. Keep Architecture A on plain `gpu`
-(8 h limit in the header); only add `gpu-preempt` if S2 measured every item
-well under 2 h, and then pass `--time=02:00:00`. A preempted item restarts from
-zero; the script caps restarts at 3 so a loop is a visible failure, not a
-silently burned allocation.
+`train_idm.py` writes a per-epoch resume state (`<tag>/resume.pt`, full
+model/optimizer/schedule/RNG state, atomic) and continues from it on the next
+launch, so Architecture A can be assembled from 2 h `gpu-preempt` windows like
+the world models: `-p gpu,gpu-preempt --time=02:00:00` once S2 has measured the
+epoch time. Verify the resume at S3 by actually being preempted (the log says
+`resumed from ... epoch k/N`). The restart cap (12) only catches an item that
+never completes an epoch.
 
 Cost: Arch B probes + masking ~5-15 GPU-h; Arch A (30 items) ~30-90 GPU-h on
 A100/L40S.
@@ -314,12 +316,21 @@ for m in WM-base-100 WM-base-30 WM-base-10 WM-data-poor WM-physics-corrupted; do
       --dir $OGAF_DATA/generated/$m/box --expected-frames 16 \
       --manifest $OGAF_DATA/generated/$m/box/manifest.json
 done
+# 6. ladder.yaml controls: the appearance-gap control generates on ABSENT
+#    (free-space) clips -- no object, so contact physics cannot diverge and
+#    whatever the metrics read is rendering/domain gap.  300 per model.
+for g in box sphere cylinder; do
+  sbatch $CHEAP --time=02:00:00 unity/run.sbatch python wm/render_clips.py --geometry $g --shards $(seq 0 19) --condition ABSENT
+done
+for m in WM-base-100 WM-base-30 WM-base-10 WM-data-poor WM-physics-corrupted; do
+  OGAF_WM_MODEL=$m OGAF_WM_CONDITION=ABSENT OGAF_WM_N=300 sbatch --array=0-4 -p gpu,gpu-preempt unity/wm_generate.sbatch
+done
 sbatch $GPU --time=03:00:00 unity/run.sbatch python wm/exp_h.py
 python analyze.py --exp h
 ```
 
 `wm_train.sbatch` is **built to be killed**: it trains to a wall-clock budget,
-checkpoints on USR1, exits 0, and self-requeues to resume. A 150k-step run is
+checkpoints on USR1, exits 0, and self-requeues to resume. A 120k-step run is
 assembled from however many short windows the partition gives you. (It now
 waits for the trainer to finish writing its checkpoint before requeueing; the
 previous version raced it and could lose up to 2000 steps per kill.)
@@ -527,19 +538,27 @@ ones that would have cost a GPU allocation or produced a wrong result:
   `unity/probes.sbatch`, `unity/run.sbatch`), so no documented command runs on
   a login node.
 
-**Decisions this audit deliberately did NOT make for you:**
+**Decisions taken 2026-09-24 (second pass), so they are no longer open:**
 
-1. `wm/ladder.yaml` trains 150 000 steps but calls step **120 000** "100 %"
-   (36 000 = 30 %, 12 000 = 10 %). The code follows the ladder literally
-   (WM-base-100 = step 120 000). Either set `train.steps: 120000` (saves 20 %
-   of the H training budget) or relabel -- before the prereg.
-2. The augmented A-std/A-del IDMs the ladder scores H with are 10 extra
-   Architecture A items (+50 % of that stage). They are in the array (20-29);
-   drop them only by changing `ladder.yaml`'s `augmented: true` first.
-3. `ladder.yaml`'s controls (`appearance_gap` free-space rollouts,
-   `domain_shift` FID-style distance) are specified but not implemented;
-   `analyze.py --exp h` prints them as absent. C3(b)'s effect sizes are
-   unpaired Cohen's d although every model sees the same held-out actions.
+1. **The ladder run is 120 000 steps.** `train.steps: 120000`; WM-base-100 is
+   the run's final state (`final.pt`), 36 000 / 12 000 are 30 % / 10 % of it.
+   Saves 20 % of the H training budget that no ladder model used.
+2. **The augmented A-std/A-del IDMs stay** (train_idm items 20-29): the ladder
+   registers `augmented: true` for the H metrics, and dropping them would be a
+   protocol change made for cost.
+3. **The controls are implemented.** `appearance_gap`: `wm_generate.py
+   --condition ABSENT` generates on free-space clips (no object, physics
+   divergence zero by construction) and `exp_h.py` reports every metric there
+   as `domain_gap`; `domain_shift`: the DINO gen-vs-real distance on the
+   INTERACT generations next to the clean-vs-augmented IDM delta. C3(b)'s
+   effect sizes remain unpaired Cohen's d (left as is; noted).
+7. **`train_idm.py` resumes.** Per-epoch `resume.pt` (model, optimizer,
+   schedule, scaler, history, best, every RNG incl. the loader's shuffle
+   generator), atomic; deleted only after `eval.npz` lands. Architecture A
+   can run on `gpu-preempt`. Unvalidated on a GPU: the S1 smoke plus one
+   deliberate preemption at S3 are its test.
+
+**Still open:**
 4. Gate verdicts for C0/B/C/corpus are computed inside the exp scripts (with
    thresholds hardcoded there) and `analyze.py` echoes the stored booleans --
    "analyze.py is the only place arrays become verdicts" is not yet
@@ -548,9 +567,6 @@ ones that would have cost a GPU allocation or produced a wrong result:
    re-clone resets it); the public push timestamp is the real anchor.
 6. The committed `results/exp_0/results.json` used 3 probe seeds; §2's command
    uses 5.
-7. `train_idm.py` has no resume. A per-epoch checkpoint is the right fix for
-   running Architecture A on `gpu-preempt`; it needs an S1 run to validate, so
-   it was not written blind.
-8. `preflight.py`'s EGL check times context creation plus one frame against a
+7. `preflight.py`'s EGL check times context creation plus one frame against a
    0.5 s heuristic; a cold context on a healthy node can trip it -- re-run
    before believing an osmesa diagnosis.
