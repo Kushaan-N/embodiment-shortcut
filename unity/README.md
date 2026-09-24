@@ -1,6 +1,7 @@
 # Unity (UMass) plan
 
-Facts below were verified against Unity docs on 2026-08-17 (§13.2).
+Facts below were verified against Unity docs on 2026-08-17 and re-verified
+2026-09-24 against live `sinfo`/`sacctmgr` and the docs (§13.2).
 **Re-verify at S0** — cluster policy changes and a stale assumption here costs
 an allocation, not a warning.
 
@@ -23,8 +24,14 @@ an allocation, not a warning.
    schedule for a general-access account.
 5. **`--qos=long`** is needed beyond ~2 days. General-access `gpu` (153 nodes)
    and `gpu-preempt` (80 nodes) allow up to 14 days.
-6. **Check `/datasets/ai/` first.** DINOv2 is already mirrored at
-   `/datasets/ai/dinov2`; the nvidia mirror was last pulled 2025-12-06.
+6. **`/datasets/ai/dinov2` is NOT the Gate B encoder.** It is DINOv2, measured
+   and rejected at 0.55 sigma; the selected DINOv3 must be pre-staged into the
+   workspace HF cache (HANDOFF §1). `preflight.py` refuses to run a job
+   otherwise.
+7. **Nothing computes on a login node.** Every documented command runs under
+   SLURM: `unity/run.sbatch <cmd>` for one-offs (CPU by default; add
+   `-p gpu --gres=gpu:1 --constraint=[a100|l40s]` for GPU), `corpus.sbatch`
+   (60-way array on cheap EGL GPUs), `probes.sbatch`, and the array scripts.
 
 ## Escalation ladder (§13.3)
 
@@ -60,24 +67,29 @@ analysis.
 ## Commands
 
 ```bash
-# S0 — login node
+# S0 — login node: environment only; preflight itself needs a compute node
 export OGAF_DATA=$(ws_allocate ogaf 30)/data
-python unity/preflight.py --time 08:00:00 --partition gpu --projected-gb 400
+source unity/env.sh                       # venv, caches, thresholds, logs/
+srun -p gpu --gres=gpu:1 --time=00:15:00 --cpus-per-task=4 --mem=16G \
+  python unity/preflight.py --time 08:00:00 --partition gpu --projected-gb 400
 
-# S1 — interactive, one item, with the checks that matter
+# S1 — interactive, one item, with the checks that matter (isolated output dirs)
 salloc -p gpu --gres=gpu:1 --time=02:00:00 --cpus-per-task=8 --mem=64G
 bash unity/train_idm.sbatch --smoke
-bash unity/wm_generate.sbatch --s1        # determinism + two-action divergence
+bash unity/wm_train.sbatch --smoke        # proves RESUME, not restart
+OGAF_WM_MODEL=WM-base-10 bash unity/wm_generate.sbatch --s1   # determinism + divergence
 
 # S2 — 5 items, gpu only, record the wall clock
 sbatch --array=0-4 -p gpu unity/train_idm.sbatch
 sacct -j <jobid> --format=JobID,Elapsed,State,MaxRSS
 
-# S3 — 50 items, invite preemption, then verify resume
-sbatch --array=0-49 -p gpu,gpu-preempt unity/train_idm.sbatch
+# S3 — invite preemption, then verify resume BY BEING PREEMPTED.  Only the
+# stages with a real resume belong here (wm_train, wm_generate, corpus);
+# train_idm.py has none, so Architecture A stays on -p gpu.
+sbatch --array=0-2  -p gpu,gpu-preempt unity/wm_train.sbatch
 
-# S4 — full sweep, --time = 3x the S2 median
-sbatch --array=0-19 -p gpu,gpu-preempt --time=<3x S2 median> unity/train_idm.sbatch
+# S4 — full sweep, --time = 3x the S2 median (Arch A: 30 items, 0-19 + 10 augmented)
+sbatch --array=0-29 -p gpu --time=<3x S2 median> unity/train_idm.sbatch
 ```
 
 ## Monitoring
@@ -92,11 +104,13 @@ before analysing**, never after.
 on a machine where you trust the download:
 
 ```bash
+# with unity/env.sh sourced, after HANDOFF §1's pre-staging
 python - <<'PY' > unity/weights_manifest.json
-import hashlib, json, pathlib
-root = pathlib.Path("/datasets/ai/dinov2")
+import hashlib, json, os, pathlib
+roots = [pathlib.Path(os.environ["HF_HOME"]) / "hub",              # DINOv3 snapshot
+         pathlib.Path(os.environ["TORCH_HOME"]) / "hub" / "checkpoints"]  # ResNet-50
 out = {}
-for p in sorted(root.rglob("*.safetensors")):
+for p in sorted(q for r in roots for q in r.rglob("*") if q.suffix in (".safetensors", ".pth")):
     h = hashlib.sha256()
     with open(p, "rb") as fh:
         for c in iter(lambda: fh.read(1 << 20), b""):
