@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +45,81 @@ def verdict(name: str, measured, threshold, passed: bool, *, ci=None, units: str
 
 def _load(path: Path):
     return json.loads(path.read_text()) if path.exists() else None
+
+
+def _holm_report(out: Path, variants: dict, tau1: float, prior: float) -> None:
+    """Holm-corrected one-sided bootstrap p-values for the confirmatory family.
+
+    prereg §10.2 promises Holm across the confirmatory tests; until now the
+    p-values were never computed (``tests``/``labels`` were collected and
+    dropped) and stats.holm_correction was dead code.  They are computed
+    HERE -- the only place arrays become verdicts -- from the per-sample
+    arrays exp_e wrote, against the SAME nulls the CI verdicts above use:
+      C1: G(A-std)            < tau_1 * floor(A-std)
+      C2: err(A-del, INTERACT) < midpoint(floor(A-del), prior)
+    T5 compares two point estimates with no registered null and stays
+    descriptive, so the family is {C1, C2}.  Never lets a failure here take
+    the verdict table down with it.
+    """
+    npz = out / "confound.npz"
+    if not npz.exists():
+        print(f"\n  Holm: {npz} missing; p-values not computed")
+        return
+    try:
+        z = np.load(npz, allow_pickle=False)
+        pvals, labels = [], []
+
+        std = variants.get("A-std", {})
+        if _finite_positive(std.get("floor_mae")):
+            vals, ids = {}, {}
+            for k in z.files:
+                m = re.match(r"^A-std_seed(\d+)_G_paired$", k)
+                if m:
+                    s = int(m.group(1))
+                    vals[s], ids[s] = z[k], z[f"A-std_seed{s}_G_pair_ids"]
+            if vals:
+                pd = stats.PairedData(values=vals, pair_ids=ids)
+                pvals.append(stats.one_sided_p(pd, tau1 * float(std["floor_mae"]), "less",
+                                               n_boot=C.N_BOOTSTRAP, rng_seed=C.BOOTSTRAP_SEED))
+                labels.append("C1: G(A-std) < tau_1 * floor")
+
+        dele = variants.get("A-del", {})
+        if _finite_positive(dele.get("floor_mae")):
+            vals, ids = {}, {}
+            for k in z.files:
+                m = re.match(r"^A-del_seed(\d+)_INTERACT_mae$", k)
+                if m:
+                    s = int(m.group(1))
+                    vals[s] = z[k]
+                    ids[s] = stats.pair_id(z[f"A-del_seed{s}_INTERACT_geometry"],
+                                           z[f"A-del_seed{s}_INTERACT_tuple"])
+            if vals:
+                pd = stats.PairedData(values=vals, pair_ids=ids)
+                mid = 0.5 * (float(dele["floor_mae"]) + prior)
+                pvals.append(stats.one_sided_p(pd, mid, "less",
+                                               n_boot=C.N_BOOTSTRAP, rng_seed=C.BOOTSTRAP_SEED))
+                labels.append("C2: err(A-del, INTERACT) < midpoint")
+
+        if not pvals:
+            print("\n  Holm: no confirmatory p-values available (floors missing?)")
+            return
+        adj = stats.holm_correction(pvals, labels)
+        print(f"\n  Holm-Bonferroni over the confirmatory family ({len(pvals)} tests; "
+              "T5 descriptive), one-sided bootstrap p:")
+        for lab in labels:
+            print(f"    {lab:44s} p={adj[lab]['p_raw']:.4f}   "
+                  f"Holm-adjusted={adj[lab]['p_holm']:.4f}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"\n  Holm: p-values not computed ({type(exc).__name__}: {exc})")
+
+
+def _finite_positive(x) -> bool:
+    """json.dump writes NaN, json.loads accepts it, and NaN is truthy -- so a
+    missing floor must be tested explicitly, not with ``if floor:``."""
+    try:
+        return x is not None and float(x) == float(x) and float(x) > 0
+    except (TypeError, ValueError):
+        return False
 
 
 # ==========================================================================
@@ -201,7 +277,6 @@ def analyze_e(root: Path, prereg_path: Path | None = None) -> None:
           f"pre-declared before E)\n")
 
     variants = res["variants"]
-    tests, labels = [], []
 
     for v, entry in sorted(variants.items()):
         floor = entry.get("floor_mae")
@@ -219,7 +294,10 @@ def analyze_e(root: Path, prereg_path: Path | None = None) -> None:
     # ---- C1 -----------------------------------------------------------
     std = variants.get("A-std", {})
     g_std = std.get("G", {}).get("pooled")
-    if g_std and std.get("floor_mae"):
+    if g_std and not _finite_positive(std.get("floor_mae")):
+        print("\n  C1: floor_mae for A-std is missing/NaN -- run exp_d_floors.py and "
+              "re-run exp_e_confound.py; no verdict without the floor")
+    if g_std and _finite_positive(std.get("floor_mae")):
         ratio = g_std["point"] / std["floor_mae"]
         hi = g_std["ci_high"] / std["floor_mae"]
         lo = g_std["ci_low"] / std["floor_mae"]
@@ -235,8 +313,6 @@ def analyze_e(root: Path, prereg_path: Path | None = None) -> None:
         elif not c1_supported:
             print("    INCONCLUSIVE: the CI straddles tau_1.  Report the continuous G and\n"
                   "    say so; do not move tau_1 (§0.1).")
-        tests.append(g_std.get("p_one_sided", np.nan))
-        labels.append("C1")
 
     # ---- C2 -----------------------------------------------------------
     dele = variants.get("A-del", {})
@@ -244,7 +320,9 @@ def analyze_e(root: Path, prereg_path: Path | None = None) -> None:
         ci = dele.get("conditions", {}).get("INTERACT")
         cd = dele.get("conditions", {}).get("DECOY")
         floor = dele.get("floor_mae")
-        if ci and floor:
+        if ci and not _finite_positive(floor):
+            print("  C2: floor_mae for A-del is missing/NaN -- run exp_d_floors.py first")
+        if ci and _finite_positive(floor):
             mid = 0.5 * (floor + prior)
             verdict("C2  err(A-del, INTERACT) < midpoint(floor, prior)",
                     ci["point"], mid, ci["ci_high"] < mid,
@@ -278,6 +356,9 @@ def analyze_e(root: Path, prereg_path: Path | None = None) -> None:
                 ci=(gc["ci_low"], gc["ci_high"]))
         print("    Prediction: granting clip access re-opens the shortcut.  This turns\n"
               "    the would-be bug into a supporting result (§4-T8).")
+
+    # ---- Holm across the confirmatory family ----------------------------
+    _holm_report(out, variants, tau1, prior)
 
     print("\n  Architecture B and all ablations are reported as descriptive support "
           "only (§10.2).")
@@ -381,33 +462,43 @@ def analyze_h(root: Path) -> None:
             print("    The ladder FAILED.  Between-model claims are void (§9-H); fix the\n"
                   "    ladder before reporting C3(b).")
     for name, v in res.get("within_model", {}).items():
-        verdict(f"C3(a) {name}: Spearman(standard rank, OG-AF rank)",
-                v["spearman"], 1.0, v["spearman"] < 0.9)
+        # Disagreement is the prediction: pass when the two rankings correlate
+        # BELOW 0.9 (the threshold printed is the one applied).
+        verdict(f"C3(a) {name}: Spearman(standard rank, OG-AF rank) < 0.9",
+                v["spearman"], 0.9, v["spearman"] < 0.9)
     for name, v in res.get("between_model", {}).items():
+        if not isinstance(v, dict):          # e.g. {"void": "ladder not monotone"}
+            print(f"  C3(b) {name}: {v}")
+            continue
         print(f"  C3(b) {name}: standard d={v['standard_effect']:+.3f}, "
               f"OG-AF d={v['ogaf_effect']:+.3f}, DINO d={v['dino_effect']:+.3f}")
     if "domain_gap" in res:
         print(f"\n  sim->generated feature distance: {res['domain_gap']}")
 
 
+_PREREG_NUMBER = r"\s*[:=]\s*(?:<<)?\s*([0-9]*\.?[0-9]+)"
+
+
 def _read_prereg_thresholds() -> dict:
-    """Parse the thresholds frozen in prereg.md, if present."""
+    """Parse the thresholds frozen in prereg.md, if present.
+
+    The template writes them as ``- τ₁ (...): `- tau_1: <<0.25>>` `` -- the
+    ``tau_1:`` token is mid-line, inside backticks, and may still be wrapped in
+    the ``<<>>`` placeholder markers.  A line-prefix match therefore never
+    fired and analysis silently fell back to config.TAU_1_DEFAULT, which the
+    lock does not hash.  Prefer a dedicated ``- tau_1:`` line; otherwise take
+    the first ``tau_1: <number>`` anywhere in the file.
+    """
     p = prereg_lock.PREREG_PATH
     if not p.exists():
         return {}
+    text = p.read_text()
     out = {}
-    for line in p.read_text().splitlines():
-        s = line.strip()
-        if s.startswith("- tau_1:"):
-            try:
-                out["tau_1"] = float(s.split(":", 1)[1].strip())
-            except ValueError:
-                pass
-        if s.startswith("- eps_a:"):
-            try:
-                out["eps_a"] = float(s.split(":", 1)[1].strip())
-            except ValueError:
-                pass
+    for key in ("tau_1", "eps_a"):
+        m = (re.search(rf"^\s*-\s*{key}{_PREREG_NUMBER}", text, re.MULTILINE)
+             or re.search(rf"{key}{_PREREG_NUMBER}", text))
+        if m:
+            out[key] = float(m.group(1))
     return out
 
 
