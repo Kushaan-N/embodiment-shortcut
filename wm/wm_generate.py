@@ -36,6 +36,12 @@ from wm.wm_train import VideoWorldModel  # noqa: E402
 LADDER_PATH = Path(__file__).resolve().parent / "ladder.yaml"
 
 
+def generated_subdir(geometry: str, condition: str) -> str:
+    """generated/<model>/<geometry> for INTERACT (unchanged layout); the
+    appearance-gap control lives beside it as <geometry>__ABSENT."""
+    return geometry if condition == "INTERACT" else f"{geometry}__{condition}"
+
+
 def resolve_checkpoint(model_name: str, ckpt_root: Path) -> Path:
     """Map a ladder model name to the checkpoint that DEFINES it (wm/ladder.yaml).
 
@@ -53,6 +59,8 @@ def resolve_checkpoint(model_name: str, ckpt_root: Path) -> Path:
             continue
         if "checkpoint_at" in m:
             step = int(m["checkpoint_at"])
+            if step >= int(ladder["base"]["train"]["steps"]):
+                return ckpt_root / base_name / "final.pt"     # the run's final state
             p = ckpt_root / base_name / f"ckpt_step{step:07d}.pt"
             if not p.exists():
                 raise FileNotFoundError(
@@ -186,6 +194,9 @@ def main() -> int:
     ap.add_argument("--s1", action="store_true", help="S1 ladder stage: 1 item + S1 checks")
     ap.add_argument("--out", type=Path, default=C.DATA_ROOT / "generated")
     ap.add_argument("--geometry", default="box", choices=C.GEOMETRIES)
+    ap.add_argument("--condition", default="INTERACT", choices=C.CONDITIONS,
+                    help="ABSENT = ladder.yaml's appearance_gap control: no object, so "
+                         "contact physics cannot diverge; residual error is domain gap")
     ap.add_argument("--clips", type=Path, default=C.DATA_ROOT / "wm_clips")
     args = ap.parse_args()
 
@@ -197,7 +208,7 @@ def main() -> int:
 
     # The SAME held-out action set for every model on the ladder (§9-H), and the
     # same REAL video to score against -- the WM clips, not the horizon frames.
-    clip_root = Path(args.clips) / args.geometry / "INTERACT"
+    clip_root = Path(args.clips) / args.geometry / args.condition
     items = sorted(clip_root.glob("*.npz"))
     if not items:
         raise SystemExit(f"no WM clips under {clip_root}; run wm/render_clips.py")
@@ -214,7 +225,7 @@ def main() -> int:
               f"every ladder model is scored on these same {n}", flush=True)
     idx = np.arange(n)[args.shard :: args.n_shards]
 
-    outdir = Path(args.out) / args.model / args.geometry
+    outdir = Path(args.out) / args.model / generated_subdir(args.geometry, args.condition)
     outdir.mkdir(parents=True, exist_ok=True)
 
     if args.s1:
