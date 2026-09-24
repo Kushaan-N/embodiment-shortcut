@@ -26,6 +26,7 @@ from __future__ import annotations
 import math
 import os
 from dataclasses import dataclass, asdict
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -297,12 +298,20 @@ def _make_schedule(opt, cfg: TrainConfig, total_steps: int):
 
 
 def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
-              *, dev=None, log_every: int = 50, augment: AppearanceAugment | None = None) -> dict:
+              *, dev=None, log_every: int = 50, augment: AppearanceAugment | None = None,
+              resume_path: Path | str | None = None) -> dict:
     """Train one IDM.  Loss is MSE, because MultiWorld §B.2 says MSE.
 
     Model selection is on validation MAE (§7.1 makes MAE primary for
     *reporting*; the training objective stays the paper's).  Returns the
     training history; per-sample errors come from ``evaluate_idm``.
+
+    ``resume_path``: after every epoch the full state (model, optimizer,
+    schedule, scaler, history, best-so-far, every RNG incl. the loader's
+    shuffle generator) is written there atomically; if the file exists at
+    start, training continues from the next epoch.  This is what lets an
+    Architecture A item survive gpu-preempt's 2 h kill instead of restarting
+    from zero on every requeue.
     """
     dev = dev or device()
     torch.manual_seed(cfg.seed)
@@ -317,7 +326,27 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
     history = {"train_mse": [], "val_mse": [], "val_mae": [], "lr": []}
     best = {"val_mae": float("inf"), "epoch": -1, "state": None}
 
-    for epoch in range(cfg.epochs):
+    start_epoch = 0
+    if resume_path is not None and Path(resume_path).exists():
+        ck = torch.load(resume_path, map_location="cpu", weights_only=False)
+        model.load_state_dict(ck["model"])
+        opt.load_state_dict(ck["optimizer"])
+        sched.load_state_dict(ck["scheduler"])
+        if ck.get("scaler") is not None:
+            scaler.load_state_dict(ck["scaler"])
+        history, best = ck["history"], ck["best"]
+        torch.set_rng_state(ck["torch_rng"])
+        np.random.set_state(ck["numpy_rng"])
+        if dev.type == "cuda" and ck.get("cuda_rng") is not None:
+            torch.cuda.set_rng_state(ck["cuda_rng"])
+        gen = getattr(train_loader, "generator", None)
+        if gen is not None and ck.get("loader_rng") is not None:
+            gen.set_state(ck["loader_rng"])
+        start_epoch = int(ck["epoch"]) + 1
+        print(f"    resumed from {resume_path}: epoch {start_epoch}/{cfg.epochs}, "
+              f"best val_mae so far {best['val_mae']:.5f}", flush=True)
+
+    for epoch in range(start_epoch, cfg.epochs):
         model.train()
         running, nb = 0.0, 0
         for x, y in train_loader:
@@ -348,12 +377,41 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
         if epoch % max(1, cfg.epochs // 10) == 0 or epoch == cfg.epochs - 1:
             print(f"    epoch {epoch:3d}/{cfg.epochs}  train_mse={history['train_mse'][-1]:.5f}  "
                   f"val_mae={val['mae']:.5f}  lr={history['lr'][-1]:.2e}", flush=True)
+        if resume_path is not None:
+            _save_resume(resume_path, epoch, model, opt, sched, scaler, history, best,
+                         train_loader, dev)
 
     if best["state"] is not None:
         model.load_state_dict(best["state"])
     history["best_epoch"] = best["epoch"]
     history["best_val_mae"] = best["val_mae"]
     return history
+
+
+def _save_resume(path, epoch, model, opt, sched, scaler, history, best, train_loader, dev):
+    """Atomic per-epoch resume state (tmp -> fsync -> rename)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    gen = getattr(train_loader, "generator", None)
+    payload = {
+        "epoch": int(epoch),
+        "model": {k: v.detach().cpu() for k, v in model.state_dict().items()},
+        "optimizer": opt.state_dict(),
+        "scheduler": sched.state_dict(),
+        "scaler": scaler.state_dict() if scaler.is_enabled() else None,
+        "history": history,
+        "best": best,
+        "torch_rng": torch.get_rng_state(),
+        "cuda_rng": torch.cuda.get_rng_state() if dev.type == "cuda" else None,
+        "numpy_rng": np.random.get_state(),
+        "loader_rng": gen.get_state() if gen is not None else None,
+    }
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "wb") as fh:
+        torch.save(payload, fh)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
 
 
 @torch.no_grad()
