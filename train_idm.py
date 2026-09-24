@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -67,8 +68,14 @@ def embed_stores(stores, split, horizon, encoder_name, *, mask_mode="full",
     meta = {"tuple_index": [], "condition": [], "geometry": [], "action": []}
 
     for st in stores:
+        fm = getattr(st, "friction_mult", 1.0)
+        fm_tag = "" if abs(fm - 1.0) < 1e-9 else f"__fm{fm:g}"
+        # The friction multiplier MUST be in the key: Experiment F evaluates
+        # the same (geometry, condition, horizon, split) at several
+        # multipliers, and a shared cache would score the x1.0 embeddings at
+        # every multiplier -- a flat dose-response by construction.
         tag = (f"{encoder_name.replace('/', '_')}__{st.geometry}__{st.condition}"
-               f"__{horizon}__{mask_mode}__{split}")
+               f"{fm_tag}__{horizon}__{mask_mode}__{split}")
         cache = cache_root / f"{tag}.npz"
         if cache.exists():
             z = np.load(cache, allow_pickle=False)
@@ -172,6 +179,14 @@ def main() -> int:
                for s in train_stores}
     print(f"training mixture (§8.2): {json.dumps(mixture)}", flush=True)
 
+    # Seed BEFORE the model is built.  idm.train_idm seeds again before the
+    # loop, but by then build_model has already drawn the initial weights from
+    # the process-default generator, which is the SAME for every seed -- the
+    # 5/10 seeds would differ only in shuffle order, not initialisation, and
+    # would not be the independent replicates the seed-level summary assumes.
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+
     # ---------------- build model + loaders --------------------------------
     if is_arch_a:
         cfg = idm.train_config_from_protocol(proto, args.variant, args.seed,
@@ -187,8 +202,10 @@ def main() -> int:
         tr_ds, va_ds = mk("train"), mk("val")
         tr = idd.make_loader(tr_ds, cfg.batch_size, shuffle=True, seed=args.seed,
                              num_workers=cfg.num_workers)
+        # Validation is a small pass; 8 persistent workers on top of the 8
+        # training workers exceeds the 8-CPU allocation for nothing.
         va = idd.make_loader(va_ds, cfg.batch_size, shuffle=False,
-                             num_workers=cfg.num_workers)
+                             num_workers=min(2, cfg.num_workers))
     else:
         Xtr, Ytr, _ = embed_stores(train_stores, "train", horizon, args.encoder,
                                    mask_mode=args.mask_mode, background=background)
@@ -210,12 +227,15 @@ def main() -> int:
     aug = idm.AppearanceAugment(enabled=args.augment) if (is_arch_a and args.augment) else None
     history = idm.train_idm(model, tr, va, cfg, dev=dev, augment=aug)
 
+    ck_path = outdir / "checkpoint.pt"
+    ck_tmp = ck_path.with_suffix(".pt.tmp")
     torch.save({"state_dict": model.state_dict(), "cfg": cfg.to_dict(),
                 "variant": args.variant, "seed": args.seed,
                 "mask_mode": args.mask_mode, "encoder": args.encoder,
                 "protocol_sha256": proto.sha256,
                 "embed_norm": None if is_arch_a else {"mu": mu, "sd": sd}},
-               outdir / "checkpoint.pt")
+               ck_tmp)
+    os.replace(ck_tmp, ck_path)   # atomic: never a half-written checkpoint
 
     # ---------------- held-out evaluation ---------------------------------
     evals = {}
@@ -225,7 +245,7 @@ def main() -> int:
             d = (idd.ClipDataset(stores, "test", args.variant) if is_clip
                  else idd.PairDataset(stores, "test", horizon))
             loader = idd.make_loader(d, cfg.batch_size, shuffle=False,
-                                     num_workers=cfg.num_workers)
+                                     num_workers=min(2, cfg.num_workers))
             meta = d.meta()
         else:
             Xte, Yte, meta = embed_stores(stores, "test", horizon, args.encoder,
