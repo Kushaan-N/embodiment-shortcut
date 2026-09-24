@@ -72,17 +72,20 @@ def load_generated(model_name: str, geometry: str, root: Path) -> dict:
     items = sorted(d.glob("*.npz"))
     if not items:
         raise FileNotFoundError(f"no generated rollouts under {d}")
-    gen, cond, act, real, ids = [], [], [], [], []
+    gen, cond, act, real, ids, fidx = [], [], [], [], [], []
     for p in items:
         with np.load(p) as z:
             gen.append(z["generated"])
             cond.append(z["conditioning"])
             act.append(z["action"])
             real.append(z["real_target"])
+            if "frame_indices" in z.files:
+                fidx.append(z["frame_indices"].astype(np.int64))
         ids.append(int(p.stem))
     return {"generated": np.stack(gen), "conditioning": np.stack(cond),
             "action": np.stack(act), "real": np.stack(real),
-            "tuple_index": np.asarray(ids)}
+            "tuple_index": np.asarray(ids),
+            "frame_indices": np.stack(fidx) if len(fidx) == len(items) else None}
 
 
 @torch.no_grad()
@@ -90,8 +93,15 @@ def score_with_idm(variant: str, seed: int, batch: np.ndarray, actions: np.ndarr
                    *, augmented: bool, ckpt_root: Path, device) -> np.ndarray:
     """Per-rollout normalised MAE from a trained IDM on (s_0, generated) pairs."""
     tag = f"{variant}__seed{seed}__full" + ("__aug" if augmented else "")
-    ck = torch.load(Path(ckpt_root) / tag / "checkpoint.pt", map_location="cpu",
-                    weights_only=False)
+    ck_path = Path(ckpt_root) / tag / "checkpoint.pt"
+    if not ck_path.exists():
+        raise SystemExit(
+            f"{ck_path} missing.  ladder.yaml scores the standard/OG-AF metrics with "
+            f"AUGMENTED IDMs (evaluation.metrics.augmented: true) and also reports the "
+            f"clean ones; train it with `train_idm.py --variant {variant} --seed {seed}"
+            f"{' --augment' if augmented else ''}` (unity/train_idm.sbatch array items "
+            f"20-29 are the augmented A-std/A-del seeds)")
+    ck = torch.load(ck_path, map_location="cpu", weights_only=False)
     model = idm.build_model(variant, proto_mod.load())
     model.load_state_dict(ck["state_dict"])
     model = model.to(device).eval()
@@ -125,10 +135,13 @@ def ground_truth_error(generated: np.ndarray, real: np.ndarray) -> np.ndarray:
     a good world model, and the ladder-monotonicity check depends on this
     number ordering the models honestly.
     """
-    g = generated.astype(np.float64)
-    r = real.astype(np.float64)
-    axes = tuple(range(1, g.ndim))
-    return np.abs(g - r).mean(axis=axes) / 255.0
+    # Per item, in float32: materialising float64 copies of the whole
+    # (N, 16, 224, 224, 3) arrays is ~116 GB at N=1500 (OOM on --mem=64G).
+    out = np.empty(len(generated), dtype=np.float64)
+    for i in range(len(generated)):
+        out[i] = float(np.abs(generated[i].astype(np.float32)
+                              - real[i].astype(np.float32)).mean()) / 255.0
+    return out
 
 
 def main() -> int:
@@ -156,19 +169,36 @@ def main() -> int:
         except FileNotFoundError as exc:
             print(f"  {name}: {exc}")
             continue
-        # The IDM scores an (s_0, s_del) pair.  s_0 is the conditioning frame;
-        # s_del is the LAST generated frame, since WM clips span [0, s_del].
-        gen_last = g["generated"][:, -1] if g["generated"].ndim == 5 else g["generated"]
-        pairs = np.stack([g["conditioning"][:, 0], gen_last], axis=1)
+        # Each IDM scores an (s_0, s_h) pair at ITS OWN horizon.  s_0 is the
+        # conditioning frame.  A-del's horizon is s_del = the LAST generated
+        # frame (WM clips span [0, s_del]).  A-std was trained on (s_0, s_std)
+        # with s_std = end of the push, arm mid-motion -- scoring it on the
+        # settled last frame would evaluate the "standard metric" on input it
+        # never saw, and every C3 number would be an artefact.  The clip's
+        # frame_indices (video-rate) locate the frame nearest s_std per item.
+        gen = g["generated"]
+        if gen.ndim != 5 or g.get("frame_indices") is None:
+            raise SystemExit(f"{name}: generated items carry no frame_indices; regenerate "
+                             f"with the current wm/wm_generate.py")
+        gen_last = gen[:, -1]
+        k_std = np.argmin(np.abs(g["frame_indices"] * C.FRAME_STRIDE
+                                 - C.PHASES.push_end_idx), axis=1)
+        gen_std = gen[np.arange(len(gen)), k_std]
+        pairs_std = np.stack([g["conditioning"][:, 0], gen_std], axis=1)
+        pairs_del = np.stack([g["conditioning"][:, 0], gen_last], axis=1)
+        print(f"  {name}: standard metric scored at clip frame(s) "
+              f"{sorted(set(k_std.tolist()))} (nearest s_std={C.PHASES.push_end_idx}), "
+              f"OG-AF at the last frame", flush=True)
 
-        std_e = np.mean([score_with_idm("A-std", s, pairs, g["action"], augmented=True,
+        std_e = np.mean([score_with_idm("A-std", s, pairs_std, g["action"], augmented=True,
                                         ckpt_root=args.ckpt_root, device=dev)
                          for s in args.seeds], axis=0)
-        del_e = np.mean([score_with_idm("A-del", s, pairs, g["action"], augmented=True,
+        del_e = np.mean([score_with_idm("A-del", s, pairs_del, g["action"], augmented=True,
                                         ckpt_root=args.ckpt_root, device=dev)
                          for s in args.seeds], axis=0)
-        std_clean = np.mean([score_with_idm("A-std", s, pairs, g["action"], augmented=False,
-                                            ckpt_root=args.ckpt_root, device=dev)
+        std_clean = np.mean([score_with_idm("A-std", s, pairs_std, g["action"],
+                                            augmented=False, ckpt_root=args.ckpt_root,
+                                            device=dev)
                              for s in args.seeds], axis=0)
         real_last = g["real"][:, -1] if g["real"].ndim == 5 else g["real"]
         dino = dino_state_distance(gen_last, real_last, args.encoder, dev)
@@ -208,7 +238,14 @@ def main() -> int:
 
     # ---- C3(b) between-model --------------------------------------------
     results["between_model"] = {}
-    if "WM-base-100" in per_model and "WM-physics-corrupted" in per_model:
+    ladder_ok = bool(results.get("ladder_monotone", {}).get("passed", False))
+    if not ladder_ok:
+        # §9-H: if the ladder is not a ladder, between-model claims are void
+        # and are NOT reported -- not computed-and-caveated.
+        results["between_model"]["void"] = ("ladder not verified monotone; C3(b) is "
+                                            "void and was not computed (§9-H)")
+        print("\n  C3(b): VOID -- ladder not verified monotone; not computed (§9-H)")
+    if ladder_ok and "WM-base-100" in per_model and "WM-physics-corrupted" in per_model:
         a, b = per_model["WM-base-100"], per_model["WM-physics-corrupted"]
         results["between_model"]["corrupted_vs_base"] = {
             "standard_effect": cohens_d(b["standard"], a["standard"]),
