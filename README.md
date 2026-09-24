@@ -24,13 +24,13 @@ occupied in RL.
 
 | Stage | Gate | Result |
 |---|---|---|
-| 1. `distances.py` + tests | 97 unit tests | **PASS** |
+| 1. `distances.py` + tests | 114 unit tests | **PASS** |
 | 2. `scene.py` + validators + contact sheet | visual inspection | ✋ **awaiting human review** |
 | 3. Experiment 0 — state oracles | **Gate C0** | **PASS** |
 | 4. Experiment A — contact deltas | thresholds written | **done** |
 | 5. Experiment B — encoder floor | **Gate B** | **PASS** (DINOv3; DINOv2 fails) |
 | 6. Experiment C — injectivity | **Gate C** | **PASS** |
-| 7. Corpus + `validate_corpus.py` | T11, T7 | not run |
+| 7. Corpus + `validate_corpus.py` | T11, T7, completeness | **STALE** — re-run after the real build (`unity/HANDOFF.md` §0) |
 | 8–12 | — | not run |
 
 Measured gate values are in `results/*/results.json`; `python analyze.py`
@@ -91,47 +91,53 @@ number against its threshold. Never tune a threshold, swap an encoder, resample,
 or re-seed to make a gate pass (§0.1).
 
 ```bash
-# environment (mujoco has no 3.14 wheels)
+# environment (mujoco has no 3.14 wheels); on Unity see unity/HANDOFF.md §1
 uv venv --python 3.11 .venv
 uv pip install --python .venv/bin/python mujoco numpy scipy scikit-learn \
     statsmodels imageio imageio-ffmpeg tqdm torch torchvision transformers \
-    timm pytest pyyaml
+    timm pytest pyyaml huggingface_hub
 
-.venv/bin/python -m pytest tests/ -q                    #  ~4 s
+.venv/bin/python -m pytest tests/ -q                    #  114 tests, a few seconds
 .venv/bin/python scripts/contact_sheet.py               #  ~10 s   ✋ inspect the PNGs
 .venv/bin/python exp_a_deltas.py --n 120                #  ~2 min  -> thresholds.json
 .venv/bin/python exp_0_oracles.py --n 700 --seeds 5     #  ~25 min GATE C0        ✋
 .venv/bin/python exp_b_resolution.py                    #  ~5 min  GATE B (GPU)   ✋
 .venv/bin/python exp_c_injectivity.py --pairs 240       #  ~4 min  GATE C         ✋
 
-# corpus: 2000 tuples x 3 geometries x 3 conditions
+# corpus: 2000 tuples x 3 geometries x 3 conditions, BOTH clip variants
 for g in box sphere cylinder; do
   .venv/bin/python datasets.py --geometry $g --shards $(seq 0 19) --clips
 done
-.venv/bin/python validate_corpus.py                     #  T11 + T7 gates         ✋
+.venv/bin/python idm_data.py                            #  frame stores (CPU, once)
+.venv/bin/python validate_corpus.py                     #  T11 + T7 + completeness ✋
 
 # IDMs: Architecture B first (cheap, surfaces data bugs), then A
 .venv/bin/python exp_masking.py --train                 #  §8.4, 5 seeds
 for v in B-std B-del B-time; do for s in $(seq 0 9); do
   .venv/bin/python train_idm.py --variant $v --seed $s
 done; done
-sbatch --array=0-19 -p gpu,gpu-preempt unity/train_idm.sbatch   # Architecture A
+sbatch --array=0-29 -p gpu unity/train_idm.sbatch       #  Architecture A (20 + 10 augmented)
 
 .venv/bin/python exp_d_floors.py                        #  INTERACT only
 .venv/bin/python power.py
 cp prereg_template.md prereg.md && $EDITOR prereg.md
 git add prereg.md && git commit -m "pre-registration" && git push   #  PUBLIC      ✋
-.venv/bin/python prereg_lock.py                         #  must PASS
+.venv/bin/python prereg_lock.py                         #  must PASS (verifies the public push)
 
 .venv/bin/python exp_e_confound.py                      #  the decisive experiment
-.venv/bin/python exp_f_friction.py --generate && .venv/bin/python exp_f_friction.py
+.venv/bin/python exp_f_friction.py --generate --clips && .venv/bin/python exp_f_friction.py
 .venv/bin/python exp_g_lipschitz.py
 .venv/bin/python analyze.py --exp all                   #  full decision table     ✋
 
-# Experiment H — do NOT build until 0–G pass human review
+# Experiment H — do NOT build until 0–G pass human review; full recipe in
+# unity/HANDOFF.md §2 (friction x3 corpus, clips, VAE, 3 trainings, 5 generations)
 .venv/bin/python wm/vae.py && .venv/bin/python wm/wm_train.py --model WM-base
-bash unity/wm_generate.sbatch --s1                       #  determinism + divergence
+OGAF_WM_MODEL=WM-base-10 bash unity/wm_generate.sbatch --s1   #  determinism + divergence
 ```
+
+On Unity every one of these runs under SLURM (`unity/run.sbatch`,
+`unity/corpus.sbatch`, `unity/probes.sbatch`, the array scripts) -- nothing
+computes on a login node.  `unity/HANDOFF.md` §2 is the authoritative order.
 
 ## Cost and wall-clock
 
@@ -141,15 +147,15 @@ bash unity/wm_generate.sbatch --s1                       #  determinism + diverg
 | Exp B | A10G | < 1 GPU-hour |
 | Corpus, 18 k rollouts + renders | CPU ×8 | ~2–3 node-hours (measured ~0.35 s/rollout) |
 | Arch B probes (30) + masking (45) | A10G | ~5–15 GPU-hours |
-| Arch A trainings (20) | A100/L40S | ~20–60 GPU-hours |
+| Arch A trainings (30: 20 + 10 augmented for Exp H) | A100/L40S | ~30–90 GPU-hours |
 | D/E/F/G evaluation | A10G | ~5 GPU-hours |
 | **Exp H: WM training + generation** | A100 | **~100–200 GPU-hours** |
 
 Everything before H is cheap; H is the budget. The fail-fast ordering exists so
 no H dollar is spent until 0–G survive human review.
 
-Storage: frames ~11 GB (memmapped), A-std clips ~8–12 GB compressed, generated
-rollouts ~1 GB/model.
+Storage: frames ~11 GB (memmapped), clips ~2 × 8–12 GB compressed (A-std and
+A-clip-del), generated rollouts ~1 GB/model.
 
 ## Layout
 
@@ -167,8 +173,9 @@ prereg_lock.py       the §0.5 mechanical lock (no skip flag)
 exp_*.py             one file per experiment
 analyze.py           the ONLY place that turns arrays into verdicts
 wm/                  Experiment H: vae.py, wm_train.py, wm_generate.py, exp_h.py, ladder.yaml
-unity/               preflight.py, validate.py, sbatch templates, escalation ladder
-tests/               97 tests: distances, priors, stats, splits, validators
+unity/               preflight.py, validate.py, env.sh, sbatch: corpus/probes/train_idm/
+                     wm_train/wm_generate/run (generic), escalation ladder, HANDOFF.md
+tests/               114 tests: distances, priors, stats, splits, validators, clips
 ```
 
 ## Design decisions a reviewer should check first
@@ -214,6 +221,10 @@ model — which is what makes it the faithful reproduction the C1 claim must hol
 for, and what makes A-clip-del a meaningful T8 ablation.
 
 ## Open items requiring a human
+
+0. **The 2026-09-24 audit's decisions** (`unity/HANDOFF.md` §7): the ladder's
+   150k-vs-120k step count, the augmented IDMs' cost, unimplemented H controls,
+   the exp_0 seed-count discrepancy.
 
 1. **✋ Contact sheet review** (build-order step 2). `results/contact_sheet/`.
 2. **13 protocol fields are the implementing agent's decision, not a paper's.**
