@@ -10,6 +10,12 @@ results/*/*
 !results/*/results.json
 !results/*/thresholds.json
 !results/*/report.json
+# The pre-registration cites these as its sources, and metadata.json is the
+# provenance (git sha, argv, seeds, versions) that says which run produced
+# each committed record.  Small JSON; version them.
+!results/*/metadata.json
+!results/exp_d/floors.json
+!results/power/power.json
 logs/
 *.npz
 *.npy
