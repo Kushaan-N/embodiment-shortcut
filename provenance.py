@@ -117,13 +117,21 @@ def save_run(outdir: Path, experiment: str, arrays: dict, *, seeds=None,
     outdir.mkdir(parents=True, exist_ok=True)
     import numpy as np
 
-    npz_path = outdir / arrays_name
-    np.savez_compressed(npz_path, **arrays)
+    import os
+
+    # Atomic: a wall-clock kill mid-write must not leave a truncated eval.npz
+    # that a skip-if-exists check then treats as a finished run.
+    npz_path = save_arrays(outdir / arrays_name, **arrays)
     meta = build_metadata(experiment, seeds=seeds, extra=extra)
     meta["arrays"] = {k: list(np.shape(v)) for k, v in arrays.items()}
     meta["arrays_file"] = arrays_name
-    with open(outdir / "metadata.json", "w") as fh:
+    mpath = outdir / "metadata.json"
+    tmp = mpath.with_suffix(".json.tmp")
+    with open(tmp, "w") as fh:
         json.dump(_jsonable(meta), fh, indent=2, sort_keys=True)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, mpath)
     return npz_path
 
 
