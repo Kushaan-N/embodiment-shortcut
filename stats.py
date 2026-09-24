@@ -19,6 +19,35 @@ from typing import Callable, Sequence
 
 import numpy as np
 
+# Pair ids must be unique within a condition (``paired_gap`` refuses
+# duplicates).  A per-geometry ``tuple_index`` is NOT unique once geometries
+# are pooled -- box/7 and sphere/7 are different rollouts -- so every consumer
+# builds ids through ``pair_id``.  One int64 per pair so ids survive an .npz
+# round trip unchanged and decode back to the geometry.
+_PAIR_ID_STRIDE = 10_000_000
+
+
+def pair_id(geometry, tuple_index) -> np.ndarray:
+    """Globally unique int64 pair id for each (geometry, tuple_index)."""
+    import config as C
+
+    geoms = np.asarray(geometry).astype(str).ravel()
+    ti = np.asarray(tuple_index, dtype=np.int64).ravel()
+    if geoms.shape != ti.shape:
+        raise ValueError("geometry/tuple_index shape mismatch")
+    if (ti < 0).any() or (ti >= _PAIR_ID_STRIDE).any():
+        raise ValueError("tuple_index out of range for pair_id encoding")
+    ords = np.array([C.GEOMETRIES.index(g) for g in geoms.tolist()], dtype=np.int64)
+    return ords * _PAIR_ID_STRIDE + ti
+
+
+def pair_id_geometry(pair_ids) -> np.ndarray:
+    """Decode the geometry name from ids made by ``pair_id``."""
+    import config as C
+
+    ords = np.asarray(pair_ids, dtype=np.int64) // _PAIR_ID_STRIDE
+    return np.asarray([C.GEOMETRIES[int(o)] for o in ords.ravel().tolist()])
+
 __all__ = [
     "PairedData", "BootstrapResult", "paired_gap", "hierarchical_bootstrap",
     "one_sided_p", "holm_correction", "cohen_style_effect", "summarise",
@@ -110,6 +139,14 @@ def paired_gap(
     common = np.intersect1d(a_ids, b_ids)
     if common.size == 0:
         raise ValueError("no matched pairs between conditions -- pairing is broken")
+    dropped = (int(len(a_ids) - common.size), int(len(b_ids) - common.size))
+    if any(dropped):
+        # Partially matched input is legal (validator exclusions differ per
+        # condition) but must never be silent: G is then computed on the
+        # intersection while per-condition summaries use every sample.
+        print(f"[paired_gap] WARNING: {dropped[0]} {minuend} and {dropped[1]} "
+              f"{subtrahend} samples had no partner and were dropped; G uses "
+              f"{common.size} matched pairs", flush=True)
     ia = {pid: i for i, pid in enumerate(a_ids.tolist())}
     ib = {pid: i for i, pid in enumerate(b_ids.tolist())}
     order = sorted(common.tolist())
