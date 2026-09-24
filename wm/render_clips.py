@@ -123,14 +123,34 @@ def main() -> int:
     args = ap.parse_args()
 
     fm = "" if abs(args.friction_mult - 1.0) < 1e-9 else f"_fm{args.friction_mult:g}"
+    # A friction-swept corpus gets its OWN clip root (the sibling wm_train.py
+    # reads: wm_clips_fm3/...).  Writing swept clips into the baseline root
+    # would either be skipped as "exists" or overwrite what WM-base trains on.
+    out_root = Path(args.out)
+    if fm:
+        out_root = out_root.parent / f"{out_root.name}{fm}"
+    missing, written, skipped = [], 0, 0
     for s in args.shards:
         p = Path(args.corpus) / args.geometry / f"{args.condition}{fm}_shard{s:05d}.npz"
         if not p.exists():
-            print(f"  missing {p}, skipping")
+            print(f"  MISSING shard {p}", flush=True)
+            missing.append(str(p))
             continue
-        info = process_shard(args.geometry, p, args.out, args.frames,
+        info = process_shard(args.geometry, p, out_root, args.frames,
                              args.condition, args.overwrite)
+        written += info["written"]
+        skipped += info["skipped"]
         print(f"  {args.geometry} shard {s}: {info}", flush=True)
+    # Content, not exit code (§13.5): a run that found nothing to render must
+    # not exit 0 and leave wm_train.py to starve after a GPU is allocated.
+    if missing:
+        print(f"{len(missing)} requested shard(s) missing under {args.corpus}; "
+              f"build them first (datasets.py --friction-mult ...)", flush=True)
+        return 2
+    if written + skipped == 0:
+        print("nothing rendered and nothing already present -- corpus empty?", flush=True)
+        return 2
+    print(f"clips under {out_root}: {written} written, {skipped} already present")
     return 0
 
 
