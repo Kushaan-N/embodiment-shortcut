@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import struct
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -166,6 +167,35 @@ def shard_path(root: Path, geometry: str, condition: str, shard: int,
 # ==========================================================================
 
 
+def clip_path(clip_root: Path, variant: str, geometry: str, condition: str,
+              tuple_index: int, friction_mult: float = 1.0) -> Path:
+    """Where the rendered clip of one (variant, geometry, condition, tuple) lives.
+
+    Keyed on the clip VARIANT (A-std and A-clip-del sample different frames)
+    and on the friction multiplier (a swept corpus must never overwrite the
+    baseline clips Experiment E scores).
+    """
+    fm = "" if abs(friction_mult - 1.0) < 1e-9 else f"_fm{friction_mult:g}"
+    return (Path(clip_root) / variant / geometry / f"{condition}{fm}"
+            / f"{tuple_index:07d}.npz")
+
+
+def clips_complete(clip_root: Path, geometry: str, condition: str, tuple_range,
+                   friction_mult: float = 1.0) -> bool:
+    """True iff every clip variant exists for every tuple in ``tuple_range``."""
+    return all(clip_path(clip_root, v, geometry, condition, ti, friction_mult).exists()
+               for v in C.CLIP_VARIANTS for ti in tuple_range)
+
+
+def _write_json_atomic(path: Path, obj) -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "w") as fh:
+        json.dump(obj, fh, indent=1)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
+
+
 def build_shard(geometry: str, shard: int, *, conditions=C.CONDITIONS,
                 shard_size: int = C.SHARD_SIZE, root: Path = C.CORPUS_ROOT,
                 friction_mult: float = 1.0, thresholds=None,
@@ -190,14 +220,22 @@ def build_shard(geometry: str, shard: int, *, conditions=C.CONDITIONS,
     for condition in conditions:
         out_path = shard_path(root, geometry, condition, shard, friction_mult)
         if out_path.exists() and not overwrite:
-            summary["skipped"][condition] = str(out_path)
-            continue
+            # Skip-if-exists is keyed on the shard, but the clips are written
+            # per tuple inside it.  A run that forgot --clips (or was cut mid-
+            # shard) must not look complete: re-simulate to write the clips
+            # (deterministic, so the shard itself is rewritten identically).
+            if clip_root is None or clips_complete(clip_root, geometry, condition,
+                                                   range(lo, hi), friction_mult):
+                summary["skipped"][condition] = str(out_path)
+                continue
+            print(f"  {out_path.name}: shard exists but its clips are incomplete under "
+                  f"{clip_root}; re-simulating to write them", flush=True)
         per_key: dict = defaultdict(list)
         meta_rows = []
         for ti in range(lo, hi):
             streams = scene.tuple_streams(master_seed, geometry, ti)
             action = scene.sample_action(streams["action"])
-            clip_variant = "A-std" if clip_root is not None else None
+            clip_variant = list(C.CLIP_VARIANTS) if clip_root is not None else None
             r = scene.rollout(action, seed=ti, condition=condition, geometry=geometry,
                               thresholds=thr_g, master_seed=master_seed,
                               friction_mult=friction_mult, clip_variant=clip_variant)
@@ -211,12 +249,14 @@ def build_shard(geometry: str, shard: int, *, conditions=C.CONDITIONS,
                 "validators": {k: v for k, v in r["validators"].items()
                                if isinstance(v, dict)},
             })
-            if clip_root is not None and r["clip"] is not None:
-                provenance.save_arrays(
-                    Path(clip_root) / geometry / condition / f"{ti:07d}.npz",
-                    clip=r["clip"].astype(np.uint8),
-                    clip_indices=r["clip_indices"].astype(np.int64),
-                )
+            if clip_root is not None:
+                for cv, (cclip, cidx) in r["clips"].items():
+                    provenance.save_arrays(
+                        clip_path(clip_root, cv, geometry, condition, ti, friction_mult),
+                        clip=cclip.astype(np.uint8),
+                        clip_indices=cidx.astype(np.int64),
+                        clip_variant=np.str_(cv),
+                    )
 
         arrays = {}
         for k, vals in per_key.items():
@@ -225,9 +265,12 @@ def build_shard(geometry: str, shard: int, *, conditions=C.CONDITIONS,
         arrays["condition"] = np.asarray([condition] * len(meta_rows))
         arrays["geometry"] = np.asarray([geometry] * len(meta_rows))
 
+        # validators.json FIRST (atomically), then the shard: skip-if-exists is
+        # keyed on the shard, so a kill between the two can never leave a shard
+        # that looks done while its validator record is missing.
+        _write_json_atomic(out_path.with_suffix(".validators.json"),
+                           provenance._jsonable(meta_rows))
         provenance.save_arrays(out_path, **arrays)
-        with open(out_path.with_suffix(".validators.json"), "w") as fh:
-            json.dump(provenance._jsonable(meta_rows), fh, indent=1)
         summary["written"][condition] = str(out_path)
     return summary
 
@@ -311,14 +354,20 @@ def main() -> int:
     ap.add_argument("--shard-size", type=int, default=C.SHARD_SIZE)
     ap.add_argument("--friction-mult", type=float, default=1.0)
     ap.add_argument("--root", type=Path, default=C.CORPUS_ROOT)
-    ap.add_argument("--clips", action="store_true", help="also render and store A-std clips")
+    ap.add_argument("--conditions", nargs="+", default=list(C.CONDITIONS),
+                    choices=C.CONDITIONS,
+                    help="subset of conditions (e.g. INTERACT only for a WM friction corpus)")
+    ap.add_argument("--clips", action="store_true",
+                    help="also render and store every config.CLIP_VARIANTS clip "
+                         "(A-std AND A-clip-del) -- REQUIRED for Architecture A")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
 
     thresholds = C.load_thresholds()  # raises if Experiment A has not run
     clip_root = C.CLIP_ROOT if args.clips else None
     for s in args.shards:
-        info = build_shard(args.geometry, s, shard_size=args.shard_size,
+        info = build_shard(args.geometry, s, conditions=args.conditions,
+                           shard_size=args.shard_size,
                            root=args.root, friction_mult=args.friction_mult,
                            thresholds=thresholds, clip_root=clip_root,
                            overwrite=args.overwrite)
