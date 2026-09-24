@@ -9,19 +9,19 @@
 #   S1 (1 item, interactive):
 #     salloc -p gpu --gres=gpu:1 --time=02:00:00 --cpus-per-task=8 --mem=64G
 #     bash unity/train_idm.sbatch --smoke
-#   S2 (5 items):    sbatch --array=0-4  -p gpu   unity/train_idm.sbatch
-#   S3/S4 (full):    sbatch --array=0-29 -p gpu   unity/train_idm.sbatch
+#   S2 (5 items):    sbatch --array=0-4  -p gpu             unity/train_idm.sbatch
+#   S3 (invite preemption, verify resume BY being preempted):
+#                    sbatch --array=0-9  -p gpu,gpu-preempt --time=02:00:00 unity/train_idm.sbatch
+#   S4 (full):       sbatch --array=0-29 -p gpu,gpu-preempt --time=02:00:00 unity/train_idm.sbatch
 #
 # Work list: items 0-19 are the four variants x five seeds; items 20-29 are
 # the AUGMENTED A-std / A-del seeds that wm/ladder.yaml scores Experiment H
 # with (evaluation.metrics.augmented: true).  --array=0-19 leaves them out.
 #
-# train_idm.py has NO mid-run checkpoint/resume: an item must finish inside
-# ONE window.  On plain `gpu` the 8 h limit below covers it.  Only add
-# gpu-preempt (2 h kill) once S2 has measured every item well under 2 h, and
-# then pass --time=02:00:00 on the command line: a killed item restarts from
-# zero, and the restart cap below turns an endless requeue loop into a
-# visible failure instead of a silently burned allocation.
+# train_idm.py writes a per-epoch resume state (<tag>/resume.pt) and continues
+# from it on the next launch, so an item assembled from 2 h gpu-preempt
+# windows loses at most one epoch per kill.  The restart cap below only
+# guards against a genuine loop (an item that never completes an epoch).
 #
 #SBATCH --job-name=ogaf-idm
 #SBATCH --output=logs/idm_%A_%a.out
@@ -90,16 +90,15 @@ echo "=== task $IDX: variant=$VARIANT seed=$SEED aug=${AUG:-no} on $(hostname) =
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
 date
 
-# Restart cap: there is no resume, so a third restart means the item cannot
-# fit one window on this partition.  Fail loudly instead of looping forever.
-if (( ${SLURM_RESTART_COUNT:-0} >= 3 )); then
-  echo "task $IDX restarted ${SLURM_RESTART_COUNT} times without finishing: the item" >&2
-  echo "does not fit one window here.  Resubmit on -p gpu with a longer --time." >&2
+# Restart cap: with per-epoch resume an item needs a handful of windows at
+# most; far more means it never completes an epoch here.  Fail loudly.
+if (( ${SLURM_RESTART_COUNT:-0} >= 12 )); then
+  echo "task $IDX restarted ${SLURM_RESTART_COUNT} times without finishing: it is not" >&2
+  echo "making progress between kills.  Check the epoch time vs --time." >&2
   exit 1
 fi
-if [[ "${SLURM_JOB_PARTITION:-}" == *preempt* ]]; then
-  echo "WARNING: on ${SLURM_JOB_PARTITION} (2 h kill) with no resume: the item must" \
-       "finish within the window or it restarts from zero (cap: 3 attempts)"
+if [[ -f "$OGAF_CKPT/$TAG/resume.pt" ]]; then
+  echo "resume state present: continuing ${TAG} from its last completed epoch"
 fi
 
 # Skip-if-exists: makes the whole array idempotent under --requeue.
