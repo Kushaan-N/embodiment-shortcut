@@ -42,25 +42,35 @@ set -euo pipefail
 # point into the repo under sbatch; SLURM_SUBMIT_DIR does (submit from the repo
 # root).  The fallback covers interactive `bash unity/*.sbatch` runs.
 _OGAF_REPO="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+[[ -f "$_OGAF_REPO/unity/env.sh" ]] || _OGAF_REPO="$PWD"
 if [[ ! -f "$_OGAF_REPO/unity/env.sh" ]]; then
   echo "cannot find unity/env.sh under $_OGAF_REPO; submit from the repo root" >&2
   exit 1
 fi
+cd "$_OGAF_REPO"
 source "$_OGAF_REPO/unity/env.sh"
 
 # Stop ~10 min before the SLURM limit so the final checkpoint always lands.
-# Read from the ladder so the two cannot drift apart.
+# Hardcoded to match --time=02:00:00 above (ladder.yaml max_hours_per_job is
+# documentation, not read here); if you raise --time on the command line,
+# raise OGAF_MAX_HOURS the same way.  The trainer starts this budget BEFORE
+# it (re)builds the latent cache.
 export OGAF_MAX_HOURS=${OGAF_MAX_HOURS:-1.8}
 
 MODELS=(WM-base WM-data-poor WM-physics-corrupted)
 
 if [[ "${1:-}" == "--smoke" ]]; then
-  echo "S1: budget report, then 200 steps with a forced checkpoint + resume"
+  echo "S1: budget report, then 400 steps with a forced checkpoint + resume"
   python unity/preflight.py --time 02:00:00 --partition gpu || exit 1
   python wm/wm_train.py --model WM-base --budget-only
-  OGAF_MAX_HOURS=0.02 python wm/wm_train.py --model WM-base --steps 400 --ckpt-every 100
+  # --out: the smoke run writes a 400-step final.pt.  In the production dir
+  # that file would make every S2-S4 array task exit "already complete" and
+  # WM-base would never train (and its ckpt_step0000100.pt would be resumed).
+  SMOKE_OUT="$OGAF_CKPT/wm_smoke"
+  OGAF_MAX_HOURS=0.02 python wm/wm_train.py --model WM-base --steps 400 --ckpt-every 100 \
+      --out "$SMOKE_OUT"
   echo "--- relaunching to prove it RESUMES rather than restarting ---"
-  python wm/wm_train.py --model WM-base --steps 400 --ckpt-every 100
+  python wm/wm_train.py --model WM-base --steps 400 --ckpt-every 100 --out "$SMOKE_OUT"
   exit $?
 fi
 
@@ -83,7 +93,10 @@ fi
 srun --unbuffered python wm/wm_train.py --model "$MODEL" &
 PID=$!
 trap 'echo "forwarding signal to trainer"; kill -USR1 $PID 2>/dev/null || true' USR1 TERM
-wait $PID || true
+# `wait` returns the moment a trapped signal arrives -- while the trainer is
+# still writing its ~1.1 GB checkpoint.  Requeueing then kills the step
+# mid-write and loses up to --ckpt-every steps.  Wait until the PID is gone.
+while kill -0 "$PID" 2>/dev/null; do wait "$PID" || true; done
 
 # If it exited without producing final.pt, it stopped on budget/preemption.
 # Requeue ourselves so the next window continues from the checkpoint.
