@@ -127,7 +127,12 @@ def main() -> int:
     print(lock.render())
     print()
 
-    floors = json.loads(args.floors.read_text()) if args.floors.exists() else {"variants": {}}
+    if not args.floors.exists():
+        # Without the floor every C1/C2 verdict is a ratio to NaN, which
+        # analyze.py would print as INCONCLUSIVE/FAIL with no hint why.
+        raise SystemExit(f"{args.floors} missing: run exp_d_floors.py BEFORE Experiment E "
+                         f"(C1 and C2 are ratios to the INTERACT floor)")
+    floors = json.loads(args.floors.read_text())
     prior = D.prior_baseline_table(C.ACTION_RANGES)
     prior_mae = prior["pooled_mae_norm"]
 
@@ -157,20 +162,22 @@ def main() -> int:
                 arrays[f"{variant}_seed{seed}_{c}_tuple"] = per[c]["tuple_index"]
                 arrays[f"{variant}_seed{seed}_{c}_geometry"] = per[c]["geometry"]
                 cond_vals[c][seed] = per[c]["per_sample_mae"]
-                cond_ids[c][seed] = per[c]["tuple_index"]
+                # Pair ids are (geometry, tuple_index): a bare tuple_index
+                # repeats across geometries and paired_gap refuses duplicates.
+                cond_ids[c][seed] = stats.pair_id(per[c]["geometry"], per[c]["tuple_index"])
 
             if "DECOY" in per and "INTERACT" in per:
                 diffs, pair_ids = stats.paired_gap(
                     {k: per[k]["per_sample_mae"] for k in ("DECOY", "INTERACT")},
-                    {k: per[k]["tuple_index"] for k in ("DECOY", "INTERACT")},
+                    {k: stats.pair_id(per[k]["geometry"], per[k]["tuple_index"])
+                     for k in ("DECOY", "INTERACT")},
                 )
                 gap_vals[seed] = diffs
                 gap_ids[seed] = pair_ids
                 arrays[f"{variant}_seed{seed}_G_paired"] = diffs
                 arrays[f"{variant}_seed{seed}_G_pair_ids"] = pair_ids
 
-                gmap = dict(zip(per["INTERACT"]["tuple_index"], per["INTERACT"]["geometry"]))
-                gsel = np.asarray([gmap.get(p, "?") for p in pair_ids])
+                gsel = stats.pair_id_geometry(pair_ids)
                 for g in args.geometries:
                     sel = gsel == g
                     if sel.any():
