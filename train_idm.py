@@ -225,7 +225,11 @@ def main() -> int:
                              shuffle=False)
 
     aug = idm.AppearanceAugment(enabled=args.augment) if (is_arch_a and args.augment) else None
-    history = idm.train_idm(model, tr, va, cfg, dev=dev, augment=aug)
+    # Per-epoch resume state: a preempted/killed item continues from its last
+    # completed epoch on the next launch instead of restarting from zero.
+    resume_path = outdir / "resume.pt"
+    history = idm.train_idm(model, tr, va, cfg, dev=dev, augment=aug,
+                            resume_path=resume_path)
 
     ck_path = outdir / "checkpoint.pt"
     ck_tmp = ck_path.with_suffix(".pt.tmp")
@@ -282,6 +286,8 @@ def main() -> int:
                            for c, e in evals.items()}},
         arrays_name="eval.npz",
     )
+    # Only now -- eval.npz is on disk atomically -- is the resume state dead.
+    resume_path.unlink(missing_ok=True)
     print(f"wrote {outdir}  ({time.time() - t0:.0f}s)")
     return 0
 
