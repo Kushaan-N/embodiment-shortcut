@@ -274,6 +274,31 @@ def test_clip_del_ends_at_the_actual_s_del_frame():
     assert idx[-1] == 1000
 
 
+def test_clip_del_has_exactly_clip_length_frames_even_at_arm_rest():
+    """s_del == arm_rest_idx for nearly every rollout (the object settles
+    before the arm is home).  The old head ended AT arm_rest_idx, so np.unique
+    merged it with s_del and the clip had 15 frames -- a collate error in the
+    first mixed batch, and the T8 ablation could never have trained."""
+    import scene
+
+    ar = C.PHASES.arm_rest_idx
+    for s_del in (ar, ar + 1, ar + 37, 1000, C.PHASES.max_steps - 1):
+        idx = scene.clip_indices("A-clip-del", s_del_idx=s_del)
+        assert len(idx) == C.CLIP_LENGTH, (s_del, idx)
+        assert idx[0] == 0 and idx[-1] == s_del
+        assert (np.diff(idx) > 0).all()
+
+
+def test_clip_variants_sample_different_frames():
+    import scene
+
+    a = scene.clip_indices("A-std", s_del_idx=1000)
+    b = scene.clip_indices("A-clip-del", s_del_idx=1000)
+    assert not np.array_equal(a, b)
+    assert C.PHASES.push_end_idx in a.tolist()
+    assert 1000 not in a.tolist()
+
+
 def test_pair_variants_are_rejected_as_clip_variants():
     import scene
 
