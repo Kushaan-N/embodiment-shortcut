@@ -46,6 +46,7 @@ import idm  # noqa: E402
 import prereg_lock  # noqa: E402
 import protocol as proto_mod  # noqa: E402
 import provenance  # noqa: E402
+from wm.wm_generate import generated_subdir  # noqa: E402
 
 EXPERIMENT = "exp_h_world_model"
 LADDER_PATH = Path(__file__).resolve().parent / "ladder.yaml"
@@ -144,6 +145,42 @@ def ground_truth_error(generated: np.ndarray, real: np.ndarray) -> np.ndarray:
     return out
 
 
+def score_generated(name: str, g: dict, args, dev) -> dict:
+    """Score one set of generated rollouts with every metric of §9-H."""
+    gen = g["generated"]
+    if gen.ndim != 5 or g.get("frame_indices") is None:
+        raise SystemExit(f"{name}: generated items carry no frame_indices; regenerate "
+                         f"with the current wm/wm_generate.py")
+    gen_last = gen[:, -1]
+    k_std = np.argmin(np.abs(g["frame_indices"] * C.FRAME_STRIDE
+                             - C.PHASES.push_end_idx), axis=1)
+    gen_std = gen[np.arange(len(gen)), k_std]
+    pairs_std = np.stack([g["conditioning"][:, 0], gen_std], axis=1)
+    pairs_del = np.stack([g["conditioning"][:, 0], gen_last], axis=1)
+    print(f"  {name}: standard metric scored at clip frame(s) "
+          f"{sorted(set(k_std.tolist()))} (nearest s_std={C.PHASES.push_end_idx}), "
+          f"OG-AF at the last frame", flush=True)
+
+    std_e = np.mean([score_with_idm("A-std", s, pairs_std, g["action"], augmented=True,
+                                    ckpt_root=args.ckpt_root, device=dev)
+                     for s in args.seeds], axis=0)
+    del_e = np.mean([score_with_idm("A-del", s, pairs_del, g["action"], augmented=True,
+                                    ckpt_root=args.ckpt_root, device=dev)
+                     for s in args.seeds], axis=0)
+    std_clean = np.mean([score_with_idm("A-std", s, pairs_std, g["action"],
+                                        augmented=False, ckpt_root=args.ckpt_root,
+                                        device=dev)
+                         for s in args.seeds], axis=0)
+    real_last = g["real"][:, -1] if g["real"].ndim == 5 else g["real"]
+    dino = dino_state_distance(gen_last, real_last, args.encoder, dev)
+    gt = ground_truth_error(g["generated"], g["real"])
+
+    print(f"  {name:24s} standard={std_e.mean():.5f}  ogaf={del_e.mean():.5f}  "
+          f"dino={dino.mean():.5f}  gt={gt.mean():.5f}")
+    return {"standard": std_e, "ogaf": del_e, "standard_clean": std_clean,
+            "dino": dino, "ground_truth": gt}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--generated-root", type=Path, default=C.DATA_ROOT / "generated")
@@ -176,42 +213,11 @@ def main() -> int:
         # settled last frame would evaluate the "standard metric" on input it
         # never saw, and every C3 number would be an artefact.  The clip's
         # frame_indices (video-rate) locate the frame nearest s_std per item.
-        gen = g["generated"]
-        if gen.ndim != 5 or g.get("frame_indices") is None:
-            raise SystemExit(f"{name}: generated items carry no frame_indices; regenerate "
-                             f"with the current wm/wm_generate.py")
-        gen_last = gen[:, -1]
-        k_std = np.argmin(np.abs(g["frame_indices"] * C.FRAME_STRIDE
-                                 - C.PHASES.push_end_idx), axis=1)
-        gen_std = gen[np.arange(len(gen)), k_std]
-        pairs_std = np.stack([g["conditioning"][:, 0], gen_std], axis=1)
-        pairs_del = np.stack([g["conditioning"][:, 0], gen_last], axis=1)
-        print(f"  {name}: standard metric scored at clip frame(s) "
-              f"{sorted(set(k_std.tolist()))} (nearest s_std={C.PHASES.push_end_idx}), "
-              f"OG-AF at the last frame", flush=True)
-
-        std_e = np.mean([score_with_idm("A-std", s, pairs_std, g["action"], augmented=True,
-                                        ckpt_root=args.ckpt_root, device=dev)
-                         for s in args.seeds], axis=0)
-        del_e = np.mean([score_with_idm("A-del", s, pairs_del, g["action"], augmented=True,
-                                        ckpt_root=args.ckpt_root, device=dev)
-                         for s in args.seeds], axis=0)
-        std_clean = np.mean([score_with_idm("A-std", s, pairs_std, g["action"],
-                                            augmented=False, ckpt_root=args.ckpt_root,
-                                            device=dev)
-                             for s in args.seeds], axis=0)
-        real_last = g["real"][:, -1] if g["real"].ndim == 5 else g["real"]
-        dino = dino_state_distance(gen_last, real_last, args.encoder, dev)
-        gt = ground_truth_error(g["generated"], g["real"])
-
-        for k, v in [("standard", std_e), ("ogaf", del_e), ("standard_clean", std_clean),
-                     ("dino", dino), ("ground_truth", gt),
-                     ("tuple_index", g["tuple_index"])]:
+        scores = score_generated(name, g, args, dev)
+        for k, v in scores.items():
             arrays[f"{name}_{k}"] = v
-        per_model[name] = {"standard": std_e, "ogaf": del_e, "standard_clean": std_clean,
-                           "dino": dino, "ground_truth": gt}
-        print(f"  {name:24s} standard={std_e.mean():.5f}  ogaf={del_e.mean():.5f}  "
-              f"dino={dino.mean():.5f}  gt={gt.mean():.5f}")
+        arrays[f"{name}_tuple_index"] = g["tuple_index"]
+        per_model[name] = scores
 
     results: dict = {"prereg_lock": lock.to_dict(), "geometry": args.geometry}
 
@@ -263,6 +269,43 @@ def main() -> int:
         print(f"    DINO @ s_del     d = {e['dino_effect']:+.3f}")
         print(f"    ground truth     d = {e['ground_truth_effect']:+.3f}   "
               f"(privileged; confirms the models really do differ)")
+
+    # ---- ladder.yaml controls (§9-H) ------------------------------------
+    # appearance_gap: free-space (ABSENT) rollouts have no object, so contact
+    # physics cannot diverge by construction; whatever the IDMs and the DINO
+    # distance read there is domain gap (sim -> generated rendering), not
+    # physics.  domain_shift: the same feature-space distance on the INTERACT
+    # generations, next to the clean-vs-augmented IDM delta.  Generated with
+    # `wm_generate.py --condition ABSENT --n 300` per model (HANDOFF §2).
+    results["domain_gap"] = {}
+    results["domain_shift"] = {}
+    for name in present:
+        ds_ = per_model[name]
+        results["domain_shift"][name] = {
+            "dino_generated_vs_real": float(ds_["dino"].mean()),
+            "standard_augmented": float(ds_["standard"].mean()),
+            "standard_clean": float(ds_["standard_clean"].mean()),
+            "clean_minus_augmented": float(ds_["standard_clean"].mean() - ds_["standard"].mean()),
+        }
+        try:
+            ga = load_generated(name, generated_subdir(args.geometry, "ABSENT"),
+                                args.generated_root)
+        except FileNotFoundError:
+            results["domain_gap"][name] = {"missing": "no ABSENT (free-space) generations"}
+            continue
+        sa = score_generated(f"{name}/ABSENT", ga, args, dev)
+        for k, v in sa.items():
+            arrays[f"{name}_ABSENT_{k}"] = v
+        arrays[f"{name}_ABSENT_tuple_index"] = ga["tuple_index"]
+        results["domain_gap"][name] = {
+            "n": int(len(ga["tuple_index"])),
+            **{k: float(v.mean()) for k, v in sa.items()},
+            "note": "no object -> physics divergence is zero by construction; these are "
+                    "the rendering/domain-gap floors of each metric",
+        }
+        print(f"  control {name:24s} ABSENT: standard={sa['standard'].mean():.5f}  "
+              f"ogaf={sa['ogaf'].mean():.5f}  dino={sa['dino'].mean():.5f}  "
+              f"gt={sa['ground_truth'].mean():.5f}")
 
     args.out.mkdir(parents=True, exist_ok=True)
     provenance.save_run(args.out, EXPERIMENT, arrays,
