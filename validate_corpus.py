@@ -162,12 +162,78 @@ def split_integrity(root: Path) -> dict:
 
 
 # ==========================================================================
+# 4. Completeness -- the gate must describe the corpus it sits next to
+# ==========================================================================
+
+
+def corpus_completeness(root: Path, expect: int, friction_mult: float = 1.0) -> dict:
+    """Every (geometry, condition) cell present with tuple indices exactly
+    ``0..expect-1`` (no gaps, duplicates or stray shards), and every shard
+    carrying its ``.validators.json``.
+
+    Without this the gate PASSED on a 24-tuple box-only smoke corpus with
+    two geometries "skipped" (results/validate_corpus/report.json, 2026-08-17)
+    -- a report that certified nothing about the data it sat next to.
+    """
+    cells: dict = {}
+    missing_json = []
+    for path, z in ds.iter_records(root, friction_mult=friction_mult):
+        key = f"{str(z['geometry'][0])}/{str(z['condition'][0])}"
+        cells.setdefault(key, []).extend(int(t) for t in z["tuple_index"])
+        if not path.with_suffix(".validators.json").exists():
+            missing_json.append(str(path))
+    expected_cells = [f"{g}/{c}" for g in C.GEOMETRIES for c in C.CONDITIONS]
+    missing_cells = [k for k in expected_cells if k not in cells]
+    wrong = {}
+    for k, tis in cells.items():
+        s = sorted(tis)
+        if s != list(range(expect)):
+            wrong[k] = {"n": len(s), "n_unique": len(set(s)),
+                        "min": s[0] if s else None, "max": s[-1] if s else None}
+    return {"name": "corpus_completeness", "expected_tuples_per_cell": int(expect),
+            "cells_present": sorted(cells), "missing_cells": missing_cells,
+            "cells_with_wrong_tuples": wrong,
+            "shards_missing_validators_json": missing_json,
+            "passed": bool(not missing_cells and not wrong and not missing_json)}
+
+
+def clip_completeness(root: Path, clip_root: Path, friction_mult: float = 1.0) -> dict:
+    """Every clip variant must exist for every tuple: the first consumer to
+    notice a missing clip is otherwise ``ClipDataset.__getitem__`` on a GPU."""
+    checked = missing = 0
+    examples: list = []
+    for _, z in ds.iter_records(root, friction_mult=friction_mult):
+        g, c = str(z["geometry"][0]), str(z["condition"][0])
+        for ti in z["tuple_index"]:
+            for v in C.CLIP_VARIANTS:
+                checked += 1
+                p = ds.clip_path(clip_root, v, g, c, int(ti), friction_mult)
+                if not p.exists():
+                    missing += 1
+                    if len(examples) < 5:
+                        examples.append(str(p))
+    return {"name": "clip_completeness", "clip_root": str(clip_root),
+            "variants": list(C.CLIP_VARIANTS), "checked": checked, "missing": missing,
+            "examples": examples, "passed": bool(checked > 0 and missing == 0)}
+
+
+# ==========================================================================
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", type=Path, default=C.CORPUS_ROOT)
     ap.add_argument("--out", type=Path, default=C.RESULTS_ROOT / "validate_corpus")
+    ap.add_argument("--expect-tuples", type=int, default=C.N_TUPLES_PER_GEOMETRY,
+                    help="tuples per (geometry, condition) cell the gate certifies "
+                         "(default: the pre-registered corpus size)")
+    ap.add_argument("--clips", type=Path, default=C.CLIP_ROOT,
+                    help="clip store to check for completeness (A-std + A-clip-del)")
+    ap.add_argument("--no-clips", action="store_true",
+                    help="skip the clip check (a corpus that will NOT train Architecture A)")
+    ap.add_argument("--exclusion-cap", type=float, default=0.05,
+                    help="max per-validator fail rate before the gate refuses "
+                         "(unity/README.md: >5%% failures -> diagnose before analysing)")
     args = ap.parse_args()
 
     print(f"validating corpus at {args.root}")
@@ -175,6 +241,8 @@ def main() -> int:
     t11 = t11_gate(args.root)
     splits = split_integrity(args.root)
     geometry_checks = [scene.assert_corridor_decoy_disjoint(g) for g in C.GEOMETRIES]
+    completeness = corpus_completeness(args.root, args.expect_tuples)
+    clips = None if args.no_clips else clip_completeness(args.root, args.clips)
 
     print("\n--- per-rollout validators (exclusions are counted, not hidden) ---")
     for cell, v in sorted(validators.items()):
@@ -206,20 +274,54 @@ def main() -> int:
         print(f"  {gc['geometry']:9s} corridor/DECOY clearance="
               f"{gc['clearance_m'] * 1e3:.1f} mm  {'PASS' if gc['passed'] else 'FAIL'}")
 
+    print("\n--- completeness ---")
+    print(f"  cells present: {len(completeness['cells_present'])}/"
+          f"{len(C.GEOMETRIES) * len(C.CONDITIONS)}  expected tuples/cell="
+          f"{completeness['expected_tuples_per_cell']}  "
+          f"{'PASS' if completeness['passed'] else 'FAIL'}")
+    for k in completeness["missing_cells"]:
+        print(f"    MISSING cell {k}")
+    for k, v in completeness["cells_with_wrong_tuples"].items():
+        print(f"    {k}: {v}")
+    for p in completeness["shards_missing_validators_json"][:5]:
+        print(f"    shard without validators.json: {p}")
+    if clips is not None:
+        print(f"  clips: {clips['missing']} missing of {clips['checked']} checked under "
+              f"{clips['clip_root']}  {'PASS' if clips['passed'] else 'FAIL'}")
+        for p in clips["examples"]:
+            print(f"    missing {p}")
+
     all_validators_ok = all(
         c["n_failed"] == 0 or name.startswith("T5_occlusion")
         for v in validators.values() for name, c in v["checks"].items()
     )
-    passed = bool(t11["passed"] and splits["passed"]
-                  and all(g["passed"] for g in geometry_checks))
+    # Exclusions are counted, not hidden -- but a validator failing on more
+    # than the cap is a bug to diagnose BEFORE training, not a footnote.
+    over_cap = {f"{cell}:{name}": c["fail_rate"]
+                for cell, v in validators.items() for name, c in v["checks"].items()
+                if not name.startswith("T5_occlusion") and c["fail_rate"] > args.exclusion_cap}
+    for k, r in sorted(over_cap.items()):
+        print(f"  EXCLUSION CAP EXCEEDED  {k}: {r * 100:.2f}% > {args.exclusion_cap * 100:.0f}%")
+    t11_skipped = [g for g, d in t11["per_geometry"].items() if "skipped" in d]
+
+    passed = bool(t11["passed"] and not t11_skipped and splits["passed"]
+                  and all(g["passed"] for g in geometry_checks)
+                  and completeness["passed"]
+                  and (clips is None or clips["passed"])
+                  and not over_cap)
 
     report = {
         "passed": passed,
         "all_per_rollout_validators_clean": all_validators_ok,
         "validators": validators,
+        "validators_over_exclusion_cap": over_cap,
+        "exclusion_cap": args.exclusion_cap,
         "t11_gate": t11,
+        "t11_geometries_skipped": t11_skipped,
         "split_integrity": splits,
         "geometry_checks": geometry_checks,
+        "completeness": completeness,
+        "clips": clips,
     }
     args.out.mkdir(parents=True, exist_ok=True)
     with open(args.out / "report.json", "w") as fh:
@@ -234,7 +336,9 @@ def main() -> int:
         print("CORPUS GATE: FAIL -- STOP (§0.1).  Do not train on this corpus.\n"
               "  A T11 failure means DECOY placement leaks the action: fix the sampler\n"
               "  and regenerate.  A T7 failure means paired rollouts span splits, which\n"
-              "  biases G TOWARD the hypothesis.")
+              "  biases G TOWARD the hypothesis.  A completeness/clip failure means the\n"
+              "  corpus on disk is not the corpus the protocol describes: finish the\n"
+              "  build (datasets.py ... --clips) before any IDM trains.")
     print("=" * 72)
     return 0 if passed else 2
 
