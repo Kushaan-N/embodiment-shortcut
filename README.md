@@ -222,9 +222,10 @@ for, and what makes A-clip-del a meaningful T8 ablation.
 
 ## Open items requiring a human
 
-0. **The 2026-09-24 audit's decisions** (`unity/HANDOFF.md` §7): the ladder's
-   150k-vs-120k step count, the augmented IDMs' cost, unimplemented H controls,
-   the exp_0 seed-count discrepancy.
+0. **The 2026-09-24 audit** (`unity/HANDOFF.md` §7): the ladder now trains
+   120k steps, the augmented IDMs stay, the H controls are implemented, and
+   `train_idm.py` resumes per epoch; still open there: the exp_0 seed-count
+   discrepancy and gate verdicts computed outside `analyze.py`.
 
 1. **✋ Contact sheet review** (build-order step 2). `results/contact_sheet/`.
 2. **13 protocol fields are the implementing agent's decision, not a paper's.**
