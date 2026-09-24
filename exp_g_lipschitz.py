@@ -184,12 +184,8 @@ def _collect_gaps(z, variant: str, geometry: str):
             continue
         seed = int(key.split("_seed")[1].split("_")[0])
         ids = z[key.replace("_G_paired", "_G_pair_ids")]
-        gkey = f"{variant}_seed{seed}_INTERACT_geometry"
-        tkey = f"{variant}_seed{seed}_INTERACT_tuple"
-        if gkey not in z.files or tkey not in z.files:
-            continue
-        gmap = dict(zip(z[tkey].tolist(), z[gkey].astype(str).tolist()))
-        m = np.asarray([gmap.get(int(p)) == geometry for p in ids])
+        # ids are stats.pair_id values (geometry encoded); decode directly.
+        m = stats.pair_id_geometry(ids) == geometry
         if m.any():
             vals[seed] = (z[key][m], ids[m])
     return (vals, None) if vals else (None, None)
