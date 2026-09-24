@@ -28,6 +28,7 @@ import mj_env  # noqa: F401  -- MUST precede `import mujoco` (§14)
 
 import hashlib
 import math
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -113,7 +114,12 @@ def make_object_texture(path: Path = TEXTURE_PATH, face: int = 128, force: bool 
             tile[:, :bar] = 0
         img[r * face : (r + 1) * face, c * face : (c + 1) * face] = tile
 
-    imageio.imwrite(path, img)
+    # Atomic: parallel corpus shards may all be first to need the texture, and
+    # MuJoCo must never read a half-written PNG.  Same suffix so the format is
+    # inferred; os.replace is atomic on POSIX.
+    tmp = path.with_name(f".{path.stem}.{os.getpid()}.tmp{path.suffix}")
+    imageio.imwrite(tmp, img)
+    os.replace(tmp, path)
     return path
 
 
@@ -537,8 +543,16 @@ def clip_indices(variant: str, s_del_idx: int, k: int | None = None,
     if variant == "A-std":
         return np.unique(np.linspace(0, ph.push_end_idx, k).round().astype(np.int64))
     if variant == "A-clip-del":
-        head = np.linspace(0, ph.arm_rest_idx, k - 1).round().astype(np.int64)
-        return np.unique(np.concatenate([head, [s_del_idx]]))
+        # Fixed length by construction.  The head ends one step BEFORE arm
+        # rest and s_del >= arm_rest_idx always (see rollout), so the s_del
+        # frame can never collide with the head and every clip has exactly k
+        # frames -- a variable-length clip would break batch collation.
+        head = np.linspace(0, ph.arm_rest_idx - 1, k - 1).round().astype(np.int64)
+        idx = np.concatenate([head, [int(s_del_idx)]]).astype(np.int64)
+        if len(np.unique(idx)) != k or not (np.diff(idx) > 0).all():
+            raise ValueError(f"A-clip-del clip is not {k} strictly increasing frames "
+                             f"(s_del_idx={s_del_idx}, arm_rest_idx={ph.arm_rest_idx})")
+        return idx
     raise ValueError(f"{variant!r} is not a clip variant; see config.CLIP_VARIANTS")
 
 
@@ -831,6 +845,13 @@ def rollout(action, seed: int, condition: str, geometry: str,
     # --- rendering --------------------------------------------------------
     frames, seg_masks, clip = {}, {}, None
     clip_idx = None
+    clips: dict = {}
+    # One clip per requested variant, all rendered from the same simulation
+    # pass.  A-std and A-clip-del sample DIFFERENT frames (config.CLIP_VARIANTS),
+    # so the corpus must store both or the T8 ablation is vacuous.
+    clip_variants = ([] if clip_variant is None
+                     else [clip_variant] if isinstance(clip_variant, str)
+                     else list(clip_variant))
     if render:
         with mujoco.Renderer(sm.model, height=C.RENDER_SIZE, width=C.RENDER_SIZE) as rgb_r, \
              mujoco.Renderer(sm.model, height=C.RENDER_SIZE, width=C.RENDER_SIZE) as seg_r:
@@ -843,10 +864,12 @@ def rollout(action, seed: int, condition: str, geometry: str,
             if sim_time is not None:
                 f2, m2 = _render_at(sm, sim_time["qpos_traj"], [s_del_idx], rgb_r, seg_r)
                 frames["s_time"], seg_masks["s_time"] = f2[0], m2[0]
-            if clip_variant is not None:
-                clip_idx = clip_indices(clip_variant, s_del_idx, phases=ph)
-                cf, _ = _render_at(sm, sim_main["qpos_traj"], clip_idx, rgb_r, None)
-                clip = np.stack(cf)
+            for cv in clip_variants:
+                ci = clip_indices(cv, s_del_idx, phases=ph)
+                cf, _ = _render_at(sm, sim_main["qpos_traj"], ci, rgb_r, None)
+                clips[cv] = (np.stack(cf), ci)
+            if clip_variants:
+                clip, clip_idx = clips[clip_variants[0]]
 
     # --- validators -------------------------------------------------------
     validators = _run_validators(
@@ -876,7 +899,8 @@ def rollout(action, seed: int, condition: str, geometry: str,
         "seg_masks": seg_masks,
         "clip": clip,
         "clip_indices": clip_idx,
-        "clip_variant": clip_variant,
+        "clip_variant": clip_variants[0] if clip_variants else None,
+        "clips": clips,
         "decoy_xy": decoy_xy,
         "obj_init": obj_init,
         "contact_end": int(contact_end),
