@@ -118,7 +118,8 @@ def main() -> int:
                 if not sel.any():
                     continue
                 per_geom_vals.setdefault(g, {})[seed] = per_sample[sel]
-                per_geom_ids.setdefault(g, {})[seed] = e["tuple_index"][sel]
+                per_geom_ids.setdefault(g, {})[seed] = stats.pair_id(
+                    e["geometry"][sel], e["tuple_index"][sel])
 
         floors["variants"][variant] = {}
         for g, vals in per_geom_vals.items():
