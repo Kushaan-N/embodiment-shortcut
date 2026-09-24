@@ -9,13 +9,24 @@
 #   S1 (1 item, interactive):
 #     salloc -p gpu --gres=gpu:1 --time=02:00:00 --cpus-per-task=8 --mem=64G
 #     bash unity/train_idm.sbatch --smoke
-#   S2 (5 items):    sbatch --array=0-4  -p gpu               unity/train_idm.sbatch
-#   S3 (50 items):   sbatch --array=0-49 -p gpu,gpu-preempt   unity/train_idm.sbatch
-#   S4 (full):       sbatch --array=0-19 -p gpu,gpu-preempt --time=$((3*S2_MEDIAN)) ...
+#   S2 (5 items):    sbatch --array=0-4  -p gpu   unity/train_idm.sbatch
+#   S3/S4 (full):    sbatch --array=0-29 -p gpu   unity/train_idm.sbatch
+#
+# Work list: items 0-19 are the four variants x five seeds; items 20-29 are
+# the AUGMENTED A-std / A-del seeds that wm/ladder.yaml scores Experiment H
+# with (evaluation.metrics.augmented: true).  --array=0-19 leaves them out.
+#
+# train_idm.py has NO mid-run checkpoint/resume: an item must finish inside
+# ONE window.  On plain `gpu` the 8 h limit below covers it.  Only add
+# gpu-preempt (2 h kill) once S2 has measured every item well under 2 h, and
+# then pass --time=02:00:00 on the command line: a killed item restarts from
+# zero, and the restart cap below turns an endless requeue loop into a
+# visible failure instead of a silently burned allocation.
 #
 #SBATCH --job-name=ogaf-idm
 #SBATCH --output=logs/idm_%A_%a.out
 #SBATCH --error=logs/idm_%A_%a.err
+#SBATCH --open-mode=append
 #SBATCH --time=08:00:00
 #            ^^^ MANDATORY.  The default is 1 HOUR on every partition and jobs
 #                die at exactly 60 minutes with no useful error (§13.2, §14).
@@ -34,31 +45,33 @@ set -euo pipefail
 # --- environment -----------------------------------------------------------
 # SLURM spools a COPY of this script to the node, so ${BASH_SOURCE[0]} does not
 # point into the repo under sbatch; SLURM_SUBMIT_DIR does (submit from the repo
-# root).  The fallback covers interactive `bash unity/*.sbatch` runs.
+# root).  The fallbacks cover interactive `bash unity/*.sbatch` runs.
 _OGAF_REPO="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+[[ -f "$_OGAF_REPO/unity/env.sh" ]] || _OGAF_REPO="$PWD"
 if [[ ! -f "$_OGAF_REPO/unity/env.sh" ]]; then
   echo "cannot find unity/env.sh under $_OGAF_REPO; submit from the repo root" >&2
   exit 1
 fi
+cd "$_OGAF_REPO"
 source "$_OGAF_REPO/unity/env.sh"
 
-# --- clean SIGTERM so --requeue resumes rather than corrupting --------------
-trap 'echo "SIGTERM received; exiting cleanly for requeue"; exit 143' TERM
-
 # --- the work list ---------------------------------------------------------
-# One line per (variant, seed).  SLURM_ARRAY_TASK_ID indexes it, so the same
-# file drives S2's 5 items and S4's full sweep.
+# One line per (variant, seed[, --augment]).  SLURM_ARRAY_TASK_ID indexes it,
+# so the same file drives S2's 5 items and S4's full sweep.
 VARIANTS=(A-std A-del A-time A-clip-del)
 SEEDS=(0 1 2 3 4)
 WORK=()
 for v in "${VARIANTS[@]}"; do for s in "${SEEDS[@]}"; do WORK+=("$v $s"); done; done
+for v in A-std A-del; do for s in "${SEEDS[@]}"; do WORK+=("$v $s --augment"); done; done
 
 if [[ "${1:-}" == "--smoke" ]]; then
-  echo "S1 smoke test: preflight, then ONE short training run"
+  echo "S1 smoke test: preflight, then ONE short training run (isolated output dir)"
   python unity/preflight.py --time 02:00:00 --partition gpu || exit 1
   set -- ${WORK[0]}
+  # --out: a 1-epoch smoke model must NEVER land in the production tag, or the
+  # array's skip-if-exists would adopt it as A-std seed 0 for D/E/F/G.
   python train_idm.py --variant "$1" --seed "$2" --epochs 1 \
-      --num-workers "${SLURM_CPUS_PER_TASK:-8}"
+      --num-workers "${SLURM_CPUS_PER_TASK:-8}" --out "$OGAF_CKPT/_smoke"
   exit $?
 fi
 
@@ -70,24 +83,51 @@ fi
 set -- ${WORK[$IDX]}
 VARIANT=$1
 SEED=$2
+AUG=${3:-}
+TAG="${VARIANT}__seed${SEED}__full${AUG:+__aug}"
 
-echo "=== task $IDX: variant=$VARIANT seed=$SEED on $(hostname) ==="
+echo "=== task $IDX: variant=$VARIANT seed=$SEED aug=${AUG:-no} on $(hostname) ==="
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
 date
 
+# Restart cap: there is no resume, so a third restart means the item cannot
+# fit one window on this partition.  Fail loudly instead of looping forever.
+if (( ${SLURM_RESTART_COUNT:-0} >= 3 )); then
+  echo "task $IDX restarted ${SLURM_RESTART_COUNT} times without finishing: the item" >&2
+  echo "does not fit one window here.  Resubmit on -p gpu with a longer --time." >&2
+  exit 1
+fi
+if [[ "${SLURM_JOB_PARTITION:-}" == *preempt* ]]; then
+  echo "WARNING: on ${SLURM_JOB_PARTITION} (2 h kill) with no resume: the item must" \
+       "finish within the window or it restarts from zero (cap: 3 attempts)"
+fi
+
 # Skip-if-exists: makes the whole array idempotent under --requeue.
-if [[ -f "$OGAF_CKPT/${VARIANT}__seed${SEED}__full/eval.npz" ]]; then
+# eval.npz is written atomically, so its existence means a complete run.
+if [[ -f "$OGAF_CKPT/$TAG/eval.npz" ]]; then
   echo "already complete; skipping"
   exit 0
 fi
 
+# Run in the background and wait: bash defers traps while a FOREGROUND command
+# runs, so the old `trap ... TERM` around a foreground srun could never fire.
 srun python train_idm.py \
     --variant "$VARIANT" \
     --seed "$SEED" \
-    --num-workers "${SLURM_CPUS_PER_TASK:-8}"
+    --num-workers "${SLURM_CPUS_PER_TASK:-8}" $AUG &
+PID=$!
+trap 'echo "SIGTERM received; forwarding to the trainer"; kill -TERM $PID 2>/dev/null || true' TERM
+RC=0
+while kill -0 "$PID" 2>/dev/null; do
+  if wait "$PID"; then RC=0; else RC=$?; fi
+done
+if (( RC != 0 )); then
+  echo "trainer exited with status $RC"
+  exit "$RC"
+fi
 
 # Validate CONTENT, not the exit code (§13.5).
-python - "$OGAF_CKPT/${VARIANT}__seed${SEED}__full/eval.npz" <<'PY'
+python - "$OGAF_CKPT/$TAG/eval.npz" <<'PY'
 import sys, numpy as np
 p = sys.argv[1]
 z = np.load(p, allow_pickle=False)
