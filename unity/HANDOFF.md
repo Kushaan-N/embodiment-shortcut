@@ -1,6 +1,6 @@
 # Handoff: running OG-AF on Unity
 
-**State as of 2026-09-21.** Target venue: **ICML 2027** (~late Jan 2027).
+**State as of 2026-09-24.** Target venue: **ICML 2027** (~late Jan 2027).
 Workshop route abandoned — this is one run, one pre-registration, straight to
 the full paper including Experiment H.
 
@@ -58,6 +58,15 @@ threshold.
    24 tuples, 55 MB. Target is 2000 tuples x 3 geometries x 3 conditions.
    Do not train anything on it.
 
+3. **A 2026-09-24 static audit found and fixed defects that would have crashed
+   or invalidated every GPU stage** (A-clip-del trained on A-std's clips; frame
+   stores never built; ResNet-50 weights never pre-staged; the committed
+   thresholds invisible once `unity/env.sh` was sourced; a pair-id collision
+   that would have crashed Experiment E after all its GPU work; smoke runs
+   poisoning the production checkpoint dirs; Experiment H's model names,
+   corpus and scoring horizon). See **§7** for the list and for the decisions
+   it leaves to you.
+
 ---
 
 ## 1. Day 0 on Unity
@@ -65,7 +74,6 @@ threshold.
 ```bash
 # workspace (NOT $HOME -- see unity/env.sh for why)
 export OGAF_DATA=$(ws_allocate ogaf 30)/data
-echo "export OGAF_DATA=$OGAF_DATA" >> ~/.bashrc     # or record it somewhere
 ws_list -v                                          # note the expiry date
 
 git clone https://github.com/Kushaan-N/embodiment-shortcut
@@ -74,60 +82,86 @@ cd embodiment-shortcut
 # mujoco has no 3.14 wheels -- 3.11
 module load python/3.11                             # or whatever Unity exposes
 uv venv --python 3.11 .venv
-source unity/env.sh                                 # sets caches OFF $HOME
 uv pip install --python .venv/bin/python mujoco numpy scipy scikit-learn \
     statsmodels imageio imageio-ffmpeg tqdm torch torchvision transformers \
     timm pytest pyyaml huggingface_hub
+
+# EVERY shell, login or job: caches off $HOME, the venv on PATH, the committed
+# thresholds pinned, the workspace results tree seeded, logs/ created.
+# Persist BOTH lines -- a shell without them is how the encoder lands in
+# $HOME/.cache and the job then fails offline after its GPU is allocated.
+echo "export OGAF_DATA=$OGAF_DATA"    >> ~/.bashrc
+echo "source $PWD/unity/env.sh"       >> ~/.bashrc
+source unity/env.sh
 ```
 
-**Pre-stage DINOv3 before any job runs.** Every sbatch script sets
-`HF_HUB_OFFLINE=1`, so a cache miss is not a slow download — it is a hard
-failure at model load, *after* the job has queued and been allocated a GPU.
-Compute nodes have no outbound network. Do this on a login node:
+**Pre-stage BOTH pretrained weights before any job runs.** Every sbatch script
+sets `HF_HUB_OFFLINE=1` and compute nodes have no outbound network, so a cache
+miss is not a slow download -- it is a hard failure at model load, *after* the
+job has queued and been allocated a GPU. Do this on a login node with
+`unity/env.sh` sourced (so the caches land on the workspace):
 
 ```bash
-source unity/env.sh                    # so HF_HOME points at the workspace
 export HF_TOKEN=<your token>           # the DINOv3 repo is GATED
-.venv/bin/python - <<'PY'
+python - <<'PY'
 from huggingface_hub import snapshot_download
 import config as C
-p = snapshot_download(C.GATE_B_SELECTED_ENCODER)
-print("staged at", p)
+print("DINOv3 staged at", snapshot_download(C.GATE_B_SELECTED_ENCODER))
 PY
+# Architecture A's ImageNet-pretrained ResNet-50 (protocol backbone_init):
+# torchvision downloads it on first use into $TORCH_HOME/hub/checkpoints/.
+python -c "from torchvision.models import resnet50, ResNet50_Weights; \
+           resnet50(weights=ResNet50_Weights.IMAGENET1K_V2); print('ResNet-50 staged')"
 ```
 
 `/datasets/ai/dinov2` is **not** a substitute. That is DINOv2, which was
 measured and rejected at 0.55 sigma against a 3 sigma threshold.
 
-Then verify, on a compute node (several checks are meaningless on a login node,
-especially the EGL render):
+Then verify on a compute node (several checks are meaningless on a login node,
+especially the EGL render), and run the unit tests there too -- nothing
+computes on a login node:
 
 ```bash
-srun -p gpu --gres=gpu:1 --time=00:15:00 \
-  .venv/bin/python unity/preflight.py --time 08:00:00 --partition gpu
-.venv/bin/python -m pytest tests/ -q          # expect 101 passed, ~4 s
+srun -p gpu --gres=gpu:1 --time=00:15:00 --cpus-per-task=4 --mem=16G \
+  python unity/preflight.py --time 08:00:00 --partition gpu
+srun -p cpu --time=00:10:00 --cpus-per-task=4 --mem=8G \
+  python -m pytest tests/ -q                   # expect 114 passed, a few seconds
 ```
 
-`preflight.py` checks, among others: the Gate B encoder resolves from cache
-(required), caches point off `$HOME` (warn), and a **real one-frame MuJoCo EGL
-render** — headless GL silently falls back to osmesa, which works but is ~10x
-slower and would corrupt every wall-clock estimate you size later stages from.
+`preflight.py` checks, among others: both pretrained weights resolve from the
+workspace caches (required), the committed `thresholds.json` is resolvable
+(required -- never re-derive it on Unity), caches point off `$HOME`
+(required), the frame stores exist (warning until the corpus is built), and a
+**real one-frame MuJoCo EGL render** -- headless GL silently falls back to
+osmesa, which works but is ~10x slower and would corrupt every wall-clock
+estimate you size later stages from.
 
 ---
 
 ## 2. Run order
 
 Every command below was checked against the actual argparse surface on
-2026-09-21. Costs are from the measured/estimated table in `README.md`.
+2026-09-24. Costs are from the measured/estimated table in `README.md`.
 Each :hand: is a human checkpoint. **If a gate fails, STOP** and report the
 measured number against its threshold.
+
+**Nothing computes on a login node.** CPU steps go through `unity/run.sbatch`
+(a CPU allocation by default); one-off GPU steps use the same file with the
+hardware on the command line; the big stages have their own array scripts.
+`--time` is mandatory on Unity (default 1 h) and every example sets it.
+Submit from the repo root with `unity/env.sh` sourced (it creates `logs/`,
+which `#SBATCH --output` needs at submit time).
+
+```bash
+GPU='-p gpu --gres=gpu:1 --constraint=[a100|l40s]'     # one-off GPU steps
+```
 
 ### Human review, before any compute
 
 ```bash
-.venv/bin/python scripts/contact_sheet.py     # ~10 s
-# :hand: INSPECT results/contact_sheet/*.png -- outstanding since build step 2
-.venv/bin/python protocol.py
+python scripts/contact_sheet.py               # ~10 s (fine on a login node)
+# :hand: INSPECT $OGAF_RESULTS/contact_sheet/*.png -- outstanding since build step 2
+python protocol.py
 # :hand: 13 fields that were the implementing agent's decision, not a paper's.
 #    Load-bearing: clip_length (16, adapted from VPT's 128) and backbone_init
 #    (ImageNet-pretrained; a randomly-initialised ResNet-50 would be the
@@ -135,71 +169,97 @@ measured number against its threshold.
 #    Architecture A trainings.
 ```
 
-### Verification-subset audit — CPU, seconds, zero GPU
+### Verification-subset audit — CPU, minutes, zero GPU
 
-Reruns nothing; recomputes from the arrays Experiment 0 already wrote. Needs
-`results/exp_0/oracle_errors.npz`, which is **gitignored** — so run
-`exp_0_oracles.py` on Unity first (~25 min CPU) rather than expecting the clone
-to carry it.
+Reruns nothing beyond Experiment 0; recomputes from the arrays it writes.
+`results/exp_0/oracle_errors.npz` is **gitignored**, so Experiment 0 runs on
+Unity first (~25 min CPU). Note: the committed `results/exp_0/results.json`
+was produced with **3** probe seeds; the command below (5) will not reproduce
+it byte-for-byte -- decide which record the paper cites (§7).
 
 ```bash
-.venv/bin/python verification_subset.py
-.venv/bin/python analyze.py --exp subset
+sbatch --time=01:00:00 unity/run.sbatch python exp_0_oracles.py --n 700 --seeds 5
+sbatch --time=00:20:00 unity/run.sbatch python verification_subset.py
+python analyze.py --exp subset
 ```
 
 See §5 for why this exists and what it buys the paper.
 
-### Corpus — CPU, ~2-3 node-hours
+### Corpus — 60 array items on cheap GPUs (EGL), then two CPU jobs
 
-`--clips` is required: A-std is a clip model (MultiWorld §B.2 trains a
-*bidirectional* IDM following VPT, so the standard metric's input regime is a
-clip, not a frame pair), and A-clip-del is the T8 ablation.
+`--clips` is required and renders **both** clip variants: A-std is a clip
+model (MultiWorld §B.2 trains a *bidirectional* IDM following VPT, so the
+standard metric's input regime is a clip, not a frame pair), and A-clip-del is
+the T8 ablation -- which until 2026-09-24 was silently trained on A-std's clips
+(§7).
 
 ```bash
-for g in box sphere cylinder; do
-  .venv/bin/python datasets.py --geometry $g --shards $(seq 0 19) --clips
-done
-.venv/bin/python validate_corpus.py           # T11 + T7    :hand:
+bash unity/corpus.sbatch --smoke                 # S1, inside salloc (see the file header)
+sbatch --array=0-4  unity/corpus.sbatch          # S2: record the wall clock
+sbatch --array=0-59 unity/corpus.sbatch          # S4: 3 geometries x 20 shards
+# after the array finishes (--dependency=afterok:<jobid>):
+sbatch --time=01:00:00 unity/run.sbatch python idm_data.py         # frame stores (CPU)
+sbatch --time=01:00:00 unity/run.sbatch python validate_corpus.py  # T11 + T7 + completeness  :hand:
 ```
 
-Storage: frames ~11 GB (memmapped), A-std clips ~8-12 GB compressed.
+`validate_corpus.py` refuses a corpus that is not the pre-registered one: every
+(geometry, condition) cell present with tuples 0..1999, every shard's validator
+record present, both clip variants present for every tuple, no geometry skipped
+by T11, no validator failing on more than 5 %. The frame stores
+(`python idm_data.py`) are the step the old run order was missing; every
+trainer opens them and died without them.
+
+Storage: frames ~11 GB (memmapped), clips ~2 x 8-12 GB compressed.
 
 ### IDMs — Architecture B first (cheap, surfaces data bugs), then A
 
 ```bash
-.venv/bin/python exp_masking.py --train                    # §8.4, 5 seeds
-for v in B-std B-del B-time; do for s in $(seq 0 9); do
-  .venv/bin/python train_idm.py --variant $v --seed $s
-done; done
-# Architecture A: 4 variants x 5 seeds = 20 items -> array 0-19
-sbatch --array=0-19 -p gpu,gpu-preempt unity/train_idm.sbatch
+sbatch unity/probes.sbatch                    # 30 B-* probes + 45 masking cells, one GPU, sequential
+# Architecture A: items 0-19 = 4 variants x 5 seeds; items 20-29 = the
+# AUGMENTED A-std/A-del seeds Experiment H scores with (wm/ladder.yaml).
+bash unity/train_idm.sbatch --smoke                   # S1, inside salloc
+sbatch --array=0-4  -p gpu unity/train_idm.sbatch     # S2: record Elapsed with sacct
+sbatch --array=0-29 -p gpu unity/train_idm.sbatch     # full
 ```
 
-Cost: Arch B probes + masking ~5-15 GPU-h on an A10G; Arch A ~20-60 GPU-h on
+`train_idm.py` has **no mid-run resume**. Keep Architecture A on plain `gpu`
+(8 h limit in the header); only add `gpu-preempt` if S2 measured every item
+well under 2 h, and then pass `--time=02:00:00`. A preempted item restarts from
+zero; the script caps restarts at 3 so a loop is a visible failure, not a
+silently burned allocation.
+
+Cost: Arch B probes + masking ~5-15 GPU-h; Arch A (30 items) ~30-90 GPU-h on
 A100/L40S.
 
 ### Floors, power, and the pre-registration
 
 ```bash
-.venv/bin/python exp_d_floors.py              # INTERACT held-out only
-.venv/bin/python power.py
+sbatch --time=00:30:00 unity/run.sbatch python exp_d_floors.py      # INTERACT held-out only
+sbatch --time=00:30:00 unity/run.sbatch python power.py
 cp prereg_template.md prereg.md && $EDITOR prereg.md
 ```
 
-Fill **every** `<<...>>` from the A/C/D/power outputs. Then:
+Fill **every** `<<...>>` from the A/C/D/power outputs (`floors.json` and
+`power.json` are versioned, so the registration's sources are in git). Then:
 
 ```bash
 gh repo edit --visibility public               # REQUIRED -- see below
-git add prereg.md && git commit -m "pre-registration (frozen before Experiment E)"
+cp -n $OGAF_RESULTS/exp_d/floors.json results/exp_d/ ; cp -n $OGAF_RESULTS/power/power.json results/power/
+git add prereg.md results/exp_d/floors.json results/power/power.json
+git commit -m "pre-registration (frozen before Experiment E)"
 git push                                       # :hand: PUBLIC timestamp
-.venv/bin/python prereg_lock.py                # must report PASS
+python prereg_lock.py                          # must report PASS (login node: needs network)
 ```
 
-**The repo must be public.** `prereg_lock.py` checks that the prereg commit
-reached a public remote (§3.7) and there is no skip flag. The reason is not
-ceremony: a purely local or private commit is rewritable, so it is weak
-evidence that you froze the thresholds before seeing the result.
-`analyze.py` keeps Experiments E and H **sealed** until the lock passes.
+**The repo must be public, and the lock enforces it.** `prereg_lock.py` passes
+only if the prereg commit is an ancestor of the pushed upstream AND that
+upstream answers an anonymous HTTPS `ls-remote` (a private remote cannot pass
+through a cached login), and only if `prereg.md` contains no `<<...>>`
+placeholder. The reason is not ceremony: a purely local or private commit is
+rewritable, so it is weak evidence that you froze the thresholds before seeing
+the result. `analyze.py` keeps Experiments E and H **sealed** until the lock
+passes, and reads `tau_1`/`eps_a` from `prereg.md` (not from `config.py`
+defaults, which the lock does not hash).
 
 Optionally also file the same document as an OSF registration — ten minutes for
 an external timestamp nobody in this subfield has (§11).
@@ -207,11 +267,16 @@ an external timestamp nobody in this subfield has (§11).
 ### The decisive experiments — ~5 GPU-h
 
 ```bash
-.venv/bin/python exp_e_confound.py            # C1, C2, T5 -- the whole paper
-.venv/bin/python exp_f_friction.py --generate && .venv/bin/python exp_f_friction.py
-.venv/bin/python exp_g_lipschitz.py
-.venv/bin/python analyze.py --exp all         # full decision table    :hand:
+sbatch $GPU --time=03:00:00 unity/run.sbatch python exp_e_confound.py   # C1, C2, T5 -- the whole paper
+sbatch $GPU --time=03:00:00 unity/run.sbatch python exp_f_friction.py --generate --clips
+sbatch $GPU --time=02:00:00 unity/run.sbatch python exp_f_friction.py
+sbatch $GPU --time=02:00:00 unity/run.sbatch python exp_g_lipschitz.py
+python analyze.py --exp all                   # full decision table              :hand:
 ```
+
+`exp_f --generate` needs `--clips`: A-std is a clip model and the swept clips
+live under their own `_fm<x>` path (they used to share the baseline path, which
+made the dose-response flat by construction).
 
 ### Experiment H — ~100-200 GPU-h, the budget
 
@@ -220,26 +285,57 @@ trained world model, and it carries its own claim (C3(b), between-model
 ranking).
 
 ```bash
-# wm_train.py --geometries defaults to ALL THREE, so render all three or it
-# starves.  wm_generate.py and wm/exp_h.py default to box.
+# 1. Data.  WM-base / WM-data-poor train on the INTERACT corpus.  The
+#    physics-corrupted model needs a friction x3 INTERACT corpus of the SAME
+#    size (a 400-tuple sweep would confound it with data-poor).  ladder.yaml
+#    says friction_mult 3.0, which is NOT in config.FRICTION_MULTIPLIERS, so
+#    exp_f never builds it -- build it explicitly:
+OGAF_CORPUS_ARGS="--friction-mult 3.0 --conditions INTERACT" sbatch --array=0-59 unity/corpus.sbatch
+# 2. Video-rate WM clips for both corpora (EGL -> any cheap GPU):
+CHEAP='-p gpu --gres=gpu:1 --constraint=[2080_ti|1080_ti|titan_x|m40|v100]'
 for g in box sphere cylinder; do
-  .venv/bin/python wm/render_clips.py --geometry $g --shards $(seq 0 19)
-done
-.venv/bin/python wm/vae.py                    # verify_fidelity must pass
-bash unity/wm_train.sbatch --smoke            # S1: proves RESUME, not restart
+  sbatch $CHEAP --time=02:00:00 unity/run.sbatch python wm/render_clips.py --geometry $g --shards $(seq 0 19)
+  sbatch $CHEAP --time=02:00:00 unity/run.sbatch python wm/render_clips.py --geometry $g --shards $(seq 0 19) --friction-mult 3.0
+done   # the x3 clips land in wm_clips_fm3/, where wm_train.py looks for them
+# 3. VAE, then the three training runs (built to be killed; resumes across windows):
+sbatch $GPU --time=04:00:00 unity/run.sbatch python wm/vae.py     # verify_fidelity must pass
+bash unity/wm_train.sbatch --smoke            # S1 (salloc): proves RESUME, in an isolated dir
 sbatch --array=0-2 -p gpu,gpu-preempt unity/wm_train.sbatch
-bash unity/wm_generate.sbatch --s1            # determinism + 2-action divergence
-sbatch --array=0-49 -p gpu,gpu-preempt unity/wm_generate.sbatch
-.venv/bin/python wm/exp_h.py
+# 4. Generation: one submission per ladder model (WM-base-{100,30,10} are
+#    checkpoints of the WM-base run at ladder.yaml's checkpoint_at steps):
+OGAF_WM_MODEL=WM-base-10 bash unity/wm_generate.sbatch --s1     # determinism + 2-action divergence
+for m in WM-base-100 WM-base-30 WM-base-10 WM-data-poor WM-physics-corrupted; do
+  OGAF_WM_MODEL=$m sbatch --array=0-9 -p gpu,gpu-preempt unity/wm_generate.sbatch
+done
+# 5. One whole-set validation per model after its array (the per-shard ones
+#    inside the array write manifest_validate_shardNNN.json), then score:
+for m in WM-base-100 WM-base-30 WM-base-10 WM-data-poor WM-physics-corrupted; do
+  sbatch --time=00:30:00 unity/run.sbatch python unity/validate.py \
+      --dir $OGAF_DATA/generated/$m/box --expected-frames 16 \
+      --manifest $OGAF_DATA/generated/$m/box/manifest.json
+done
+sbatch $GPU --time=03:00:00 unity/run.sbatch python wm/exp_h.py
+python analyze.py --exp h
 ```
 
 `wm_train.sbatch` is **built to be killed**: it trains to a wall-clock budget,
 checkpoints on USR1, exits 0, and self-requeues to resume. A 150k-step run is
-assembled from however many short windows the partition gives you.
+assembled from however many short windows the partition gives you. (It now
+waits for the trainer to finish writing its checkpoint before requeueing; the
+previous version raced it and could lose up to 2000 steps per kill.)
 
 The determinism and two-action divergence checks run at **S1, not S2** —
 action conditioning being unwired is the one bug that invalidates all
-downstream H data, and two generations are enough to detect it.
+downstream H data, and two generations are enough to detect it. Run them on a
+real checkpoint (`WM-base-10` = step 12 000 exists about an hour into
+training; `OGAF_WM_CKPT=<path>` scores any checkpoint), not on the 400-step
+smoke model, whose two-action divergence would be near zero for the wrong
+reason.
+
+`exp_h.py` scores the **standard** metric at the generated frame nearest
+`s_std` (end of push) and OG-AF at the last frame -- the horizons each IDM was
+trained on; it needs the augmented A-std/A-del IDMs (train_idm array items
+20-29) and voids C3(b) unless the ladder is verified monotone.
 
 ---
 
@@ -344,12 +440,11 @@ roughly one a month. Novelty is intact; it will not stay that way indefinitely.
 - `weights_manifest.json` does not exist yet; `preflight.py` reports its
   absence as a warning. Generate it once on a machine where you trust the
   download (recipe in `unity/README.md`) and point it at the **DINOv3** cache.
-- `unity/README.md`'s cluster facts were verified 2026-08-17. **Re-verify at
-  S0** — a stale policy assumption costs an allocation, not a warning.
+- `unity/README.md`'s cluster facts were re-verified 2026-09-24 against live
+  `sinfo`/`sacctmgr` and the Unity docs. **Re-verify at S0** — a stale policy
+  assumption costs an allocation, not a warning.
 - Reciprocal reviewing at ICML/ICLR needs a previously-published co-author,
   and is on the critical path (§2).
-- `README.md`'s status table still lists stage 7 as "not run". Fix it when you
-  re-run `validate_corpus.py`.
 - **Encoder precision is deliberately left at fp32.** `exp_b_resolution.FrozenEncoder`
   runs the ViT in fp32 at batch 32. bf16 autocast would be roughly 2-3x faster on
   an A100, but Gate B's measured sigmas were obtained in fp32 and the embeddings
@@ -361,3 +456,101 @@ roughly one a month. Novelty is intact; it will not stay that way indefinitely.
   faster on a 1.1 GB store against an ~11 GB corpus store, with bitwise
   identical output. `tests/test_frame_selection.py` pins it. The ViT forward
   still dominates, so expect a few per cent end-to-end, not 2.7x.
+
+## 7. What the 2026-09-24 audit changed, and what it leaves to you
+
+A static adversarial review of the whole tree before any GPU time (nothing was
+executed on the login node; every finding was verified by reading the code).
+All fixes are committed file by file with their reasons in the messages. The
+ones that would have cost a GPU allocation or produced a wrong result:
+
+- **A-clip-del was A-std.** `datasets.py` rendered one clip (`A-std`) and
+  `ClipDataset` ignored its variant, so the T8 ablation would have trained on
+  the standard window and "passed" trivially; its index set was also 15 frames
+  whenever `s_del == arm_rest` (a collate crash). Every `config.CLIP_VARIANTS`
+  clip is now rendered and stored under
+  `clips/<variant>/<geometry>/<condition>[_fmX]/`, and `clip_indices` is
+  fixed-length by construction (tests pin it).
+- **Frame stores were never built** in the run order (`FrameStore` raised
+  `run materialise_frames first`; the only callers were Modal and exp_f).
+  `python idm_data.py` is the step; `preflight.py` warns when they are missing;
+  a store built from other shards than the ones on disk is rebuilt, not reused.
+- **ResNet-50 weights were downloaded at model build** (no network on compute
+  nodes); pre-staging is in §1 and `preflight.py` requires the file.
+- **The committed thresholds and gate records were invisible on Unity**:
+  `env.sh` moved `OGAF_RESULTS` to the empty workspace, so every script raised
+  `ThresholdsMissing` and `analyze.py` saw no Exp 0/A/B/C; the error's
+  suggested fix would have re-measured the thresholds Gates B/C were certified
+  against. `env.sh` pins `OGAF_THRESHOLDS` to the committed file and seeds the
+  workspace results tree (no-clobber).
+- **Experiment E would have crashed after all its GPU work**: pooled geometries
+  repeat `tuple_index`, and `stats.paired_gap` refuses duplicate pair ids. Pair
+  ids are `stats.pair_id(geometry, tuple_index)` in exp_d/e/g and in the
+  confound arrays; a test pins it.
+- **The smoke runs poisoned the production checkpoint dirs**: a 1-epoch
+  `A-std__seed0__full` and a 400-step `wm/WM-base/final.pt` would have been
+  adopted by skip-if-exists (WM-base would never have trained). Both smokes
+  write to isolated `_smoke` / `wm_smoke` dirs.
+- **`WM-base-100/-30/-10` could not be generated** (no checkpoint mapping) and
+  the physics-corrupted corpus could not be built (friction 3.0 is not in
+  `FRICTION_MULTIPLIERS`; `render_clips.py` wrote swept clips onto the base clip
+  paths and exited 0 having written nothing). `wm_generate.py` resolves ladder
+  names to `ckpt_step<checkpoint_at>.pt`; `render_clips.py` writes
+  `wm_clips_fmX/` and fails on missing input; `datasets.py --conditions` builds
+  the INTERACT-only x3 corpus.
+- **`exp_h.py` scored the standard metric at the wrong horizon** (the settled
+  last frame, which A-std never saw). Generated items carry `frame_indices`;
+  A-std is scored at the frame nearest `s_std`.
+- **Every generated shard was marked FAILED** (`validate.py` expected 1 frame),
+  and 50 concurrent validators overwrote one manifest.
+- **The sbatch scripts called bare `python`** (venv never activated) and their
+  TERM traps could never fire (bash defers traps behind a foreground `srun`);
+  `wm_train.sbatch` requeued while the trainer was still writing its checkpoint.
+  `env.sh` puts the venv on PATH; the scripts background `srun` and wait for the
+  PID to be gone; `--open-mode=append` keeps the preemption evidence.
+- **Seeds were not independent replicates**: `train_idm.py` built the model
+  before seeding, so all seeds shared one initialisation.
+- **Experiment F's dose-response was flat by construction**: the embedding cache
+  key and the clip path ignored the friction multiplier.
+- **WM training was fp16, not the registered bf16**; latents were cached in
+  fp16; a cache built for other geometries/fraction was silently reused; the
+  wall-clock budget started only after the cache build; a NaN loss ran on.
+- **`validate_corpus.py` passed on a 24-tuple smoke corpus** with two
+  geometries skipped -- it now checks completeness, clips and exclusion caps.
+- **`analyze.py` never read `tau_1` from `prereg.md`** (line-prefix match
+  against a mid-line token) and its Holm correction was dead code;
+  `prereg_lock` passed without a push and with unfilled placeholders. Fixed;
+  T5 stays descriptive (no registered null), so the Holm family is {C1, C2}.
+- Atomic writes for `eval.npz` / `metadata.json` / `checkpoint.pt` / the
+  texture PNG / `validators.json` (now written before the shard it describes).
+- Corpus, probes and one-off steps have sbatch wrappers (`unity/corpus.sbatch`,
+  `unity/probes.sbatch`, `unity/run.sbatch`), so no documented command runs on
+  a login node.
+
+**Decisions this audit deliberately did NOT make for you:**
+
+1. `wm/ladder.yaml` trains 150 000 steps but calls step **120 000** "100 %"
+   (36 000 = 30 %, 12 000 = 10 %). The code follows the ladder literally
+   (WM-base-100 = step 120 000). Either set `train.steps: 120000` (saves 20 %
+   of the H training budget) or relabel -- before the prereg.
+2. The augmented A-std/A-del IDMs the ladder scores H with are 10 extra
+   Architecture A items (+50 % of that stage). They are in the array (20-29);
+   drop them only by changing `ladder.yaml`'s `augmented: true` first.
+3. `ladder.yaml`'s controls (`appearance_gap` free-space rollouts,
+   `domain_shift` FID-style distance) are specified but not implemented;
+   `analyze.py --exp h` prints them as absent. C3(b)'s effect sizes are
+   unpaired Cohen's d although every model sees the same held-out actions.
+4. Gate verdicts for C0/B/C/corpus are computed inside the exp scripts (with
+   thresholds hardcoded there) and `analyze.py` echoes the stored booleans --
+   "analyze.py is the only place arrays become verdicts" is not yet
+   mechanically true for those gates.
+5. The lock's "commit precedes artifacts" check is mtime-based (a `cp` or a
+   re-clone resets it); the public push timestamp is the real anchor.
+6. The committed `results/exp_0/results.json` used 3 probe seeds; §2's command
+   uses 5.
+7. `train_idm.py` has no resume. A per-epoch checkpoint is the right fix for
+   running Architecture A on `gpu-preempt`; it needs an S1 run to validate, so
+   it was not written blind.
+8. `preflight.py`'s EGL check times context creation plus one frame against a
+   0.5 s heuristic; a cold context on a healthy node can trip it -- re-run
+   before believing an osmesa diagnosis.
