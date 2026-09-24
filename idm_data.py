@@ -11,7 +11,13 @@ Three input regimes, pinned per metric so T8 cannot bite:
 
 Frames are materialised once into uint8 memmaps: the corpus is ~11 GB of
 frames, which does not fit in RAM but memmaps fine, and re-decompressing shards
-inside a shuffled DataLoader would dominate training time.
+inside a shuffled DataLoader would dominate training time.  Build them with
+``python idm_data.py`` (CPU) after the corpus and before any trainer.
+
+Clips live at ``clips/<variant>/<geometry>/<condition>[_fm<x>]/<tuple>.npz``
+(``datasets.clip_path``): one file per clip VARIANT, because A-std and
+A-clip-del sample different frames, and per friction multiplier, because a
+swept corpus must never overwrite the baseline clips Experiment E scores.
 """
 
 from __future__ import annotations
@@ -41,6 +47,18 @@ _MASK_KEEP = {"arm_masked": C.SEG_OBJECT, "object_masked": C.SEG_ARM}
 # ==========================================================================
 
 
+def _shard_listing(corpus_root: Path, geometry: str, condition: str,
+                   friction_mult: float) -> list:
+    """Sorted shard filenames a store is built from (same glob as
+    ``datasets.iter_records``).  Recorded in the index so a stale store --
+    built from the smoke corpus, or before the last shard landed -- is caught
+    on the next load instead of being trained on forever."""
+    fm = "" if abs(friction_mult - 1.0) < 1e-9 else f"_fm{friction_mult:g}"
+    gdir = Path(corpus_root) / geometry
+    return sorted(p.name for p in gdir.glob(f"{condition}{fm}_shard*.npz")) \
+        if gdir.exists() else []
+
+
 def _store_paths(root: Path, geometry: str, condition: str, friction_mult: float):
     fm = "" if abs(friction_mult - 1.0) < 1e-9 else f"_fm{friction_mult:g}"
     base = Path(root) / f"{geometry}_{condition}{fm}"
@@ -55,8 +73,13 @@ def materialise_frames(geometry: str, condition: str, *, corpus_root: Path = C.C
     store_root = Path(store_root or (C.DATA_ROOT / "frame_store"))
     store_root.mkdir(parents=True, exist_ok=True)
     fpath, mpath, ipath = _store_paths(store_root, geometry, condition, friction_mult)
+    shards_now = _shard_listing(corpus_root, geometry, condition, friction_mult)
     if ipath.exists() and not overwrite:
-        return json.loads(ipath.read_text())
+        index = json.loads(ipath.read_text())
+        if index.get("shards") == shards_now:
+            return index
+        print(f"  frame store {ipath.name} is STALE ({len(index.get('shards', []))} shards "
+              f"recorded, {len(shards_now)} on disk); rebuilding", flush=True)
 
     rows = []
     frames_list, masks_list = [], []
@@ -84,6 +107,7 @@ def materialise_frames(geometry: str, condition: str, *, corpus_root: Path = C.C
     np.save(mpath, masks)
     index = {"geometry": geometry, "condition": condition, "friction_mult": friction_mult,
              "n": len(rows), "horizons": list(ds.HORIZONS), "rows": rows,
+             "shards": shards_now,
              "frames_path": str(fpath), "masks_path": str(mpath)}
     ipath.write_text(json.dumps(index))
     return index
@@ -102,6 +126,7 @@ class FrameStore:
         self.frames = np.load(fpath, mmap_mode="r")
         self.masks = np.load(mpath, mmap_mode="r")
         self.geometry, self.condition = geometry, condition
+        self.friction_mult = float(friction_mult)
         self.horizon_pos = {h: i for i, h in enumerate(self.index["horizons"])}
 
     def rows_for_split(self, split: str, only_valid: bool = True):
@@ -201,9 +226,13 @@ class ClipDataset(_Base):
         si, ri = self.items[i]
         st = self.stores[si]
         row = st.index["rows"][ri]
-        path = self.clip_root / st.geometry / st.condition / f"{row['tuple_index']:07d}.npz"
+        path = ds.clip_path(self.clip_root, self.variant, st.geometry, st.condition,
+                            int(row["tuple_index"]), st.friction_mult)
         with np.load(path) as z:
             clip = z["clip"]
+        if clip.shape[0] != C.CLIP_LENGTH:
+            raise ValueError(f"{path}: {clip.shape[0]} frames, expected {C.CLIP_LENGTH}; "
+                             f"regenerate the clip store (datasets.py --clips)")
         x = torch.from_numpy(np.ascontiguousarray(clip)).permute(0, 3, 1, 2)
         return x.contiguous().float() / 255.0, self._target(si, ri)
 
@@ -235,3 +264,23 @@ def make_loader(dataset, batch_size: int, *, shuffle: bool, seed: int = 0,
         num_workers=num_workers, pin_memory=torch.cuda.is_available(),
         drop_last=False, persistent_workers=bool(num_workers),
     )
+
+
+if __name__ == "__main__":
+    # The CPU step between the corpus build and any IDM training: flatten the
+    # shards into the memmapped frame stores every trainer opens.  Run it once
+    # (idempotent; stale stores are rebuilt) BEFORE spending a GPU.
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Materialise frame stores (CPU, once per corpus).")
+    ap.add_argument("--geometries", nargs="+", default=list(C.GEOMETRIES))
+    ap.add_argument("--conditions", nargs="+", default=list(C.CONDITIONS))
+    ap.add_argument("--friction-mult", type=float, default=1.0)
+    ap.add_argument("--overwrite", action="store_true")
+    _a = ap.parse_args()
+    for _g in _a.geometries:
+        for _c in _a.conditions:
+            _ix = materialise_frames(_g, _c, friction_mult=_a.friction_mult,
+                                     overwrite=_a.overwrite)
+            print(f"  {_g}/{_c}: n={_ix['n']} shards={len(_ix.get('shards', []))} "
+                  f"-> {_ix['frames_path']}", flush=True)
