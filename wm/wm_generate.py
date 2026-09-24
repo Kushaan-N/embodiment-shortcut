@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -31,6 +32,35 @@ import provenance  # noqa: E402
 import scene  # noqa: E402
 from wm.vae import CompactVAE  # noqa: E402
 from wm.wm_train import VideoWorldModel  # noqa: E402
+
+LADDER_PATH = Path(__file__).resolve().parent / "ladder.yaml"
+
+
+def resolve_checkpoint(model_name: str, ckpt_root: Path) -> Path:
+    """Map a ladder model name to the checkpoint that DEFINES it (wm/ladder.yaml).
+
+    WM-base-100 / -30 / -10 are checkpoints of ONE training run -- trained
+    under the base name (``ladder.base.name``, what wm_train.sbatch submits)
+    -- at the ladder's ``checkpoint_at`` steps.  The override models are
+    their own runs and use ``final.pt``.  Nothing else maps these names, so
+    without this every ``--model WM-base-100`` died in torch.load.
+    """
+    ckpt_root = Path(ckpt_root)
+    ladder = yaml.safe_load(LADDER_PATH.read_text())
+    base_name = ladder["base"]["name"]
+    for m in ladder["models"]:
+        if m["name"] != model_name:
+            continue
+        if "checkpoint_at" in m:
+            step = int(m["checkpoint_at"])
+            p = ckpt_root / base_name / f"ckpt_step{step:07d}.pt"
+            if not p.exists():
+                raise FileNotFoundError(
+                    f"{model_name} is {base_name} at step {step}: {p} missing "
+                    f"(train {base_name} past step {step}; checkpoints are kept)")
+            return p
+        return ckpt_root / model_name / "final.pt"
+    return ckpt_root / model_name / "final.pt"     # e.g. the base run itself (S1)
 
 
 def load_model(ckpt_path: Path, device, vae_path: Path | None = None):
@@ -160,7 +190,8 @@ def main() -> int:
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ckpt = args.ckpt or (C.CHECKPOINT_ROOT / "wm" / args.model / "final.pt")
+    ckpt = args.ckpt or resolve_checkpoint(args.model, C.CHECKPOINT_ROOT / "wm")
+    print(f"  {args.model} <- {ckpt}", flush=True)
     model, vae, ck = load_model(ckpt, dev)
     n_frames = int(ck["cfg"]["transformer"]["max_frames"])
 
@@ -176,6 +207,11 @@ def main() -> int:
             if str(z["split"]) == "test":
                 held_out.append((f, z["action"].copy(), int(z["tuple_index"])))
     n = min(args.n, len(held_out))
+    if n < args.n:
+        # The test split is 10% of the corpus, so --n 1500 is not reachable;
+        # every model is scored on the same n either way, but say so.
+        print(f"  WARNING: only {n} held-out test clips exist (requested --n {args.n}); "
+              f"every ladder model is scored on these same {n}", flush=True)
     idx = np.arange(n)[args.shard :: args.n_shards]
 
     outdir = Path(args.out) / args.model / args.geometry
@@ -200,11 +236,16 @@ def main() -> int:
             continue
         with np.load(clip_path) as z:
             real = z["clip"].copy()
+            frame_idx = z["frame_indices"].astype(np.int64).copy()
+            s_del_step = np.int64(z["s_del_step"])
         gen = generate_video(model, vae, real[0], action, n_frames, dev)
         checks = validate_item(gen, real[0], expected_count=n_frames)
         digest = hashlib.sha256(gen.tobytes()).hexdigest()
+        # frame_indices travel with the item: exp_h must score the STANDARD
+        # metric at the frame nearest s_std, not at the settled last frame.
         provenance.save_arrays(path, generated=gen, conditioning=real[:1],
-                               action=action, real_target=real)
+                               action=action, real_target=real,
+                               frame_indices=frame_idx, s_del_step=s_del_step)
         manifest.append({"id": item_id, "sha256": digest,
                          "passed": checks["_all_passed"], "checks": checks})
         if not checks["_all_passed"]:
