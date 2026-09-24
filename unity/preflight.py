@@ -107,6 +107,49 @@ def c_encoder_cache():
     return True, f"{repo} [{weights[0]}] cached under HF_HOME={where}"
 
 
+def c_thresholds():
+    """Every script calls config.load_thresholds(); on Unity OGAF_RESULTS is the
+    workspace, so the committed thresholds.json is only found via
+    OGAF_THRESHOLDS (unity/env.sh sets it).  Never re-derive on Unity."""
+    import config as C
+
+    p = C.THRESHOLDS_PATH
+    if not p.exists():
+        return False, (f"{p} missing; `source unity/env.sh` pins OGAF_THRESHOLDS to the "
+                       f"committed results/exp_a/thresholds.json -- do NOT re-run exp_a")
+    return True, str(p)
+
+
+def c_resnet50_weights():
+    """Architecture A builds resnet50(weights=IMAGENET1K_V2); torchvision
+    downloads it on first use, and compute nodes have no network -- so every
+    Arch A task died at build_model after its GPU was allocated."""
+    home = os.environ.get("TORCH_HOME")
+    if not home:
+        return False, "TORCH_HOME unset; `source unity/env.sh`"
+    p = Path(home) / "hub" / "checkpoints" / "resnet50-11ad3fa6.pth"
+    if not p.exists():
+        return False, (f"{p} missing; pre-stage on a LOGIN node with env.sh sourced: "
+                       "python -c 'from torchvision.models import resnet50, ResNet50_Weights; "
+                       "resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)'")
+    mb = p.stat().st_size / 2**20
+    return mb > 90, f"{p} ({mb:.0f} MiB)"
+
+
+def c_frame_stores():
+    """train_idm.py opens the memmapped frame stores; they are built by
+    `python idm_data.py` (CPU) after the corpus.  Warn-only: preflight also runs
+    before any corpus exists."""
+    import config as C
+
+    root = C.DATA_ROOT / "frame_store"
+    have = sorted(p.name for p in root.glob("*.index.json")) if root.exists() else []
+    need = len(C.GEOMETRIES) * len(C.CONDITIONS)
+    ok = len(have) >= need
+    return ok, (f"{len(have)}/{need} index files under {root}"
+                + ("" if ok else "; run `python idm_data.py` after the corpus build"))
+
+
 def c_caches_off_home():
     """Caches under $HOME will fill a shared group quota (see unity/env.sh)."""
     home = str(Path.home())
@@ -221,8 +264,13 @@ def main() -> int:
     check("weight checksums vs manifest", lambda: c_weight_checksums(args.manifest),
           required=False)
     check("HF_TOKEN validity", c_hf_token, required=False)
+    # Required: with HF_HOME unset the encoder resolves from $HOME/.cache here
+    # and the job (which sources env.sh -> workspace HF_HOME, offline) fails.
+    check("caches point off $HOME", c_caches_off_home)
     check("Gate B encoder cached (offline-ready)", c_encoder_cache)
-    check("caches point off $HOME", c_caches_off_home, required=False)
+    check("committed thresholds.json resolvable", c_thresholds)
+    check("ResNet-50 ImageNet weights pre-staged", c_resnet50_weights)
+    check("frame stores materialised", c_frame_stores, required=False)
     check("CUDA device / VRAM / torch.version.cuda", c_cuda)
     check("REAL one-frame MuJoCo EGL render", c_egl_render)
     check("offline operation (HF_HUB_OFFLINE=1)", c_offline_ok)
