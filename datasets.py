@@ -188,6 +188,7 @@ def clips_complete(clip_root: Path, geometry: str, condition: str, tuple_range,
 
 
 def _write_json_atomic(path: Path, obj) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)   # first write on a fresh corpus root
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w") as fh:
         json.dump(obj, fh, indent=1)
