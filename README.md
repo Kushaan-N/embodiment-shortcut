@@ -25,13 +25,16 @@ occupied in RL.
 | Stage | Gate | Result |
 |---|---|---|
 | 1. `distances.py` + tests | 114 unit tests | **PASS** |
-| 2. `scene.py` + validators + contact sheet | visual inspection | ✋ **awaiting human review** |
+| 2. `scene.py` + validators + contact sheet | visual inspection | reviewed 2026-09-29 (agent); ✋ human sign-off pending |
 | 3. Experiment 0 — state oracles | **Gate C0** | **PASS** |
 | 4. Experiment A — contact deltas | thresholds written | **done** |
 | 5. Experiment B — encoder floor | **Gate B** | **PASS** (DINOv3; DINOv2 fails) |
 | 6. Experiment C — injectivity | **Gate C** | **PASS** |
-| 7. Corpus + `validate_corpus.py` | T11, T7, completeness | **STALE** — re-run after the real build (`unity/HANDOFF.md` §0) |
-| 8–12 | — | not run |
+| 7. Corpus + `validate_corpus.py` | T11, T7, completeness | **PASS** 2026-09-29 — 9×2000 tuples, 36k clips, T11 R²≈0, ≤1.1 % excluded |
+| 8. IDMs — Architecture A (30) | content checks | **done** 2026-09-29 (Arch B blocked: DINOv3 needs `HF_TOKEN`) |
+| 9. Experiment D — floors, + power | headroom vs prior | **done** — A-std 1.9 %, A-del 44.7 % of prior; n ≤ 102/geometry |
+| 10. Pre-registration (`prereg.md`, public push) | §0.5 lock | ✋ **next — human** |
+| 11–12. Experiments E/F/G, H | — | not run (E, H sealed until the lock passes) |
 
 Measured gate values are in `results/*/results.json`; `python analyze.py`
 prints them all with thresholds and PASS/FAIL.
