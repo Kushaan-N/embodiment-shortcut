@@ -1,0 +1,3215 @@
+{
+  "argv": [
+    "exp_e_confound.py",
+    "--num-workers",
+    "8"
+  ],
+  "arrays": {
+    "A-clip-del_seed0_ABSENT_geometry": [
+      615
+    ],
+    "A-clip-del_seed0_ABSENT_mae": [
+      615
+    ],
+    "A-clip-del_seed0_ABSENT_tuple": [
+      615
+    ],
+    "A-clip-del_seed0_DECOY_geometry": [
+      615
+    ],
+    "A-clip-del_seed0_DECOY_mae": [
+      615
+    ],
+    "A-clip-del_seed0_DECOY_tuple": [
+      615
+    ],
+    "A-clip-del_seed0_G_pair_ids": [
+      611
+    ],
+    "A-clip-del_seed0_G_paired": [
+      611
+    ],
+    "A-clip-del_seed0_INTERACT_geometry": [
+      611
+    ],
+    "A-clip-del_seed0_INTERACT_mae": [
+      611
+    ],
+    "A-clip-del_seed0_INTERACT_tuple": [
+      611
+    ],
+    "A-clip-del_seed1_ABSENT_geometry": [
+      615
+    ],
+    "A-clip-del_seed1_ABSENT_mae": [
+      615
+    ],
+    "A-clip-del_seed1_ABSENT_tuple": [
+      615
+    ],
+    "A-clip-del_seed1_DECOY_geometry": [
+      615
+    ],
+    "A-clip-del_seed1_DECOY_mae": [
+      615
+    ],
+    "A-clip-del_seed1_DECOY_tuple": [
+      615
+    ],
+    "A-clip-del_seed1_G_pair_ids": [
+      611
+    ],
+    "A-clip-del_seed1_G_paired": [
+      611
+    ],
+    "A-clip-del_seed1_INTERACT_geometry": [
+      611
+    ],
+    "A-clip-del_seed1_INTERACT_mae": [
+      611
+    ],
+    "A-clip-del_seed1_INTERACT_tuple": [
+      611
+    ],
+    "A-clip-del_seed2_ABSENT_geometry": [
+      615
+    ],
+    "A-clip-del_seed2_ABSENT_mae": [
+      615
+    ],
+    "A-clip-del_seed2_ABSENT_tuple": [
+      615
+    ],
+    "A-clip-del_seed2_DECOY_geometry": [
+      615
+    ],
+    "A-clip-del_seed2_DECOY_mae": [
+      615
+    ],
+    "A-clip-del_seed2_DECOY_tuple": [
+      615
+    ],
+    "A-clip-del_seed2_G_pair_ids": [
+      611
+    ],
+    "A-clip-del_seed2_G_paired": [
+      611
+    ],
+    "A-clip-del_seed2_INTERACT_geometry": [
+      611
+    ],
+    "A-clip-del_seed2_INTERACT_mae": [
+      611
+    ],
+    "A-clip-del_seed2_INTERACT_tuple": [
+      611
+    ],
+    "A-clip-del_seed3_ABSENT_geometry": [
+      615
+    ],
+    "A-clip-del_seed3_ABSENT_mae": [
+      615
+    ],
+    "A-clip-del_seed3_ABSENT_tuple": [
+      615
+    ],
+    "A-clip-del_seed3_DECOY_geometry": [
+      615
+    ],
+    "A-clip-del_seed3_DECOY_mae": [
+      615
+    ],
+    "A-clip-del_seed3_DECOY_tuple": [
+      615
+    ],
+    "A-clip-del_seed3_G_pair_ids": [
+      611
+    ],
+    "A-clip-del_seed3_G_paired": [
+      611
+    ],
+    "A-clip-del_seed3_INTERACT_geometry": [
+      611
+    ],
+    "A-clip-del_seed3_INTERACT_mae": [
+      611
+    ],
+    "A-clip-del_seed3_INTERACT_tuple": [
+      611
+    ],
+    "A-clip-del_seed4_ABSENT_geometry": [
+      615
+    ],
+    "A-clip-del_seed4_ABSENT_mae": [
+      615
+    ],
+    "A-clip-del_seed4_ABSENT_tuple": [
+      615
+    ],
+    "A-clip-del_seed4_DECOY_geometry": [
+      615
+    ],
+    "A-clip-del_seed4_DECOY_mae": [
+      615
+    ],
+    "A-clip-del_seed4_DECOY_tuple": [
+      615
+    ],
+    "A-clip-del_seed4_G_pair_ids": [
+      611
+    ],
+    "A-clip-del_seed4_G_paired": [
+      611
+    ],
+    "A-clip-del_seed4_INTERACT_geometry": [
+      611
+    ],
+    "A-clip-del_seed4_INTERACT_mae": [
+      611
+    ],
+    "A-clip-del_seed4_INTERACT_tuple": [
+      611
+    ],
+    "A-del_seed0_ABSENT_geometry": [
+      615
+    ],
+    "A-del_seed0_ABSENT_mae": [
+      615
+    ],
+    "A-del_seed0_ABSENT_tuple": [
+      615
+    ],
+    "A-del_seed0_DECOY_geometry": [
+      615
+    ],
+    "A-del_seed0_DECOY_mae": [
+      615
+    ],
+    "A-del_seed0_DECOY_tuple": [
+      615
+    ],
+    "A-del_seed0_G_pair_ids": [
+      611
+    ],
+    "A-del_seed0_G_paired": [
+      611
+    ],
+    "A-del_seed0_INTERACT_geometry": [
+      611
+    ],
+    "A-del_seed0_INTERACT_mae": [
+      611
+    ],
+    "A-del_seed0_INTERACT_tuple": [
+      611
+    ],
+    "A-del_seed1_ABSENT_geometry": [
+      615
+    ],
+    "A-del_seed1_ABSENT_mae": [
+      615
+    ],
+    "A-del_seed1_ABSENT_tuple": [
+      615
+    ],
+    "A-del_seed1_DECOY_geometry": [
+      615
+    ],
+    "A-del_seed1_DECOY_mae": [
+      615
+    ],
+    "A-del_seed1_DECOY_tuple": [
+      615
+    ],
+    "A-del_seed1_G_pair_ids": [
+      611
+    ],
+    "A-del_seed1_G_paired": [
+      611
+    ],
+    "A-del_seed1_INTERACT_geometry": [
+      611
+    ],
+    "A-del_seed1_INTERACT_mae": [
+      611
+    ],
+    "A-del_seed1_INTERACT_tuple": [
+      611
+    ],
+    "A-del_seed2_ABSENT_geometry": [
+      615
+    ],
+    "A-del_seed2_ABSENT_mae": [
+      615
+    ],
+    "A-del_seed2_ABSENT_tuple": [
+      615
+    ],
+    "A-del_seed2_DECOY_geometry": [
+      615
+    ],
+    "A-del_seed2_DECOY_mae": [
+      615
+    ],
+    "A-del_seed2_DECOY_tuple": [
+      615
+    ],
+    "A-del_seed2_G_pair_ids": [
+      611
+    ],
+    "A-del_seed2_G_paired": [
+      611
+    ],
+    "A-del_seed2_INTERACT_geometry": [
+      611
+    ],
+    "A-del_seed2_INTERACT_mae": [
+      611
+    ],
+    "A-del_seed2_INTERACT_tuple": [
+      611
+    ],
+    "A-del_seed3_ABSENT_geometry": [
+      615
+    ],
+    "A-del_seed3_ABSENT_mae": [
+      615
+    ],
+    "A-del_seed3_ABSENT_tuple": [
+      615
+    ],
+    "A-del_seed3_DECOY_geometry": [
+      615
+    ],
+    "A-del_seed3_DECOY_mae": [
+      615
+    ],
+    "A-del_seed3_DECOY_tuple": [
+      615
+    ],
+    "A-del_seed3_G_pair_ids": [
+      611
+    ],
+    "A-del_seed3_G_paired": [
+      611
+    ],
+    "A-del_seed3_INTERACT_geometry": [
+      611
+    ],
+    "A-del_seed3_INTERACT_mae": [
+      611
+    ],
+    "A-del_seed3_INTERACT_tuple": [
+      611
+    ],
+    "A-del_seed4_ABSENT_geometry": [
+      615
+    ],
+    "A-del_seed4_ABSENT_mae": [
+      615
+    ],
+    "A-del_seed4_ABSENT_tuple": [
+      615
+    ],
+    "A-del_seed4_DECOY_geometry": [
+      615
+    ],
+    "A-del_seed4_DECOY_mae": [
+      615
+    ],
+    "A-del_seed4_DECOY_tuple": [
+      615
+    ],
+    "A-del_seed4_G_pair_ids": [
+      611
+    ],
+    "A-del_seed4_G_paired": [
+      611
+    ],
+    "A-del_seed4_INTERACT_geometry": [
+      611
+    ],
+    "A-del_seed4_INTERACT_mae": [
+      611
+    ],
+    "A-del_seed4_INTERACT_tuple": [
+      611
+    ],
+    "A-std_seed0_ABSENT_geometry": [
+      615
+    ],
+    "A-std_seed0_ABSENT_mae": [
+      615
+    ],
+    "A-std_seed0_ABSENT_tuple": [
+      615
+    ],
+    "A-std_seed0_DECOY_geometry": [
+      615
+    ],
+    "A-std_seed0_DECOY_mae": [
+      615
+    ],
+    "A-std_seed0_DECOY_tuple": [
+      615
+    ],
+    "A-std_seed0_G_pair_ids": [
+      611
+    ],
+    "A-std_seed0_G_paired": [
+      611
+    ],
+    "A-std_seed0_INTERACT_geometry": [
+      611
+    ],
+    "A-std_seed0_INTERACT_mae": [
+      611
+    ],
+    "A-std_seed0_INTERACT_tuple": [
+      611
+    ],
+    "A-std_seed1_ABSENT_geometry": [
+      615
+    ],
+    "A-std_seed1_ABSENT_mae": [
+      615
+    ],
+    "A-std_seed1_ABSENT_tuple": [
+      615
+    ],
+    "A-std_seed1_DECOY_geometry": [
+      615
+    ],
+    "A-std_seed1_DECOY_mae": [
+      615
+    ],
+    "A-std_seed1_DECOY_tuple": [
+      615
+    ],
+    "A-std_seed1_G_pair_ids": [
+      611
+    ],
+    "A-std_seed1_G_paired": [
+      611
+    ],
+    "A-std_seed1_INTERACT_geometry": [
+      611
+    ],
+    "A-std_seed1_INTERACT_mae": [
+      611
+    ],
+    "A-std_seed1_INTERACT_tuple": [
+      611
+    ],
+    "A-std_seed2_ABSENT_geometry": [
+      615
+    ],
+    "A-std_seed2_ABSENT_mae": [
+      615
+    ],
+    "A-std_seed2_ABSENT_tuple": [
+      615
+    ],
+    "A-std_seed2_DECOY_geometry": [
+      615
+    ],
+    "A-std_seed2_DECOY_mae": [
+      615
+    ],
+    "A-std_seed2_DECOY_tuple": [
+      615
+    ],
+    "A-std_seed2_G_pair_ids": [
+      611
+    ],
+    "A-std_seed2_G_paired": [
+      611
+    ],
+    "A-std_seed2_INTERACT_geometry": [
+      611
+    ],
+    "A-std_seed2_INTERACT_mae": [
+      611
+    ],
+    "A-std_seed2_INTERACT_tuple": [
+      611
+    ],
+    "A-std_seed3_ABSENT_geometry": [
+      615
+    ],
+    "A-std_seed3_ABSENT_mae": [
+      615
+    ],
+    "A-std_seed3_ABSENT_tuple": [
+      615
+    ],
+    "A-std_seed3_DECOY_geometry": [
+      615
+    ],
+    "A-std_seed3_DECOY_mae": [
+      615
+    ],
+    "A-std_seed3_DECOY_tuple": [
+      615
+    ],
+    "A-std_seed3_G_pair_ids": [
+      611
+    ],
+    "A-std_seed3_G_paired": [
+      611
+    ],
+    "A-std_seed3_INTERACT_geometry": [
+      611
+    ],
+    "A-std_seed3_INTERACT_mae": [
+      611
+    ],
+    "A-std_seed3_INTERACT_tuple": [
+      611
+    ],
+    "A-std_seed4_ABSENT_geometry": [
+      615
+    ],
+    "A-std_seed4_ABSENT_mae": [
+      615
+    ],
+    "A-std_seed4_ABSENT_tuple": [
+      615
+    ],
+    "A-std_seed4_DECOY_geometry": [
+      615
+    ],
+    "A-std_seed4_DECOY_mae": [
+      615
+    ],
+    "A-std_seed4_DECOY_tuple": [
+      615
+    ],
+    "A-std_seed4_G_pair_ids": [
+      611
+    ],
+    "A-std_seed4_G_paired": [
+      611
+    ],
+    "A-std_seed4_INTERACT_geometry": [
+      611
+    ],
+    "A-std_seed4_INTERACT_mae": [
+      611
+    ],
+    "A-std_seed4_INTERACT_tuple": [
+      611
+    ],
+    "A-time_seed0_ABSENT_geometry": [
+      615
+    ],
+    "A-time_seed0_ABSENT_mae": [
+      615
+    ],
+    "A-time_seed0_ABSENT_tuple": [
+      615
+    ],
+    "A-time_seed0_DECOY_geometry": [
+      615
+    ],
+    "A-time_seed0_DECOY_mae": [
+      615
+    ],
+    "A-time_seed0_DECOY_tuple": [
+      615
+    ],
+    "A-time_seed0_G_pair_ids": [
+      611
+    ],
+    "A-time_seed0_G_paired": [
+      611
+    ],
+    "A-time_seed0_INTERACT_geometry": [
+      611
+    ],
+    "A-time_seed0_INTERACT_mae": [
+      611
+    ],
+    "A-time_seed0_INTERACT_tuple": [
+      611
+    ],
+    "A-time_seed1_ABSENT_geometry": [
+      615
+    ],
+    "A-time_seed1_ABSENT_mae": [
+      615
+    ],
+    "A-time_seed1_ABSENT_tuple": [
+      615
+    ],
+    "A-time_seed1_DECOY_geometry": [
+      615
+    ],
+    "A-time_seed1_DECOY_mae": [
+      615
+    ],
+    "A-time_seed1_DECOY_tuple": [
+      615
+    ],
+    "A-time_seed1_G_pair_ids": [
+      611
+    ],
+    "A-time_seed1_G_paired": [
+      611
+    ],
+    "A-time_seed1_INTERACT_geometry": [
+      611
+    ],
+    "A-time_seed1_INTERACT_mae": [
+      611
+    ],
+    "A-time_seed1_INTERACT_tuple": [
+      611
+    ],
+    "A-time_seed2_ABSENT_geometry": [
+      615
+    ],
+    "A-time_seed2_ABSENT_mae": [
+      615
+    ],
+    "A-time_seed2_ABSENT_tuple": [
+      615
+    ],
+    "A-time_seed2_DECOY_geometry": [
+      615
+    ],
+    "A-time_seed2_DECOY_mae": [
+      615
+    ],
+    "A-time_seed2_DECOY_tuple": [
+      615
+    ],
+    "A-time_seed2_G_pair_ids": [
+      611
+    ],
+    "A-time_seed2_G_paired": [
+      611
+    ],
+    "A-time_seed2_INTERACT_geometry": [
+      611
+    ],
+    "A-time_seed2_INTERACT_mae": [
+      611
+    ],
+    "A-time_seed2_INTERACT_tuple": [
+      611
+    ],
+    "A-time_seed3_ABSENT_geometry": [
+      615
+    ],
+    "A-time_seed3_ABSENT_mae": [
+      615
+    ],
+    "A-time_seed3_ABSENT_tuple": [
+      615
+    ],
+    "A-time_seed3_DECOY_geometry": [
+      615
+    ],
+    "A-time_seed3_DECOY_mae": [
+      615
+    ],
+    "A-time_seed3_DECOY_tuple": [
+      615
+    ],
+    "A-time_seed3_G_pair_ids": [
+      611
+    ],
+    "A-time_seed3_G_paired": [
+      611
+    ],
+    "A-time_seed3_INTERACT_geometry": [
+      611
+    ],
+    "A-time_seed3_INTERACT_mae": [
+      611
+    ],
+    "A-time_seed3_INTERACT_tuple": [
+      611
+    ],
+    "A-time_seed4_ABSENT_geometry": [
+      615
+    ],
+    "A-time_seed4_ABSENT_mae": [
+      615
+    ],
+    "A-time_seed4_ABSENT_tuple": [
+      615
+    ],
+    "A-time_seed4_DECOY_geometry": [
+      615
+    ],
+    "A-time_seed4_DECOY_mae": [
+      615
+    ],
+    "A-time_seed4_DECOY_tuple": [
+      615
+    ],
+    "A-time_seed4_G_pair_ids": [
+      611
+    ],
+    "A-time_seed4_G_paired": [
+      611
+    ],
+    "A-time_seed4_INTERACT_geometry": [
+      611
+    ],
+    "A-time_seed4_INTERACT_mae": [
+      611
+    ],
+    "A-time_seed4_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed0_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed0_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed0_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed0_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed0_DECOY_mae": [
+      615
+    ],
+    "B-del_seed0_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed0_G_pair_ids": [
+      611
+    ],
+    "B-del_seed0_G_paired": [
+      611
+    ],
+    "B-del_seed0_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed0_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed0_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed1_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed1_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed1_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed1_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed1_DECOY_mae": [
+      615
+    ],
+    "B-del_seed1_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed1_G_pair_ids": [
+      611
+    ],
+    "B-del_seed1_G_paired": [
+      611
+    ],
+    "B-del_seed1_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed1_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed1_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed2_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed2_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed2_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed2_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed2_DECOY_mae": [
+      615
+    ],
+    "B-del_seed2_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed2_G_pair_ids": [
+      611
+    ],
+    "B-del_seed2_G_paired": [
+      611
+    ],
+    "B-del_seed2_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed2_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed2_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed3_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed3_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed3_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed3_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed3_DECOY_mae": [
+      615
+    ],
+    "B-del_seed3_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed3_G_pair_ids": [
+      611
+    ],
+    "B-del_seed3_G_paired": [
+      611
+    ],
+    "B-del_seed3_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed3_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed3_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed4_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed4_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed4_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed4_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed4_DECOY_mae": [
+      615
+    ],
+    "B-del_seed4_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed4_G_pair_ids": [
+      611
+    ],
+    "B-del_seed4_G_paired": [
+      611
+    ],
+    "B-del_seed4_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed4_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed4_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed5_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed5_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed5_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed5_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed5_DECOY_mae": [
+      615
+    ],
+    "B-del_seed5_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed5_G_pair_ids": [
+      611
+    ],
+    "B-del_seed5_G_paired": [
+      611
+    ],
+    "B-del_seed5_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed5_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed5_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed6_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed6_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed6_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed6_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed6_DECOY_mae": [
+      615
+    ],
+    "B-del_seed6_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed6_G_pair_ids": [
+      611
+    ],
+    "B-del_seed6_G_paired": [
+      611
+    ],
+    "B-del_seed6_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed6_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed6_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed7_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed7_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed7_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed7_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed7_DECOY_mae": [
+      615
+    ],
+    "B-del_seed7_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed7_G_pair_ids": [
+      611
+    ],
+    "B-del_seed7_G_paired": [
+      611
+    ],
+    "B-del_seed7_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed7_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed7_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed8_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed8_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed8_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed8_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed8_DECOY_mae": [
+      615
+    ],
+    "B-del_seed8_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed8_G_pair_ids": [
+      611
+    ],
+    "B-del_seed8_G_paired": [
+      611
+    ],
+    "B-del_seed8_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed8_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed8_INTERACT_tuple": [
+      611
+    ],
+    "B-del_seed9_ABSENT_geometry": [
+      615
+    ],
+    "B-del_seed9_ABSENT_mae": [
+      615
+    ],
+    "B-del_seed9_ABSENT_tuple": [
+      615
+    ],
+    "B-del_seed9_DECOY_geometry": [
+      615
+    ],
+    "B-del_seed9_DECOY_mae": [
+      615
+    ],
+    "B-del_seed9_DECOY_tuple": [
+      615
+    ],
+    "B-del_seed9_G_pair_ids": [
+      611
+    ],
+    "B-del_seed9_G_paired": [
+      611
+    ],
+    "B-del_seed9_INTERACT_geometry": [
+      611
+    ],
+    "B-del_seed9_INTERACT_mae": [
+      611
+    ],
+    "B-del_seed9_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed0_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed0_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed0_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed0_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed0_DECOY_mae": [
+      615
+    ],
+    "B-std_seed0_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed0_G_pair_ids": [
+      611
+    ],
+    "B-std_seed0_G_paired": [
+      611
+    ],
+    "B-std_seed0_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed0_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed0_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed1_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed1_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed1_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed1_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed1_DECOY_mae": [
+      615
+    ],
+    "B-std_seed1_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed1_G_pair_ids": [
+      611
+    ],
+    "B-std_seed1_G_paired": [
+      611
+    ],
+    "B-std_seed1_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed1_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed1_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed2_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed2_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed2_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed2_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed2_DECOY_mae": [
+      615
+    ],
+    "B-std_seed2_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed2_G_pair_ids": [
+      611
+    ],
+    "B-std_seed2_G_paired": [
+      611
+    ],
+    "B-std_seed2_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed2_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed2_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed3_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed3_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed3_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed3_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed3_DECOY_mae": [
+      615
+    ],
+    "B-std_seed3_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed3_G_pair_ids": [
+      611
+    ],
+    "B-std_seed3_G_paired": [
+      611
+    ],
+    "B-std_seed3_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed3_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed3_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed4_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed4_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed4_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed4_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed4_DECOY_mae": [
+      615
+    ],
+    "B-std_seed4_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed4_G_pair_ids": [
+      611
+    ],
+    "B-std_seed4_G_paired": [
+      611
+    ],
+    "B-std_seed4_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed4_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed4_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed5_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed5_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed5_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed5_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed5_DECOY_mae": [
+      615
+    ],
+    "B-std_seed5_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed5_G_pair_ids": [
+      611
+    ],
+    "B-std_seed5_G_paired": [
+      611
+    ],
+    "B-std_seed5_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed5_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed5_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed6_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed6_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed6_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed6_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed6_DECOY_mae": [
+      615
+    ],
+    "B-std_seed6_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed6_G_pair_ids": [
+      611
+    ],
+    "B-std_seed6_G_paired": [
+      611
+    ],
+    "B-std_seed6_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed6_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed6_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed7_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed7_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed7_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed7_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed7_DECOY_mae": [
+      615
+    ],
+    "B-std_seed7_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed7_G_pair_ids": [
+      611
+    ],
+    "B-std_seed7_G_paired": [
+      611
+    ],
+    "B-std_seed7_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed7_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed7_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed8_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed8_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed8_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed8_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed8_DECOY_mae": [
+      615
+    ],
+    "B-std_seed8_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed8_G_pair_ids": [
+      611
+    ],
+    "B-std_seed8_G_paired": [
+      611
+    ],
+    "B-std_seed8_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed8_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed8_INTERACT_tuple": [
+      611
+    ],
+    "B-std_seed9_ABSENT_geometry": [
+      615
+    ],
+    "B-std_seed9_ABSENT_mae": [
+      615
+    ],
+    "B-std_seed9_ABSENT_tuple": [
+      615
+    ],
+    "B-std_seed9_DECOY_geometry": [
+      615
+    ],
+    "B-std_seed9_DECOY_mae": [
+      615
+    ],
+    "B-std_seed9_DECOY_tuple": [
+      615
+    ],
+    "B-std_seed9_G_pair_ids": [
+      611
+    ],
+    "B-std_seed9_G_paired": [
+      611
+    ],
+    "B-std_seed9_INTERACT_geometry": [
+      611
+    ],
+    "B-std_seed9_INTERACT_mae": [
+      611
+    ],
+    "B-std_seed9_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed0_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed0_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed0_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed0_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed0_DECOY_mae": [
+      615
+    ],
+    "B-time_seed0_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed0_G_pair_ids": [
+      611
+    ],
+    "B-time_seed0_G_paired": [
+      611
+    ],
+    "B-time_seed0_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed0_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed0_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed1_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed1_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed1_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed1_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed1_DECOY_mae": [
+      615
+    ],
+    "B-time_seed1_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed1_G_pair_ids": [
+      611
+    ],
+    "B-time_seed1_G_paired": [
+      611
+    ],
+    "B-time_seed1_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed1_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed1_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed2_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed2_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed2_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed2_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed2_DECOY_mae": [
+      615
+    ],
+    "B-time_seed2_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed2_G_pair_ids": [
+      611
+    ],
+    "B-time_seed2_G_paired": [
+      611
+    ],
+    "B-time_seed2_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed2_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed2_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed3_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed3_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed3_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed3_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed3_DECOY_mae": [
+      615
+    ],
+    "B-time_seed3_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed3_G_pair_ids": [
+      611
+    ],
+    "B-time_seed3_G_paired": [
+      611
+    ],
+    "B-time_seed3_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed3_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed3_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed4_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed4_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed4_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed4_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed4_DECOY_mae": [
+      615
+    ],
+    "B-time_seed4_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed4_G_pair_ids": [
+      611
+    ],
+    "B-time_seed4_G_paired": [
+      611
+    ],
+    "B-time_seed4_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed4_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed4_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed5_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed5_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed5_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed5_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed5_DECOY_mae": [
+      615
+    ],
+    "B-time_seed5_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed5_G_pair_ids": [
+      611
+    ],
+    "B-time_seed5_G_paired": [
+      611
+    ],
+    "B-time_seed5_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed5_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed5_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed6_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed6_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed6_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed6_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed6_DECOY_mae": [
+      615
+    ],
+    "B-time_seed6_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed6_G_pair_ids": [
+      611
+    ],
+    "B-time_seed6_G_paired": [
+      611
+    ],
+    "B-time_seed6_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed6_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed6_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed7_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed7_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed7_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed7_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed7_DECOY_mae": [
+      615
+    ],
+    "B-time_seed7_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed7_G_pair_ids": [
+      611
+    ],
+    "B-time_seed7_G_paired": [
+      611
+    ],
+    "B-time_seed7_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed7_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed7_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed8_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed8_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed8_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed8_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed8_DECOY_mae": [
+      615
+    ],
+    "B-time_seed8_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed8_G_pair_ids": [
+      611
+    ],
+    "B-time_seed8_G_paired": [
+      611
+    ],
+    "B-time_seed8_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed8_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed8_INTERACT_tuple": [
+      611
+    ],
+    "B-time_seed9_ABSENT_geometry": [
+      615
+    ],
+    "B-time_seed9_ABSENT_mae": [
+      615
+    ],
+    "B-time_seed9_ABSENT_tuple": [
+      615
+    ],
+    "B-time_seed9_DECOY_geometry": [
+      615
+    ],
+    "B-time_seed9_DECOY_mae": [
+      615
+    ],
+    "B-time_seed9_DECOY_tuple": [
+      615
+    ],
+    "B-time_seed9_G_pair_ids": [
+      611
+    ],
+    "B-time_seed9_G_paired": [
+      611
+    ],
+    "B-time_seed9_INTERACT_geometry": [
+      611
+    ],
+    "B-time_seed9_INTERACT_mae": [
+      611
+    ],
+    "B-time_seed9_INTERACT_tuple": [
+      611
+    ]
+  },
+  "arrays_file": "confound.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-09-29T15:47:57+0000",
+  "created_unix": 1790696877.5016887,
+  "experiment": "exp_e_confound",
+  "extra": {
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "prereg_lock": {
+      "artifacts_checked": [],
+      "commit_iso": "2026-09-29T14:37:07+00:00",
+      "commit_precedes_artifacts": true,
+      "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+      "commit_unix": 1790692627.0,
+      "committed": true,
+      "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+      "earliest_artifact_unix": null,
+      "exists_in_worktree": true,
+      "identical": true,
+      "messages": [],
+      "passed": true,
+      "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+      "push_evidence": {
+        "commit_is_ancestor_of_upstream": true,
+        "public_anonymous_https": true,
+        "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+        "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+        "upstream": "origin/main"
+      },
+      "pushed_verified": true,
+      "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+    },
+    "results": {
+      "prereg_lock": {
+        "artifacts_checked": [],
+        "commit_iso": "2026-09-29T14:37:07+00:00",
+        "commit_precedes_artifacts": true,
+        "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+        "commit_unix": 1790692627.0,
+        "committed": true,
+        "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+        "earliest_artifact_unix": null,
+        "exists_in_worktree": true,
+        "identical": true,
+        "messages": [],
+        "passed": true,
+        "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+        "push_evidence": {
+          "commit_is_ancestor_of_upstream": true,
+          "public_anonymous_https": true,
+          "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+          "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+          "upstream": "origin/main"
+        },
+        "pushed_verified": true,
+        "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+      },
+      "prior": {
+        "per_dim": {
+          "approach_angle": {
+            "mae": 0.7853981633974483,
+            "mae_norm": 0.25,
+            "mse": 0.8224670334241132,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -1.5707963267948966,
+              1.5707963267948966
+            ]
+          },
+          "contact_offset": {
+            "mae": 0.0175,
+            "mae_norm": 0.25,
+            "mse": 0.0004083333333333334,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -0.035,
+              0.035
+            ]
+          },
+          "push_speed": {
+            "mae": 0.06,
+            "mae_norm": 0.25,
+            "mse": 0.0048,
+            "mse_norm": 0.08333333333333333,
+            "range": [
+              0.12,
+              0.36
+            ]
+          }
+        },
+        "pooled_mae_norm": 0.25,
+        "pooled_mse_norm": 0.08333333333333333
+      },
+      "variants": {
+        "A-clip-del": {
+          "G": {
+            "box": {
+              "boot_std": 0.00014456656284665071,
+              "ci_high": 0.0010947574719719086,
+              "ci_high_over_floor": 0.18156249696787258,
+              "ci_level": 0.95,
+              "ci_low": 0.0005296676346998714,
+              "ci_low_over_floor": 0.08784391135139318,
+              "effect_over_floor": 0.13461643695346798,
+              "floor": 0.006029645385223059,
+              "n_boot": 10000,
+              "n_pairs_total": 965,
+              "n_seeds": 5,
+              "point": 0.0008116893778516492,
+              "seed_max": 0.0009470583454505516,
+              "seed_means": {
+                "0": 0.0006718473114468967,
+                "1": 0.0008713733659721814,
+                "2": 0.0007489300016289664,
+                "3": 0.0008192378647596493,
+                "4": 0.0009470583454505516
+              },
+              "seed_min": 0.0006718473114468967
+            },
+            "cylinder": {
+              "boot_std": 0.00012995497414641812,
+              "ci_high": 0.0009405340624808948,
+              "ci_high_over_floor": 0.17132827803444953,
+              "ci_level": 0.95,
+              "ci_low": 0.0004312041515445031,
+              "ci_low_over_floor": 0.07854842021410173,
+              "effect_over_floor": 0.12257301610085246,
+              "floor": 0.005489660395067875,
+              "n_boot": 10000,
+              "n_pairs_total": 945,
+              "n_seeds": 5,
+              "point": 0.0006728842319928667,
+              "seed_max": 0.0008973167641285472,
+              "seed_means": {
+                "0": 0.0004689595662442371,
+                "1": 0.0006042404741507083,
+                "2": 0.0008973167641285472,
+                "3": 0.0006258755071684916,
+                "4": 0.0007680288482723492
+              },
+              "seed_min": 0.0004689595662442371
+            },
+            "pooled": {
+              "boot_std": 6.596712942512139e-05,
+              "ci_high": 0.0008863601418715991,
+              "ci_high_over_floor": 0.15940318996040287,
+              "ci_level": 0.95,
+              "ci_low": 0.0006260427170904529,
+              "ci_low_over_floor": 0.1125876508221334,
+              "effect_over_floor": 0.1357280300611496,
+              "floor": 0.005560491870280505,
+              "n_boot": 10000,
+              "n_pairs": 3055,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "point": 0.0007547146077242103,
+              "seed_max": 0.0008143145926738746,
+              "seed_means": {
+                "0": 0.0007126318106989669,
+                "1": 0.0007527155950554965,
+                "2": 0.0008143145926738746,
+                "3": 0.0007369559757989174,
+                "4": 0.0007569550643937964
+              },
+              "seed_min": 0.0007126318106989669
+            },
+            "sphere": {
+              "boot_std": 0.00010168644127745207,
+              "ci_high": 0.0009745732071197146,
+              "ci_high_over_floor": 0.18657293163940183,
+              "ci_level": 0.95,
+              "ci_low": 0.0005758397087521392,
+              "ci_low_over_floor": 0.11023913014578565,
+              "effect_over_floor": 0.14821975385344716,
+              "floor": 0.005223550911465107,
+              "n_boot": 10000,
+              "n_pairs_total": 1145,
+              "n_seeds": 5,
+              "point": 0.0007742334303383077,
+              "seed_max": 0.0009481141799460999,
+              "seed_means": {
+                "0": 0.0009481141799460999,
+                "1": 0.0007752520494838143,
+                "2": 0.0008009164078124518,
+                "3": 0.0007592869976405298,
+                "4": 0.0005875975168086426
+              },
+              "seed_min": 0.0005875975168086426
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 8.299480308546264e-05,
+              "ci_high": 0.005148918440670998,
+              "ci_level": 0.95,
+              "ci_low": 0.004826940910379607,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 0.8970034678118022,
+              "over_prior": 0.019951121961523786,
+              "point": 0.004987780490380947,
+              "seed_max": 0.005193025805056095,
+              "seed_means": {
+                "0": 0.005193025805056095,
+                "1": 0.005034449975937605,
+                "2": 0.004809091333299875,
+                "3": 0.004826776217669249,
+                "4": 0.005075559485703707
+              },
+              "seed_min": 0.004809091333299875
+            },
+            "DECOY": {
+              "boot_std": 8.406217119344848e-05,
+              "ci_high": 0.0064795657063870336,
+              "ci_level": 0.95,
+              "ci_low": 0.006147805803041452,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 1.1354389065237853,
+              "over_prior": 0.025254395235702776,
+              "point": 0.006313598808925694,
+              "seed_max": 0.006433425005525351,
+              "seed_means": {
+                "0": 0.006433425005525351,
+                "1": 0.006309598218649626,
+                "2": 0.006295044906437397,
+                "3": 0.0061554801650345325,
+                "4": 0.006374445743858814
+              },
+              "seed_min": 0.0061554801650345325
+            },
+            "INTERACT": {
+              "boot_std": 7.833067722368507e-05,
+              "ci_high": 0.005708394739125228,
+              "ci_level": 0.95,
+              "ci_low": 0.005403991055977988,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_floor": 0.9991790307032652,
+              "over_prior": 0.022223707508721043,
+              "point": 0.005555926877180261,
+              "seed_max": 0.005723228212445974,
+              "seed_means": {
+                "0": 0.005723228212445974,
+                "1": 0.00555801298469305,
+                "2": 0.005467806477099657,
+                "3": 0.005404114257544279,
+                "4": 0.00562647171318531
+              },
+              "seed_min": 0.005404114257544279
+            }
+          },
+          "floor_mae": 0.005560491870280505
+        },
+        "A-del": {
+          "G": {
+            "box": {
+              "boot_std": 0.002783552216780927,
+              "ci_high": 0.13615269513325426,
+              "ci_high_over_floor": 1.1618893993655537,
+              "ci_level": 0.95,
+              "ci_low": 0.12522343153457297,
+              "ci_low_over_floor": 1.0686220901451864,
+              "effect_over_floor": 1.1156602609499155,
+              "floor": 0.11718214763608312,
+              "n_boot": 10000,
+              "n_pairs_total": 965,
+              "n_seeds": 5,
+              "point": 0.13073546541034403,
+              "seed_max": 0.13429604706697051,
+              "seed_means": {
+                "0": 0.1313890943911718,
+                "1": 0.13429604706697051,
+                "2": 0.1314561341942283,
+                "3": 0.13169175925437804,
+                "4": 0.1248442921449715
+              },
+              "seed_min": 0.1248442921449715
+            },
+            "cylinder": {
+              "boot_std": 0.002938253230224249,
+              "ci_high": 0.14369326515983122,
+              "ci_high_over_floor": 1.385071499678356,
+              "ci_level": 0.95,
+              "ci_low": 0.13217353838885196,
+              "ci_low_over_floor": 1.2740318819424965,
+              "effect_over_floor": 1.3298886369722445,
+              "floor": 0.10374429420661674,
+              "n_boot": 10000,
+              "n_pairs_total": 945,
+              "n_seeds": 5,
+              "point": 0.13796835801608506,
+              "seed_max": 0.14121182180606026,
+              "seed_means": {
+                "0": 0.14101508743174018,
+                "1": 0.13742199465238228,
+                "2": 0.14121182180606026,
+                "3": 0.13959860425225643,
+                "4": 0.13059428193798614
+              },
+              "seed_min": 0.13059428193798614
+            },
+            "pooled": {
+              "boot_std": 0.0018888903075209575,
+              "ci_high": 0.1387313962254998,
+              "ci_high_over_floor": 1.2418711383849204,
+              "ci_level": 0.95,
+              "ci_low": 0.1313616871290174,
+              "ci_low_over_floor": 1.1759002819369835,
+              "effect_over_floor": 1.2106310386996744,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs": 3055,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "point": 0.13524151509886825,
+              "seed_max": 0.1374006612461103,
+              "seed_means": {
+                "0": 0.13554913580643224,
+                "1": 0.1374006612461103,
+                "2": 0.1367878378163139,
+                "3": 0.1368816178261551,
+                "4": 0.12958832279932966
+              },
+              "seed_min": 0.12958832279932966
+            },
+            "sphere": {
+              "boot_std": 0.002596949462338929,
+              "ci_high": 0.1419977335734537,
+              "ci_high_over_floor": 1.2491371653700638,
+              "ci_level": 0.95,
+              "ci_low": 0.13175221845926513,
+              "ci_low_over_floor": 1.1590085880651777,
+              "effect_over_floor": 1.2033134918585218,
+              "floor": 0.11367665418183764,
+              "n_boot": 10000,
+              "n_pairs_total": 1145,
+              "n_seeds": 5,
+              "point": 0.1367886516863407,
+              "seed_max": 0.13999960676047088,
+              "seed_means": {
+                "0": 0.13454399666216177,
+                "1": 0.13999960676047088,
+                "2": 0.13763013399535523,
+                "3": 0.13901319979043378,
+                "4": 0.13275632122328188
+              },
+              "seed_min": 0.13275632122328188
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 0.0015430333890438666,
+              "ci_high": 0.249394084715875,
+              "ci_level": 0.95,
+              "ci_low": 0.24333792428093076,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 2.2053008200790534,
+              "over_prior": 0.9854306212951982,
+              "point": 0.24635765532379955,
+              "seed_max": 0.24778836965560913,
+              "seed_means": {
+                "0": 0.24535129964351654,
+                "1": 0.2468794733285904,
+                "2": 0.24572257697582245,
+                "3": 0.24778836965560913,
+                "4": 0.24604658782482147
+              },
+              "seed_min": 0.24535129964351654
+            },
+            "DECOY": {
+              "boot_std": 0.0015377863343625684,
+              "ci_high": 0.2505608999387444,
+              "ci_level": 0.95,
+              "ci_low": 0.2445336441719314,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 2.2161905192154427,
+              "over_prior": 0.9902966436028965,
+              "point": 0.24757416090072412,
+              "seed_max": 0.24827218055725098,
+              "seed_means": {
+                "0": 0.2477530688047409,
+                "1": 0.24782511591911316,
+                "2": 0.24827218055725098,
+                "3": 0.24770987033843994,
+                "4": 0.24631059169769287
+              },
+              "seed_min": 0.24631059169769287
+            },
+            "INTERACT": {
+              "boot_std": 0.0014738079872463098,
+              "ci_high": 0.11475629241790686,
+              "ci_level": 0.95,
+              "ci_low": 0.10900185357880628,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_floor": 1.00003469921174,
+              "over_prior": 0.44686185484919727,
+              "point": 0.11171546371229932,
+              "seed_max": 0.11612913757562637,
+              "seed_means": {
+                "0": 0.11161033809185028,
+                "1": 0.10982909053564072,
+                "2": 0.11075397580862045,
+                "3": 0.11025478690862656,
+                "4": 0.11612913757562637
+              },
+              "seed_min": 0.10982909053564072
+            }
+          },
+          "floor_mae": 0.11171158740827403
+        },
+        "A-std": {
+          "G": {
+            "box": {
+              "boot_std": 0.00017198210122955354,
+              "ci_high": 0.0007533841533058593,
+              "ci_high_over_floor": 0.13645505874838051,
+              "ci_level": 0.95,
+              "ci_low": 8.409592512858687e-05,
+              "ci_low_over_floor": 0.015231690703297785,
+              "effect_over_floor": 0.07550529665062607,
+              "floor": 0.0055211155981771225,
+              "n_boot": 10000,
+              "n_pairs_total": 965,
+              "n_seeds": 5,
+              "point": 0.00041687347108276243,
+              "seed_max": 0.0006185548158044024,
+              "seed_means": {
+                "0": 0.00024082618246791122,
+                "1": 0.0006185548158044024,
+                "2": 0.0004510105571859164,
+                "3": 0.0004680488886519147,
+                "4": 0.0003059269113036674
+              },
+              "seed_min": 0.00024082618246791122
+            },
+            "cylinder": {
+              "boot_std": 0.0001489513693647941,
+              "ci_high": 0.0011910704519394408,
+              "ci_high_over_floor": 0.2613780133280649,
+              "ci_level": 0.95,
+              "ci_low": 0.0006062919021993396,
+              "ci_low_over_floor": 0.13304953761191465,
+              "effect_over_floor": 0.1956878147601156,
+              "floor": 0.00455688845734888,
+              "n_boot": 10000,
+              "n_pairs_total": 945,
+              "n_seeds": 5,
+              "point": 0.0008917275443241966,
+              "seed_max": 0.0010480619083859627,
+              "seed_means": {
+                "0": 0.0008055088286584972,
+                "1": 0.0009590916519753004,
+                "2": 0.0010406683450416914,
+                "3": 0.0010480619083859627,
+                "4": 0.0006053069875595312
+              },
+              "seed_min": 0.0006053069875595312
+            },
+            "pooled": {
+              "boot_std": 9.016117008093156e-05,
+              "ci_high": 0.0009035352506695689,
+              "ci_high_over_floor": 0.1876323063619531,
+              "ci_level": 0.95,
+              "ci_low": 0.0005545794604174534,
+              "ci_low_over_floor": 0.11516653405828088,
+              "effect_over_floor": 0.1510576070898208,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs": 3055,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "point": 0.0007274113692561967,
+              "seed_max": 0.0008713534997727375,
+              "seed_means": {
+                "0": 0.0006512606928459218,
+                "1": 0.0007598094001782787,
+                "2": 0.0008713534997727375,
+                "3": 0.0007926675318079161,
+                "4": 0.0005619657216761292
+              },
+              "seed_min": 0.0005619657216761292
+            },
+            "sphere": {
+              "boot_std": 0.00011956371546680484,
+              "ci_high": 0.0010911660123917408,
+              "ci_high_over_floor": 0.24608319470131146,
+              "ci_level": 0.95,
+              "ci_low": 0.0006242840592462192,
+              "ci_low_over_floor": 0.14079050662848086,
+              "effect_over_floor": 0.19248771100396161,
+              "floor": 0.004434134617425485,
+              "n_boot": 10000,
+              "n_pairs_total": 1145,
+              "n_seeds": 5,
+              "point": 0.0008535164227916587,
+              "seed_max": 0.0010858761293073408,
+              "seed_means": {
+                "0": 0.0008698675174501981,
+                "1": 0.0007143848988443093,
+                "2": 0.0010858761293073408,
+                "3": 0.0008554704180780359,
+                "4": 0.0007419831502784093
+              },
+              "seed_min": 0.0007143848988443093
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 5.276288725662027e-05,
+              "ci_high": 0.003947727371907648,
+              "ci_level": 0.95,
+              "ci_low": 0.0037414532239245755,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 0.798028134162572,
+              "over_prior": 0.015371479767476912,
+              "point": 0.003842869941869228,
+              "seed_max": 0.003955014981329441,
+              "seed_means": {
+                "0": 0.0037215922493487597,
+                "1": 0.0038900196086615324,
+                "2": 0.0038344073109328747,
+                "3": 0.003955014981329441,
+                "4": 0.003813315648585558
+              },
+              "seed_min": 0.0037215922493487597
+            },
+            "DECOY": {
+              "boot_std": 8.542428777984423e-05,
+              "ci_high": 0.005718182362298523,
+              "ci_level": 0.95,
+              "ci_low": 0.005386014390624426,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 1.1523506519955535,
+              "over_prior": 0.02219637876649092,
+              "point": 0.00554909469162273,
+              "seed_max": 0.005709309596568346,
+              "seed_means": {
+                "0": 0.005386580713093281,
+                "1": 0.005560148507356644,
+                "2": 0.0055442871525883675,
+                "3": 0.005709309596568346,
+                "4": 0.005545147228986025
+              },
+              "seed_min": 0.005386580713093281
+            },
+            "INTERACT": {
+              "boot_std": 7.134285581212242e-05,
+              "ci_high": 0.004957186503703395,
+              "ci_level": 0.95,
+              "ci_low": 0.004680149137544778,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_floor": 1.0001230169739146,
+              "over_prior": 0.019264196413995946,
+              "point": 0.0048160491034989865,
+              "seed_max": 0.004976017866283655,
+              "seed_means": {
+                "0": 0.004727762192487717,
+                "1": 0.004784809425473213,
+                "2": 0.004686616826802492,
+                "3": 0.004905039444565773,
+                "4": 0.004976017866283655
+              },
+              "seed_min": 0.004686616826802492
+            }
+          },
+          "floor_mae": 0.0048154567205852036
+        },
+        "A-time": {
+          "G": {
+            "box": {
+              "boot_std": 0.0003348331220107942,
+              "ci_high": -0.0007359908863612866,
+              "ci_high_over_floor": -0.06032075876103046,
+              "ci_level": 0.95,
+              "ci_low": -0.0020394314399978008,
+              "ci_low_over_floor": -0.1671488793971012,
+              "effect_over_floor": -0.11376718029091942,
+              "floor": 0.012201286944632486,
+              "n_boot": 10000,
+              "n_pairs_total": 965,
+              "n_seeds": 5,
+              "point": -0.0013881060116112454,
+              "seed_max": -0.000999970233035901,
+              "seed_means": {
+                "0": -0.0014308123768505114,
+                "1": -0.0012475836821807635,
+                "2": -0.0017741234506205342,
+                "3": -0.0014880403153685168,
+                "4": -0.000999970233035901
+              },
+              "seed_min": -0.0017741234506205342
+            },
+            "cylinder": {
+              "boot_std": 0.0002971641198618634,
+              "ci_high": 0.0016347173290647795,
+              "ci_high_over_floor": 0.17410295461087585,
+              "ci_level": 0.95,
+              "ci_low": 0.00047236412033689997,
+              "ci_low_over_floor": 0.050308385150520815,
+              "effect_over_floor": 0.11189515127465868,
+              "floor": 0.009389371551553565,
+              "n_boot": 10000,
+              "n_pairs_total": 945,
+              "n_seeds": 5,
+              "point": 0.001050625150135063,
+              "seed_max": 0.0014590390874122186,
+              "seed_means": {
+                "0": 0.0014171484443876478,
+                "1": 0.0014590390874122186,
+                "2": 0.0007312866973397495,
+                "3": 0.000601919769203517,
+                "4": 0.0010437317523321816
+              },
+              "seed_min": 0.000601919769203517
+            },
+            "pooled": {
+              "boot_std": 0.00018413934240931032,
+              "ci_high": 0.0005734674369272749,
+              "ci_high_over_floor": 0.05588084815575675,
+              "ci_level": 0.95,
+              "ci_low": -0.0001525006258281296,
+              "ci_low_over_floor": -0.014860240995061589,
+              "effect_over_floor": 0.02147349040121567,
+              "floor": 0.01026232521254596,
+              "n_boot": 10000,
+              "n_pairs": 3055,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "point": 0.00022036794194575922,
+              "seed_max": 0.0004449387422211029,
+              "seed_means": {
+                "0": 0.0003639678249772754,
+                "1": 0.0004449387422211029,
+                "2": -0.0002003065101309251,
+                "3": 0.00012024473477042175,
+                "4": 0.00037299491789092123
+              },
+              "seed_min": -0.0002003065101309251
+            },
+            "sphere": {
+              "boot_std": 0.0002392154457000994,
+              "ci_high": 0.00135069718146717,
+              "ci_high_over_floor": 0.14448043545455933,
+              "ci_level": 0.95,
+              "ci_low": 0.00040612630343891265,
+              "ci_low_over_floor": 0.04344223559174637,
+              "effect_over_floor": 0.09528083110403932,
+              "floor": 0.009348651097414356,
+              "n_boot": 10000,
+              "n_pairs_total": 1145,
+              "n_seeds": 5,
+              "point": 0.0008907472462633291,
+              "seed_max": 0.0010781592900933918,
+              "seed_means": {
+                "0": 0.0010073802349519587,
+                "1": 0.00103442285867717,
+                "2": 0.00035722865712906206,
+                "3": 0.0010781592900933918,
+                "4": 0.0009765451904650631
+              },
+              "seed_min": 0.00035722865712906206
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 8.985210254633085e-05,
+              "ci_high": 0.008176322620231432,
+              "ci_level": 0.95,
+              "ci_low": 0.007825841889509645,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 0.7795612095826033,
+              "over_prior": 0.0320004426232895,
+              "point": 0.008000110655822375,
+              "seed_max": 0.008124670945107937,
+              "seed_means": {
+                "0": 0.008080807514488697,
+                "1": 0.008124670945107937,
+                "2": 0.007854067720472813,
+                "3": 0.008015438914299011,
+                "4": 0.007925568148493767
+              },
+              "seed_min": 0.007854067720472813
+            },
+            "DECOY": {
+              "boot_std": 0.0001644934229555264,
+              "ci_high": 0.010812403361641233,
+              "ci_level": 0.95,
+              "ci_low": 0.01016505674776059,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 1.0199449705560568,
+              "over_prior": 0.04186802794698747,
+              "point": 0.010467006986746867,
+              "seed_max": 0.01090306043624878,
+              "seed_means": {
+                "0": 0.01090306043624878,
+                "1": 0.010441034100949764,
+                "2": 0.010268145240843296,
+                "3": 0.010272322222590446,
+                "4": 0.010450472123920918
+              },
+              "seed_min": 0.010268145240843296
+            },
+            "INTERACT": {
+              "boot_std": 0.00014888027341661438,
+              "ci_high": 0.01054207578542358,
+              "ci_level": 0.95,
+              "ci_low": 0.009961646410799557,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_floor": 0.9982424585199948,
+              "over_prior": 0.040977155001214426,
+              "point": 0.010244288750303606,
+              "seed_max": 0.010533696040511131,
+              "seed_means": {
+                "0": 0.010533696040511131,
+                "1": 0.009999457746744156,
+                "2": 0.010446839965879917,
+                "3": 0.010174849070608616,
+                "4": 0.010066598653793335
+              },
+              "seed_min": 0.009999457746744156
+            }
+          },
+          "floor_mae": 0.01026232521254596
+        },
+        "B-del": {
+          "G": {
+            "box": {
+              "boot_std": 0.0023667527119840344,
+              "ci_high": 0.13011881947271597,
+              "ci_level": 0.95,
+              "ci_low": 0.12080552431736974,
+              "n_boot": 10000,
+              "n_pairs_total": 1930,
+              "n_seeds": 10,
+              "point": 0.12552641898651795,
+              "seed_max": 0.13202079279357906,
+              "seed_means": {
+                "0": 0.12842506224680403,
+                "1": 0.1310862009437668,
+                "2": 0.12494556584101113,
+                "3": 0.13079182530507213,
+                "4": 0.12136811102919011,
+                "5": 0.12482448475232705,
+                "6": 0.13202079279357906,
+                "7": 0.11635860779510879,
+                "8": 0.12398372783562062,
+                "9": 0.12145981132269987
+              },
+              "seed_min": 0.11635860779510879
+            },
+            "cylinder": {
+              "boot_std": 0.0023779282864618253,
+              "ci_high": 0.13635450571057234,
+              "ci_level": 0.95,
+              "ci_low": 0.12700989650865455,
+              "n_boot": 10000,
+              "n_pairs_total": 1890,
+              "n_seeds": 10,
+              "point": 0.1316476894715042,
+              "seed_max": 0.13927815548050657,
+              "seed_means": {
+                "0": 0.1315232129353616,
+                "1": 0.13494235319060782,
+                "2": 0.13012709292193886,
+                "3": 0.13386027794331312,
+                "4": 0.13927815548050657,
+                "5": 0.13205000120535415,
+                "6": 0.13433607472057538,
+                "7": 0.12743127669784285,
+                "8": 0.12886230200627652,
+                "9": 0.12406614761326522
+              },
+              "seed_min": 0.12406614761326522
+            },
+            "pooled": {
+              "boot_std": 0.0021423372515167256,
+              "ci_high": 0.1396850920373074,
+              "ci_level": 0.95,
+              "ci_low": 0.13133363583057536,
+              "n_boot": 10000,
+              "n_pairs": 6110,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "point": 0.13540662726987177,
+              "seed_max": 0.14509465798747812,
+              "seed_means": {
+                "0": 0.13262716181989326,
+                "1": 0.14226344812954067,
+                "2": 0.13221838412449716,
+                "3": 0.14257263285359414,
+                "4": 0.1324659286222364,
+                "5": 0.1377146919844779,
+                "6": 0.14509465798747812,
+                "7": 0.1256148434166359,
+                "8": 0.13047960797346117,
+                "9": 0.13301491578690305
+              },
+              "seed_min": 0.1256148434166359
+            },
+            "sphere": {
+              "boot_std": 0.003962595877215214,
+              "ci_high": 0.15464093756574251,
+              "ci_level": 0.95,
+              "ci_low": 0.1392640735270195,
+              "n_boot": 10000,
+              "n_pairs_total": 2290,
+              "n_seeds": 10,
+              "point": 0.14683596981388383,
+              "seed_max": 0.16499259781222547,
+              "seed_means": {
+                "0": 0.13707978870540727,
+                "1": 0.15772587455012002,
+                "2": 0.14007387742579114,
+                "3": 0.15969198191432712,
+                "4": 0.13619679289841496,
+                "5": 0.15325371623364598,
+                "6": 0.16499259781222547,
+                "7": 0.13191679793544211,
+                "8": 0.13728910882237436,
+                "9": 0.1501391618410898
+              },
+              "seed_min": 0.13191679793544211
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 0.0010841018738814506,
+              "ci_high": 0.24760502505719253,
+              "ci_level": 0.95,
+              "ci_low": 0.24333071222750668,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.981763918843817,
+              "point": 0.24544097971095424,
+              "seed_max": 0.24685946106910706,
+              "seed_means": {
+                "0": 0.24419908225536346,
+                "1": 0.24685946106910706,
+                "2": 0.2449580729007721,
+                "3": 0.24569086730480194,
+                "4": 0.24672265350818634,
+                "5": 0.24498672783374786,
+                "6": 0.2451285570859909,
+                "7": 0.2461213916540146,
+                "8": 0.24498796463012695,
+                "9": 0.24475497007369995
+              },
+              "seed_min": 0.24419908225536346
+            },
+            "DECOY": {
+              "boot_std": 0.001695239548073231,
+              "ci_high": 0.25573759465377655,
+              "ci_level": 0.95,
+              "ci_low": 0.2491161979530234,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 1.0094288720275328,
+              "point": 0.2523572180068832,
+              "seed_max": 0.25906750559806824,
+              "seed_means": {
+                "0": 0.2505897581577301,
+                "1": 0.25906750559806824,
+                "2": 0.24916709959506989,
+                "3": 0.2565516531467438,
+                "4": 0.25101712346076965,
+                "5": 0.2554822266101837,
+                "6": 0.25631409883499146,
+                "7": 0.24619579315185547,
+                "8": 0.2486984133720398,
+                "9": 0.2504885196685791
+              },
+              "seed_min": 0.24619579315185547
+            },
+            "INTERACT": {
+              "boot_std": 0.001082880142720532,
+              "ci_high": 0.11850989141761277,
+              "ci_level": 0.95,
+              "ci_low": 0.11431187424999655,
+              "n_boot": 10000,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.4659074563400457,
+              "point": 0.11647686408501143,
+              "seed_max": 0.1200890764594078,
+              "seed_means": {
+                "0": 0.11757504940032959,
+                "1": 0.11613381654024124,
+                "2": 0.11659511923789978,
+                "3": 0.11357732117176056,
+                "4": 0.11808072775602341,
+                "5": 0.11740665137767792,
+                "6": 0.11061890423297882,
+                "7": 0.1200890764594078,
+                "8": 0.11774127185344696,
+                "9": 0.11695066094398499
+              },
+              "seed_min": 0.11061890423297882
+            }
+          },
+          "floor_mae": NaN
+        },
+        "B-std": {
+          "G": {
+            "box": {
+              "boot_std": 0.0006896639321946253,
+              "ci_high": -0.0030717489609227593,
+              "ci_level": 0.95,
+              "ci_low": -0.005767206512264898,
+              "n_boot": 10000,
+              "n_pairs_total": 1930,
+              "n_seeds": 10,
+              "point": -0.004446298533138563,
+              "seed_max": -0.003318541683256626,
+              "seed_means": {
+                "0": -0.004674951740120745,
+                "1": -0.005407831611092458,
+                "2": -0.003318541683256626,
+                "3": -0.004568825834165352,
+                "4": -0.0035999303610049615,
+                "5": -0.004033651880900631,
+                "6": -0.0046233444274379025,
+                "7": -0.004739895326669275,
+                "8": -0.005055999946104932,
+                "9": -0.00444001252063275
+              },
+              "seed_min": -0.005407831611092458
+            },
+            "cylinder": {
+              "boot_std": 0.0005567014984483549,
+              "ci_high": -0.0011083804864021238,
+              "ci_level": 0.95,
+              "ci_low": -0.003290511661713632,
+              "n_boot": 10000,
+              "n_pairs_total": 1890,
+              "n_seeds": 10,
+              "point": -0.002185676363173616,
+              "seed_max": -0.0009551906389080816,
+              "seed_means": {
+                "0": -0.0025952688551374842,
+                "1": -0.0009551906389080816,
+                "2": -0.0016207207676772245,
+                "3": -0.0029527609514949657,
+                "4": -0.0030139915265694813,
+                "5": -0.0029310657958150224,
+                "6": -0.0016578651531032784,
+                "7": -0.0019025903949070546,
+                "8": -0.0022079147319629708,
+                "9": -0.0020193948161605964
+              },
+              "seed_min": -0.0030139915265694813
+            },
+            "pooled": {
+              "boot_std": 0.0003211336879356403,
+              "ci_high": -0.001172406905235547,
+              "ci_level": 0.95,
+              "ci_low": -0.0024314163679022872,
+              "n_boot": 10000,
+              "n_pairs": 6110,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "point": -0.0018051443857776456,
+              "seed_max": -0.0012775108272685333,
+              "seed_means": {
+                "0": -0.0018685128857608756,
+                "1": -0.0017220580217972665,
+                "2": -0.0012775108272685333,
+                "3": -0.00229843645893897,
+                "4": -0.0020895175787859557,
+                "5": -0.001665307170789195,
+                "6": -0.0015973792843514544,
+                "7": -0.0020141079221621962,
+                "8": -0.0017087474044674548,
+                "9": -0.001809866303454554
+              },
+              "seed_min": -0.00229843645893897
+            },
+            "sphere": {
+              "boot_std": 0.0004624710169605287,
+              "ci_high": 0.0016659287785054844,
+              "ci_level": 0.95,
+              "ci_low": -0.00016966419454229843,
+              "n_boot": 10000,
+              "n_pairs_total": 2290,
+              "n_seeds": 10,
+              "point": 0.0007348699992376188,
+              "seed_max": 0.0015242760253696007,
+              "seed_means": {
+                "0": 0.001096550769713508,
+                "1": 0.0007513758968399211,
+                "2": 0.0007259198886395217,
+                "3": 0.00015506781403821238,
+                "4": -5.3555818526765666e-05,
+                "5": 0.0013753867557670873,
+                "6": 0.0010028089331584986,
+                "7": 0.00019113293556114212,
+                "8": 0.0015242760253696007,
+                "9": 0.0005797367918154623
+              },
+              "seed_min": -5.3555818526765666e-05
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 0.00010436553143422278,
+              "ci_high": 0.0141075581778992,
+              "ci_level": 0.95,
+              "ci_low": 0.013697675239954335,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.055597036302646216,
+              "point": 0.013899259075661554,
+              "seed_max": 0.014048856683075428,
+              "seed_means": {
+                "0": 0.013824289664626122,
+                "1": 0.013885761611163616,
+                "2": 0.014048856683075428,
+                "3": 0.013856540434062481,
+                "4": 0.013916663825511932,
+                "5": 0.013993297703564167,
+                "6": 0.01388554461300373,
+                "7": 0.013771791942417622,
+                "8": 0.013974684290587902,
+                "9": 0.013835159130394459
+              },
+              "seed_min": 0.013771791942417622
+            },
+            "DECOY": {
+              "boot_std": 0.0002571375496822699,
+              "ci_high": 0.028176957936859995,
+              "ci_level": 0.95,
+              "ci_low": 0.027169513451491056,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.11066574435499384,
+              "point": 0.02766643608874846,
+              "seed_max": 0.028224671259522438,
+              "seed_means": {
+                "0": 0.02748625911772251,
+                "1": 0.0279779564589262,
+                "2": 0.028224671259522438,
+                "3": 0.027269162237644196,
+                "4": 0.027486326172947884,
+                "5": 0.02773383818566799,
+                "6": 0.027695924043655396,
+                "7": 0.027526361867785454,
+                "8": 0.02743990533053875,
+                "9": 0.02782396413385868
+              },
+              "seed_min": 0.027269162237644196
+            },
+            "INTERACT": {
+              "boot_std": 0.00022795827457374734,
+              "ci_high": 0.029798732248648204,
+              "ci_level": 0.95,
+              "ci_low": 0.028901842480334655,
+              "n_boot": 10000,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.1173836647138097,
+              "point": 0.029345916178452426,
+              "seed_max": 0.029589273035526276,
+              "seed_means": {
+                "0": 0.02920765057206154,
+                "1": 0.029589273035526276,
+                "2": 0.02937089093029499,
+                "3": 0.029452502727508545,
+                "4": 0.029454641044139862,
+                "5": 0.029242588207125664,
+                "6": 0.029154179617762566,
+                "7": 0.029427798464894295,
+                "8": 0.029044851660728455,
+                "9": 0.029514780268073082
+              },
+              "seed_min": 0.029044851660728455
+            }
+          },
+          "floor_mae": NaN
+        },
+        "B-time": {
+          "G": {
+            "box": {
+              "boot_std": 0.0006349559649390199,
+              "ci_high": -0.0023952345486514394,
+              "ci_level": 0.95,
+              "ci_low": -0.00486636556553325,
+              "n_boot": 10000,
+              "n_pairs_total": 1930,
+              "n_seeds": 10,
+              "point": -0.0036319313384471897,
+              "seed_max": -0.0027057472055469073,
+              "seed_means": {
+                "0": -0.004282830274601134,
+                "1": -0.004504729245688013,
+                "2": -0.0029613584258299263,
+                "3": -0.0033326286151812174,
+                "4": -0.0031406276647020807,
+                "5": -0.004512193141061176,
+                "6": -0.0032942266242067123,
+                "7": -0.004310876875391973,
+                "8": -0.0027057472055469073,
+                "9": -0.003274095312262755
+              },
+              "seed_min": -0.004512193141061176
+            },
+            "cylinder": {
+              "boot_std": 0.0005369842475926985,
+              "ci_high": 3.204126401912368e-06,
+              "ci_level": 0.95,
+              "ci_low": -0.0020866043561337776,
+              "n_boot": 10000,
+              "n_pairs_total": 1890,
+              "n_seeds": 10,
+              "point": -0.0010448980357660542,
+              "seed_max": -8.428051929782939e-05,
+              "seed_means": {
+                "0": -0.001877748014444791,
+                "1": -0.000505067839252728,
+                "2": -0.0014720965662192572,
+                "3": -0.0011850767319272987,
+                "4": -0.0005272116361767369,
+                "5": -8.428051929782939e-05,
+                "6": -0.0009099441671635582,
+                "7": -0.001099101682908084,
+                "8": -0.0008593218169475675,
+                "9": -0.001929131383322692
+              },
+              "seed_min": -0.001929131383322692
+            },
+            "pooled": {
+              "boot_std": 0.00030500252865489603,
+              "ci_high": -0.0008061246029921557,
+              "ci_level": 0.95,
+              "ci_low": -0.001996609084236221,
+              "n_boot": 10000,
+              "n_pairs": 6110,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "point": -0.0013986951647152585,
+              "seed_max": -0.0010608323684355484,
+              "seed_means": {
+                "0": -0.0018347012907580615,
+                "1": -0.0012014944147495416,
+                "2": -0.0012053002909347172,
+                "3": -0.0014187248334907446,
+                "4": -0.0010608323684355484,
+                "5": -0.0011643112020539622,
+                "6": -0.001466395935491825,
+                "7": -0.0016099632006601938,
+                "8": -0.001395122617377965,
+                "9": -0.0016301054932000253
+              },
+              "seed_min": -0.0018347012907580615
+            },
+            "sphere": {
+              "boot_std": 0.0004533670483822982,
+              "ci_high": 0.0010885364666246137,
+              "ci_level": 0.95,
+              "ci_low": -0.0006933958929423018,
+              "n_boot": 10000,
+              "n_pairs_total": 2290,
+              "n_seeds": 10,
+              "point": 0.00019146607615313935,
+              "seed_max": 0.0010076745791466476,
+              "seed_means": {
+                "0": 0.0002640966335148856,
+                "1": 0.0010076745791466476,
+                "2": 0.0004948906089061278,
+                "3": 1.4670384340150907e-06,
+                "4": 0.0002515963380383612,
+                "5": 0.0007658871175420336,
+                "6": -0.000385164762094747,
+                "7": 0.0002447246262746737,
+                "8": -0.0007327462233375254,
+                "9": 2.2348051069214874e-06
+              },
+              "seed_min": -0.0007327462233375254
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 0.0001105406430646175,
+              "ci_high": 0.01440732731078316,
+              "ci_level": 0.95,
+              "ci_low": 0.013974694403246182,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.05675117128759592,
+              "point": 0.01418779282189898,
+              "seed_max": 0.014399029314517975,
+              "seed_means": {
+                "0": 0.014062538743019104,
+                "1": 0.014239272102713585,
+                "2": 0.014399029314517975,
+                "3": 0.014125228859484196,
+                "4": 0.014245670288801193,
+                "5": 0.014201134443283081,
+                "6": 0.014151589944958687,
+                "7": 0.014166549779474735,
+                "8": 0.014014890417456627,
+                "9": 0.014272022992372513
+              },
+              "seed_min": 0.014014890417456627
+            },
+            "DECOY": {
+              "boot_std": 0.0002461921187479693,
+              "ci_high": 0.02847993703942691,
+              "ci_level": 0.95,
+              "ci_low": 0.027515209137233508,
+              "n_boot": 10000,
+              "n_pairs_total": 6150,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.11195075822835107,
+              "point": 0.027987689557087768,
+              "seed_max": 0.028515217825770378,
+              "seed_means": {
+                "0": 0.02771824784576893,
+                "1": 0.028174664825201035,
+                "2": 0.02809966169297695,
+                "3": 0.028139982372522354,
+                "4": 0.028515217825770378,
+                "5": 0.027724621817469597,
+                "6": 0.02804533764719963,
+                "7": 0.027690421789884567,
+                "8": 0.027781084179878235,
+                "9": 0.027987651526927948
+              },
+              "seed_min": 0.027690421789884567
+            },
+            "INTERACT": {
+              "boot_std": 0.00023810878765149007,
+              "ci_high": 0.02972587612177729,
+              "ci_level": 0.95,
+              "ci_low": 0.028800316936736195,
+              "n_boot": 10000,
+              "n_pairs_total": 6110,
+              "n_seeds": 10,
+              "over_floor": null,
+              "over_prior": 0.1170432793501606,
+              "point": 0.02926081983754015,
+              "seed_max": 0.02947358787059784,
+              "seed_means": {
+                "0": 0.02941807731986046,
+                "1": 0.029268398880958557,
+                "2": 0.02922810986638069,
+                "3": 0.029395367950201035,
+                "4": 0.02947358787059784,
+                "5": 0.028751857578754425,
+                "6": 0.02939307875931263,
+                "7": 0.029159851372241974,
+                "8": 0.02906067855656147,
+                "9": 0.029459193348884583
+              },
+              "seed_min": 0.028751857578754425
+            }
+          },
+          "floor_mae": NaN
+        }
+      }
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "d2fdc9e",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA A100-SXM4-80GB",
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": null
+}
