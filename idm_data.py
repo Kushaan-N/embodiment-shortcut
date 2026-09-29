@@ -61,9 +61,13 @@ def _shard_listing(corpus_root: Path, geometry: str, condition: str,
 
 def _store_paths(root: Path, geometry: str, condition: str, friction_mult: float):
     fm = "" if abs(friction_mult - 1.0) < 1e-9 else f"_fm{friction_mult:g}"
-    base = Path(root) / f"{geometry}_{condition}{fm}"
-    return base.with_suffix(".frames.npy"), base.with_suffix(".masks.npy"), \
-        base.with_suffix(".index.json")
+    # String concatenation, NOT Path.with_suffix: with_suffix treats the
+    # ".25" of "_fm0.25" as an extension and replaces it, so x0.25 and x0.5
+    # both mapped to "<g>_<c>_fm0.frames.npy" -- Experiment F then scored
+    # both multipliers on whichever store was materialised last.
+    stem = f"{geometry}_{condition}{fm}"
+    root = Path(root)
+    return root / f"{stem}.frames.npy", root / f"{stem}.masks.npy", root / f"{stem}.index.json"
 
 
 def materialise_frames(geometry: str, condition: str, *, corpus_root: Path = C.CORPUS_ROOT,
