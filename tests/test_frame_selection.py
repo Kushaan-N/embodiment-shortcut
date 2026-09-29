@@ -70,3 +70,21 @@ def test_selection_reads_fewer_bytes_than_naive_form(tmp_path):
     assert np.array_equal(naive, fast)
     # The intermediate the naive form builds is twice the size of the result.
     assert np.asarray(mm[rows]).nbytes == 2 * fast.nbytes
+
+
+def test_store_paths_are_distinct_for_fractional_friction_multipliers():
+    """Path.with_suffix ate the '.25' of '_fm0.25', so x0.25 and x0.5 shared one
+    frame store and Experiment F scored both on the same data."""
+    from pathlib import Path
+
+    import idm_data as idd
+
+    seen = {}
+    for fm in (0.25, 0.5, 1.0, 2.0, 3.0, 4.0):
+        paths = idd._store_paths(Path("/tmp/fs"), "box", "INTERACT", fm)
+        assert len({p.name for p in paths}) == 3
+        for p in paths:
+            assert p.name not in seen, (fm, p.name, seen.get(p.name))
+            seen[p.name] = fm
+    assert idd._store_paths(Path("/tmp/fs"), "box", "INTERACT", 0.25)[0].name \
+        == "box_INTERACT_fm0.25.frames.npy"
