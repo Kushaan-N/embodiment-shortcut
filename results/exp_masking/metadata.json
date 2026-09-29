@@ -1,0 +1,964 @@
+{
+  "argv": [
+    "exp_masking.py",
+    "--train"
+  ],
+  "arrays": {
+    "B-del_arm_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-del_arm_masked_seed0_geometry": [
+      611
+    ],
+    "B-del_arm_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-del_arm_masked_seed1_geometry": [
+      611
+    ],
+    "B-del_arm_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-del_arm_masked_seed2_geometry": [
+      611
+    ],
+    "B-del_arm_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-del_arm_masked_seed3_geometry": [
+      611
+    ],
+    "B-del_arm_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-del_arm_masked_seed4_geometry": [
+      611
+    ],
+    "B-del_full_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed0_geometry": [
+      611
+    ],
+    "B-del_full_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed1_geometry": [
+      611
+    ],
+    "B-del_full_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed2_geometry": [
+      611
+    ],
+    "B-del_full_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed3_geometry": [
+      611
+    ],
+    "B-del_full_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed4_geometry": [
+      611
+    ],
+    "B-del_full_seed5_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed5_geometry": [
+      611
+    ],
+    "B-del_full_seed6_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed6_geometry": [
+      611
+    ],
+    "B-del_full_seed7_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed7_geometry": [
+      611
+    ],
+    "B-del_full_seed8_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed8_geometry": [
+      611
+    ],
+    "B-del_full_seed9_abs_err": [
+      611,
+      3
+    ],
+    "B-del_full_seed9_geometry": [
+      611
+    ],
+    "B-del_object_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-del_object_masked_seed0_geometry": [
+      611
+    ],
+    "B-del_object_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-del_object_masked_seed1_geometry": [
+      611
+    ],
+    "B-del_object_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-del_object_masked_seed2_geometry": [
+      611
+    ],
+    "B-del_object_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-del_object_masked_seed3_geometry": [
+      611
+    ],
+    "B-del_object_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-del_object_masked_seed4_geometry": [
+      611
+    ],
+    "B-std_arm_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-std_arm_masked_seed0_geometry": [
+      611
+    ],
+    "B-std_arm_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-std_arm_masked_seed1_geometry": [
+      611
+    ],
+    "B-std_arm_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-std_arm_masked_seed2_geometry": [
+      611
+    ],
+    "B-std_arm_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-std_arm_masked_seed3_geometry": [
+      611
+    ],
+    "B-std_arm_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-std_arm_masked_seed4_geometry": [
+      611
+    ],
+    "B-std_full_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed0_geometry": [
+      611
+    ],
+    "B-std_full_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed1_geometry": [
+      611
+    ],
+    "B-std_full_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed2_geometry": [
+      611
+    ],
+    "B-std_full_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed3_geometry": [
+      611
+    ],
+    "B-std_full_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed4_geometry": [
+      611
+    ],
+    "B-std_full_seed5_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed5_geometry": [
+      611
+    ],
+    "B-std_full_seed6_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed6_geometry": [
+      611
+    ],
+    "B-std_full_seed7_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed7_geometry": [
+      611
+    ],
+    "B-std_full_seed8_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed8_geometry": [
+      611
+    ],
+    "B-std_full_seed9_abs_err": [
+      611,
+      3
+    ],
+    "B-std_full_seed9_geometry": [
+      611
+    ],
+    "B-std_object_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-std_object_masked_seed0_geometry": [
+      611
+    ],
+    "B-std_object_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-std_object_masked_seed1_geometry": [
+      611
+    ],
+    "B-std_object_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-std_object_masked_seed2_geometry": [
+      611
+    ],
+    "B-std_object_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-std_object_masked_seed3_geometry": [
+      611
+    ],
+    "B-std_object_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-std_object_masked_seed4_geometry": [
+      611
+    ],
+    "B-time_arm_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-time_arm_masked_seed0_geometry": [
+      611
+    ],
+    "B-time_arm_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-time_arm_masked_seed1_geometry": [
+      611
+    ],
+    "B-time_arm_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-time_arm_masked_seed2_geometry": [
+      611
+    ],
+    "B-time_arm_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-time_arm_masked_seed3_geometry": [
+      611
+    ],
+    "B-time_arm_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-time_arm_masked_seed4_geometry": [
+      611
+    ],
+    "B-time_full_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed0_geometry": [
+      611
+    ],
+    "B-time_full_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed1_geometry": [
+      611
+    ],
+    "B-time_full_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed2_geometry": [
+      611
+    ],
+    "B-time_full_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed3_geometry": [
+      611
+    ],
+    "B-time_full_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed4_geometry": [
+      611
+    ],
+    "B-time_full_seed5_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed5_geometry": [
+      611
+    ],
+    "B-time_full_seed6_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed6_geometry": [
+      611
+    ],
+    "B-time_full_seed7_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed7_geometry": [
+      611
+    ],
+    "B-time_full_seed8_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed8_geometry": [
+      611
+    ],
+    "B-time_full_seed9_abs_err": [
+      611,
+      3
+    ],
+    "B-time_full_seed9_geometry": [
+      611
+    ],
+    "B-time_object_masked_seed0_abs_err": [
+      611,
+      3
+    ],
+    "B-time_object_masked_seed0_geometry": [
+      611
+    ],
+    "B-time_object_masked_seed1_abs_err": [
+      611,
+      3
+    ],
+    "B-time_object_masked_seed1_geometry": [
+      611
+    ],
+    "B-time_object_masked_seed2_abs_err": [
+      611,
+      3
+    ],
+    "B-time_object_masked_seed2_geometry": [
+      611
+    ],
+    "B-time_object_masked_seed3_abs_err": [
+      611,
+      3
+    ],
+    "B-time_object_masked_seed3_geometry": [
+      611
+    ],
+    "B-time_object_masked_seed4_abs_err": [
+      611,
+      3
+    ],
+    "B-time_object_masked_seed4_geometry": [
+      611
+    ]
+  },
+  "arrays_file": "masking.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-09-29T15:41:53+0000",
+  "created_unix": 1790696513.4344182,
+  "experiment": "exp_masking",
+  "extra": {
+    "encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "results": {
+      "cells": {
+        "B-del|arm_masked": {
+          "boot_std": 0.00116879805104433,
+          "ci_high": 0.12404689452798394,
+          "ci_level": 0.95,
+          "ci_low": 0.11952271129138792,
+          "horizon": "s_del",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.4872336599805107,
+          "point": 0.12180841499512768,
+          "seed_max": 0.12271899729967117,
+          "seed_means": {
+            "0": 0.1220848485827446,
+            "1": 0.1219673752784729,
+            "2": 0.12271899729967117,
+            "3": 0.1199382022023201,
+            "4": 0.12233266234397888
+          },
+          "seed_min": 0.1199382022023201
+        },
+        "B-del|full": {
+          "boot_std": 0.001082880142720532,
+          "ci_high": 0.11850989141761277,
+          "ci_level": 0.95,
+          "ci_low": 0.11431187424999655,
+          "horizon": "s_del",
+          "n_boot": 10000,
+          "n_pairs_total": 6110,
+          "n_seeds": 10,
+          "over_prior": 0.4659074563400457,
+          "point": 0.11647686408501143,
+          "seed_max": 0.1200890764594078,
+          "seed_means": {
+            "0": 0.11757504940032959,
+            "1": 0.11613381654024124,
+            "2": 0.11659511923789978,
+            "3": 0.11357732117176056,
+            "4": 0.11808072775602341,
+            "5": 0.11740665137767792,
+            "6": 0.11061890423297882,
+            "7": 0.1200890764594078,
+            "8": 0.11774127185344696,
+            "9": 0.11695066094398499
+          },
+          "seed_min": 0.11061890423297882
+        },
+        "B-del|object_masked": {
+          "boot_std": 0.0016993324953266658,
+          "ci_high": 0.1598428977533101,
+          "ci_level": 0.95,
+          "ci_low": 0.1532711599861731,
+          "horizon": "s_del",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.6259460038543601,
+          "point": 0.15648650096359001,
+          "seed_max": 0.15970368683338165,
+          "seed_means": {
+            "0": 0.15604154765605927,
+            "1": 0.15494820475578308,
+            "2": 0.15970368683338165,
+            "3": 0.1577168107032776,
+            "4": 0.15402226150035858
+          },
+          "seed_min": 0.15402226150035858
+        },
+        "B-std|arm_masked": {
+          "boot_std": 0.0018078503801771074,
+          "ci_high": 0.12374170420359464,
+          "ci_level": 0.95,
+          "ci_low": 0.11665670505376936,
+          "horizon": "s_std",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.4803229751812261,
+          "point": 0.12008074379530652,
+          "seed_max": 0.12559764087200165,
+          "seed_means": {
+            "0": 0.12559764087200165,
+            "1": 0.11971687525510788,
+            "2": 0.120886892080307,
+            "3": 0.11770692467689514,
+            "4": 0.11649538576602936
+          },
+          "seed_min": 0.11649538576602936
+        },
+        "B-std|full": {
+          "boot_std": 0.00022795827457374734,
+          "ci_high": 0.029798732248648204,
+          "ci_level": 0.95,
+          "ci_low": 0.028901842480334655,
+          "horizon": "s_std",
+          "n_boot": 10000,
+          "n_pairs_total": 6110,
+          "n_seeds": 10,
+          "over_prior": 0.1173836647138097,
+          "point": 0.029345916178452426,
+          "seed_max": 0.029589273035526276,
+          "seed_means": {
+            "0": 0.02920765057206154,
+            "1": 0.029589273035526276,
+            "2": 0.02937089093029499,
+            "3": 0.029452502727508545,
+            "4": 0.029454641044139862,
+            "5": 0.029242588207125664,
+            "6": 0.029154179617762566,
+            "7": 0.029427798464894295,
+            "8": 0.029044851660728455,
+            "9": 0.029514780268073082
+          },
+          "seed_min": 0.029044851660728455
+        },
+        "B-std|object_masked": {
+          "boot_std": 0.00032412772515358736,
+          "ci_high": 0.025291779623637926,
+          "ci_level": 0.95,
+          "ci_low": 0.024026873840004626,
+          "horizon": "s_std",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.09861533059662364,
+          "point": 0.02465383264915591,
+          "seed_max": 0.024994315579533577,
+          "seed_means": {
+            "0": 0.024004638195037842,
+            "1": 0.02447187341749668,
+            "2": 0.024909967556595802,
+            "3": 0.02488837018609047,
+            "4": 0.024994315579533577
+          },
+          "seed_min": 0.024004638195037842
+        },
+        "B-time|arm_masked": {
+          "boot_std": 0.0014479132245114722,
+          "ci_high": 0.12451351402738968,
+          "ci_level": 0.95,
+          "ci_low": 0.11887378943087945,
+          "horizon": "s_time",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.4867254370357079,
+          "point": 0.12168135925892698,
+          "seed_max": 0.12438812851905823,
+          "seed_means": {
+            "0": 0.11892009526491165,
+            "1": 0.12438812851905823,
+            "2": 0.12368554621934891,
+            "3": 0.12119352072477341,
+            "4": 0.12021950632333755
+          },
+          "seed_min": 0.11892009526491165
+        },
+        "B-time|full": {
+          "boot_std": 0.00023810878765149007,
+          "ci_high": 0.02972587612177729,
+          "ci_level": 0.95,
+          "ci_low": 0.028800316936736195,
+          "horizon": "s_time",
+          "n_boot": 10000,
+          "n_pairs_total": 6110,
+          "n_seeds": 10,
+          "over_prior": 0.1170432793501606,
+          "point": 0.02926081983754015,
+          "seed_max": 0.02947358787059784,
+          "seed_means": {
+            "0": 0.02941807731986046,
+            "1": 0.029268398880958557,
+            "2": 0.02922810986638069,
+            "3": 0.029395367950201035,
+            "4": 0.02947358787059784,
+            "5": 0.028751857578754425,
+            "6": 0.02939307875931263,
+            "7": 0.029159851372241974,
+            "8": 0.02906067855656147,
+            "9": 0.029459193348884583
+          },
+          "seed_min": 0.028751857578754425
+        },
+        "B-time|object_masked": {
+          "boot_std": 0.0002996177771369924,
+          "ci_high": 0.02447707118488217,
+          "ci_level": 0.95,
+          "ci_low": 0.023297643741983738,
+          "horizon": "s_time",
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_prior": 0.09551064247484951,
+          "point": 0.02387766061871238,
+          "seed_max": 0.02425195276737213,
+          "seed_means": {
+            "0": 0.023607073351740837,
+            "1": 0.02379811741411686,
+            "2": 0.02388731762766838,
+            "3": 0.02425195276737213,
+            "4": 0.02384384162724018
+          },
+          "seed_min": 0.023607073351740837
+        }
+      },
+      "ordering_checks": {
+        "s_del: object-pixels informative, arm-pixels ~ prior": {
+          "arm_pixels_over_prior": 0.6259460038543601,
+          "detail": "full=46.6%  arm_px=62.6%  obj_px=48.7%  (of prior)",
+          "full_over_prior": 0.4659074563400457,
+          "holds": false,
+          "object_pixels_over_prior": 0.4872336599805107
+        },
+        "s_std: arm-pixels ~ full << prior, object-pixels ~ prior": {
+          "arm_pixels_over_prior": 0.09861533059662364,
+          "detail": "full=11.7%  arm_px=9.9%  obj_px=48.0%  (of prior)",
+          "full_over_prior": 0.1173836647138097,
+          "holds": false,
+          "object_pixels_over_prior": 0.4803229751812261
+        },
+        "s_time: object-pixels informative, arm-pixels ~ prior": {
+          "arm_pixels_over_prior": 0.09551064247484951,
+          "detail": "full=11.7%  arm_px=9.6%  obj_px=48.7%  (of prior)",
+          "full_over_prior": 0.1170432793501606,
+          "holds": false,
+          "object_pixels_over_prior": 0.4867254370357079
+        }
+      },
+      "prior": {
+        "per_dim": {
+          "approach_angle": {
+            "mae": 0.7853981633974483,
+            "mae_norm": 0.25,
+            "mse": 0.8224670334241132,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -1.5707963267948966,
+              1.5707963267948966
+            ]
+          },
+          "contact_offset": {
+            "mae": 0.0175,
+            "mae_norm": 0.25,
+            "mse": 0.0004083333333333334,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -0.035,
+              0.035
+            ]
+          },
+          "push_speed": {
+            "mae": 0.06,
+            "mae_norm": 0.25,
+            "mse": 0.0048,
+            "mse_norm": 0.08333333333333333,
+            "range": [
+              0.12,
+              0.36
+            ]
+          }
+        },
+        "pooled_mae_norm": 0.25,
+        "pooled_mse_norm": 0.08333333333333333
+      }
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "d2fdc9e",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA A100-SXM4-80GB",
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": {
+    "probe_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+}
