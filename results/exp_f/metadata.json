@@ -1,0 +1,868 @@
+{
+  "argv": [
+    "exp_f_friction.py"
+  ],
+  "arrays": {
+    "A-del_fm0.25_seed0_geometry": [
+      123
+    ],
+    "A-del_fm0.25_seed0_mae": [
+      123
+    ],
+    "A-del_fm0.25_seed1_geometry": [
+      123
+    ],
+    "A-del_fm0.25_seed1_mae": [
+      123
+    ],
+    "A-del_fm0.25_seed2_geometry": [
+      123
+    ],
+    "A-del_fm0.25_seed2_mae": [
+      123
+    ],
+    "A-del_fm0.25_seed3_geometry": [
+      123
+    ],
+    "A-del_fm0.25_seed3_mae": [
+      123
+    ],
+    "A-del_fm0.25_seed4_geometry": [
+      123
+    ],
+    "A-del_fm0.25_seed4_mae": [
+      123
+    ],
+    "A-del_fm0.5_seed0_geometry": [
+      122
+    ],
+    "A-del_fm0.5_seed0_mae": [
+      122
+    ],
+    "A-del_fm0.5_seed1_geometry": [
+      122
+    ],
+    "A-del_fm0.5_seed1_mae": [
+      122
+    ],
+    "A-del_fm0.5_seed2_geometry": [
+      122
+    ],
+    "A-del_fm0.5_seed2_mae": [
+      122
+    ],
+    "A-del_fm0.5_seed3_geometry": [
+      122
+    ],
+    "A-del_fm0.5_seed3_mae": [
+      122
+    ],
+    "A-del_fm0.5_seed4_geometry": [
+      122
+    ],
+    "A-del_fm0.5_seed4_mae": [
+      122
+    ],
+    "A-del_fm1_seed0_geometry": [
+      611
+    ],
+    "A-del_fm1_seed0_mae": [
+      611
+    ],
+    "A-del_fm1_seed1_geometry": [
+      611
+    ],
+    "A-del_fm1_seed1_mae": [
+      611
+    ],
+    "A-del_fm1_seed2_geometry": [
+      611
+    ],
+    "A-del_fm1_seed2_mae": [
+      611
+    ],
+    "A-del_fm1_seed3_geometry": [
+      611
+    ],
+    "A-del_fm1_seed3_mae": [
+      611
+    ],
+    "A-del_fm1_seed4_geometry": [
+      611
+    ],
+    "A-del_fm1_seed4_mae": [
+      611
+    ],
+    "A-del_fm2_seed0_geometry": [
+      121
+    ],
+    "A-del_fm2_seed0_mae": [
+      121
+    ],
+    "A-del_fm2_seed1_geometry": [
+      121
+    ],
+    "A-del_fm2_seed1_mae": [
+      121
+    ],
+    "A-del_fm2_seed2_geometry": [
+      121
+    ],
+    "A-del_fm2_seed2_mae": [
+      121
+    ],
+    "A-del_fm2_seed3_geometry": [
+      121
+    ],
+    "A-del_fm2_seed3_mae": [
+      121
+    ],
+    "A-del_fm2_seed4_geometry": [
+      121
+    ],
+    "A-del_fm2_seed4_mae": [
+      121
+    ],
+    "A-del_fm4_seed0_geometry": [
+      87
+    ],
+    "A-del_fm4_seed0_mae": [
+      87
+    ],
+    "A-del_fm4_seed1_geometry": [
+      87
+    ],
+    "A-del_fm4_seed1_mae": [
+      87
+    ],
+    "A-del_fm4_seed2_geometry": [
+      87
+    ],
+    "A-del_fm4_seed2_mae": [
+      87
+    ],
+    "A-del_fm4_seed3_geometry": [
+      87
+    ],
+    "A-del_fm4_seed3_mae": [
+      87
+    ],
+    "A-del_fm4_seed4_geometry": [
+      87
+    ],
+    "A-del_fm4_seed4_mae": [
+      87
+    ],
+    "A-std_fm0.25_seed0_geometry": [
+      123
+    ],
+    "A-std_fm0.25_seed0_mae": [
+      123
+    ],
+    "A-std_fm0.25_seed1_geometry": [
+      123
+    ],
+    "A-std_fm0.25_seed1_mae": [
+      123
+    ],
+    "A-std_fm0.25_seed2_geometry": [
+      123
+    ],
+    "A-std_fm0.25_seed2_mae": [
+      123
+    ],
+    "A-std_fm0.25_seed3_geometry": [
+      123
+    ],
+    "A-std_fm0.25_seed3_mae": [
+      123
+    ],
+    "A-std_fm0.25_seed4_geometry": [
+      123
+    ],
+    "A-std_fm0.25_seed4_mae": [
+      123
+    ],
+    "A-std_fm0.5_seed0_geometry": [
+      122
+    ],
+    "A-std_fm0.5_seed0_mae": [
+      122
+    ],
+    "A-std_fm0.5_seed1_geometry": [
+      122
+    ],
+    "A-std_fm0.5_seed1_mae": [
+      122
+    ],
+    "A-std_fm0.5_seed2_geometry": [
+      122
+    ],
+    "A-std_fm0.5_seed2_mae": [
+      122
+    ],
+    "A-std_fm0.5_seed3_geometry": [
+      122
+    ],
+    "A-std_fm0.5_seed3_mae": [
+      122
+    ],
+    "A-std_fm0.5_seed4_geometry": [
+      122
+    ],
+    "A-std_fm0.5_seed4_mae": [
+      122
+    ],
+    "A-std_fm1_seed0_geometry": [
+      611
+    ],
+    "A-std_fm1_seed0_mae": [
+      611
+    ],
+    "A-std_fm1_seed1_geometry": [
+      611
+    ],
+    "A-std_fm1_seed1_mae": [
+      611
+    ],
+    "A-std_fm1_seed2_geometry": [
+      611
+    ],
+    "A-std_fm1_seed2_mae": [
+      611
+    ],
+    "A-std_fm1_seed3_geometry": [
+      611
+    ],
+    "A-std_fm1_seed3_mae": [
+      611
+    ],
+    "A-std_fm1_seed4_geometry": [
+      611
+    ],
+    "A-std_fm1_seed4_mae": [
+      611
+    ],
+    "A-std_fm2_seed0_geometry": [
+      121
+    ],
+    "A-std_fm2_seed0_mae": [
+      121
+    ],
+    "A-std_fm2_seed1_geometry": [
+      121
+    ],
+    "A-std_fm2_seed1_mae": [
+      121
+    ],
+    "A-std_fm2_seed2_geometry": [
+      121
+    ],
+    "A-std_fm2_seed2_mae": [
+      121
+    ],
+    "A-std_fm2_seed3_geometry": [
+      121
+    ],
+    "A-std_fm2_seed3_mae": [
+      121
+    ],
+    "A-std_fm2_seed4_geometry": [
+      121
+    ],
+    "A-std_fm2_seed4_mae": [
+      121
+    ],
+    "A-std_fm4_seed0_geometry": [
+      87
+    ],
+    "A-std_fm4_seed0_mae": [
+      87
+    ],
+    "A-std_fm4_seed1_geometry": [
+      87
+    ],
+    "A-std_fm4_seed1_mae": [
+      87
+    ],
+    "A-std_fm4_seed2_geometry": [
+      87
+    ],
+    "A-std_fm4_seed2_mae": [
+      87
+    ],
+    "A-std_fm4_seed3_geometry": [
+      87
+    ],
+    "A-std_fm4_seed3_mae": [
+      87
+    ],
+    "A-std_fm4_seed4_geometry": [
+      87
+    ],
+    "A-std_fm4_seed4_mae": [
+      87
+    ]
+  },
+  "arrays_file": "friction.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-09-29T20:20:29+0000",
+  "created_unix": 1790713229.762295,
+  "experiment": "exp_f_friction",
+  "extra": {
+    "results": {
+      "multipliers": [
+        0.25,
+        0.5,
+        1.0,
+        2.0,
+        4.0
+      ],
+      "prior": {
+        "per_dim": {
+          "approach_angle": {
+            "mae": 0.7853981633974483,
+            "mae_norm": 0.25,
+            "mse": 0.8224670334241132,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -1.5707963267948966,
+              1.5707963267948966
+            ]
+          },
+          "contact_offset": {
+            "mae": 0.0175,
+            "mae_norm": 0.25,
+            "mse": 0.0004083333333333334,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -0.035,
+              0.035
+            ]
+          },
+          "push_speed": {
+            "mae": 0.06,
+            "mae_norm": 0.25,
+            "mse": 0.0048,
+            "mse_norm": 0.08333333333333333,
+            "range": [
+              0.12,
+              0.36
+            ]
+          }
+        },
+        "pooled_mae_norm": 0.25,
+        "pooled_mse_norm": 0.08333333333333333
+      },
+      "variants": {
+        "A-del": {
+          "log_friction_slope": -0.008103766642996914,
+          "monotone": false,
+          "per_multiplier": {
+            "0.25": {
+              "boot_std": 0.0026328441299867545,
+              "ci_high": 0.1583532525293105,
+              "ci_high_over_floor": 1.4175185959051364,
+              "ci_level": 0.95,
+              "ci_low": 0.14796817463368359,
+              "ci_low_over_floor": 1.3245552951718613,
+              "effect_over_floor": 1.3706520559220117,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs_total": 615,
+              "n_seeds": 5,
+              "over_prior": 0.6124708678058493,
+              "point": 0.1531177169514623,
+              "seed_max": 0.15771842002868652,
+              "seed_means": {
+                "0": 0.15771842002868652,
+                "1": 0.14997117221355438,
+                "2": 0.15224771201610565,
+                "3": 0.15164196491241455,
+                "4": 0.15400926768779755
+              },
+              "seed_min": 0.14997117221355438
+            },
+            "0.5": {
+              "boot_std": 0.0024574115307712517,
+              "ci_high": 0.12430680726040308,
+              "ci_high_over_floor": 1.1127476580034363,
+              "ci_level": 0.95,
+              "ci_low": 0.11468359074425563,
+              "ci_low_over_floor": 1.026604253013788,
+              "effect_over_floor": 1.0694389119563645,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs_total": 610,
+              "n_seeds": 5,
+              "over_prior": 0.47787487396329154,
+              "point": 0.11946871849082288,
+              "seed_max": 0.12391305714845657,
+              "seed_means": {
+                "0": 0.12391305714845657,
+                "1": 0.11701428145170212,
+                "2": 0.11805447936058044,
+                "3": 0.11859048157930374,
+                "4": 0.11977130174636841
+              },
+              "seed_min": 0.11701428145170212
+            },
+            "1": {
+              "boot_std": 0.0014738079872463098,
+              "ci_high": 0.11475629241790686,
+              "ci_high_over_floor": 1.0272550509778837,
+              "ci_level": 0.95,
+              "ci_low": 0.10900185357880628,
+              "ci_low_over_floor": 0.9757434846972101,
+              "effect_over_floor": 1.00003469921174,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_prior": 0.44686185484919727,
+              "point": 0.11171546371229932,
+              "seed_max": 0.11612913757562637,
+              "seed_means": {
+                "0": 0.11161033809185028,
+                "1": 0.10982909053564072,
+                "2": 0.11075397580862045,
+                "3": 0.11025478690862656,
+                "4": 0.11612913757562637
+              },
+              "seed_min": 0.10982909053564072
+            },
+            "2": {
+              "boot_std": 0.002998138253842288,
+              "ci_high": 0.12463379021322216,
+              "ci_high_over_floor": 1.115674686079978,
+              "ci_level": 0.95,
+              "ci_low": 0.11294165461524275,
+              "ci_low_over_floor": 1.0110110977339637,
+              "effect_over_floor": 1.0627323620474824,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs_total": 605,
+              "n_seeds": 5,
+              "over_prior": 0.4748780766178754,
+              "point": 0.11871951915446885,
+              "seed_max": 0.12519265711307526,
+              "seed_means": {
+                "0": 0.11434222012758255,
+                "1": 0.11793266981840134,
+                "2": 0.12004130333662033,
+                "3": 0.11608876287937164,
+                "4": 0.12519265711307526
+              },
+              "seed_min": 0.11434222012758255
+            },
+            "4": {
+              "boot_std": 0.0038559239243163243,
+              "ci_high": 0.13317657663620708,
+              "ci_high_over_floor": 1.1921464883448898,
+              "ci_level": 0.95,
+              "ci_low": 0.11802854053162296,
+              "ci_low_over_floor": 1.056546982008789,
+              "effect_over_floor": 1.1225943926368895,
+              "floor": 0.11171158740827403,
+              "n_boot": 10000,
+              "n_pairs_total": 435,
+              "n_seeds": 5,
+              "over_prior": 0.5016272064683767,
+              "point": 0.12540680161709417,
+              "seed_max": 0.13056723773479462,
+              "seed_means": {
+                "0": 0.12192307412624359,
+                "1": 0.12621334195137024,
+                "2": 0.12839055061340332,
+                "3": 0.11993979662656784,
+                "4": 0.13056723773479462
+              },
+              "seed_min": 0.11993979662656784
+            }
+          },
+          "spearman_rho": -0.3
+        },
+        "A-std": {
+          "log_friction_slope": -7.162622968986711e-05,
+          "monotone": false,
+          "per_multiplier": {
+            "0.25": {
+              "boot_std": 0.00011938810996343232,
+              "ci_high": 0.004977249691733235,
+              "ci_high_over_floor": 1.0335986762078861,
+              "ci_level": 0.95,
+              "ci_low": 0.004510007462946024,
+              "ci_low_over_floor": 0.9365689953491972,
+              "effect_over_floor": 0.9840248433937021,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs_total": 615,
+              "n_seeds": 5,
+              "over_prior": 0.01895411618137202,
+              "point": 0.004738529045343005,
+              "seed_max": 0.004861282184720039,
+              "seed_means": {
+                "0": 0.004586589988321066,
+                "1": 0.004726369399577379,
+                "2": 0.004667654167860746,
+                "3": 0.004861282184720039,
+                "4": 0.004850748926401138
+              },
+              "seed_min": 0.004586589988321066
+            },
+            "0.5": {
+              "boot_std": 0.00012153166050169763,
+              "ci_high": 0.004982492020774726,
+              "ci_high_over_floor": 1.0346873224870814,
+              "ci_level": 0.95,
+              "ci_low": 0.0045051463924278695,
+              "ci_low_over_floor": 0.9355595229771636,
+              "effect_over_floor": 0.9848790169725815,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs_total": 610,
+              "n_seeds": 5,
+              "over_prior": 0.018970569124975866,
+              "point": 0.0047426422812439665,
+              "seed_max": 0.00487793143838644,
+              "seed_means": {
+                "0": 0.004709761124104261,
+                "1": 0.004765701945871115,
+                "2": 0.004507055971771479,
+                "3": 0.004852760583162308,
+                "4": 0.00487793143838644
+              },
+              "seed_min": 0.004507055971771479
+            },
+            "1": {
+              "boot_std": 7.134285581212242e-05,
+              "ci_high": 0.004957186503703395,
+              "ci_high_over_floor": 1.029432261848045,
+              "ci_level": 0.95,
+              "ci_low": 0.004680149137544778,
+              "ci_low_over_floor": 0.971901401903996,
+              "effect_over_floor": 1.0001230169739146,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_prior": 0.019264196413995946,
+              "point": 0.0048160491034989865,
+              "seed_max": 0.004976017866283655,
+              "seed_means": {
+                "0": 0.004727762192487717,
+                "1": 0.004784809425473213,
+                "2": 0.004686616826802492,
+                "3": 0.004905039444565773,
+                "4": 0.004976017866283655
+              },
+              "seed_min": 0.004686616826802492
+            },
+            "2": {
+              "boot_std": 0.00015204066445737434,
+              "ci_high": 0.005011465425760878,
+              "ci_high_over_floor": 1.0407040736837634,
+              "ci_level": 0.95,
+              "ci_low": 0.004414981466160956,
+              "ci_low_over_floor": 0.9168354576395031,
+              "effect_over_floor": 0.9774509996952263,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs_total": 605,
+              "n_seeds": 5,
+              "over_prior": 0.018827491942100413,
+              "point": 0.004706872985525103,
+              "seed_max": 0.004997137002646923,
+              "seed_means": {
+                "0": 0.004413189832121134,
+                "1": 0.004938954953104258,
+                "2": 0.004490490071475506,
+                "3": 0.004997137002646923,
+                "4": 0.004694592207670212
+              },
+              "seed_min": 0.004413189832121134
+            },
+            "4": {
+              "boot_std": 0.00016104006708929385,
+              "ci_high": 0.00483359941228523,
+              "ci_high_over_floor": 1.0037675952153136,
+              "ci_level": 0.95,
+              "ci_low": 0.0041992157911038795,
+              "ci_low_over_floor": 0.8720285602719663,
+              "effect_over_floor": 0.9361886855118959,
+              "floor": 0.0048154567205852036,
+              "n_boot": 10000,
+              "n_pairs_total": 435,
+              "n_seeds": 5,
+              "over_prior": 0.018032704389536348,
+              "point": 0.004508176097384087,
+              "seed_max": 0.004753979854285717,
+              "seed_means": {
+                "0": 0.004169172141700983,
+                "1": 0.004753979854285717,
+                "2": 0.004619245883077383,
+                "3": 0.004629288334399462,
+                "4": 0.004369194619357586
+              },
+              "seed_min": 0.004169172141700983
+            }
+          },
+          "spearman_rho": -0.6
+        }
+      }
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "c4d48a6",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "c4d48a6b9cc6d9a29a2d06f7f9051f7204a40b6c"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA A100-SXM4-80GB",
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": null
+}
