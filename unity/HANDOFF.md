@@ -580,9 +580,8 @@ ones that would have cost a GPU allocation or produced a wrong result:
      software fallback (~8% of pixels, up to 80 levels). Never render on the
      cpu partition. Twelve WM clips were rendered that way by mistake
      (cylinder INTERACT/ABSENT tuples 0-5, sphere ABSENT tuple 0; list in the
-     workspace at jobs/suspect_cpu_clips.txt) and must be replaced before WM
-     training, e.g. `render_clips.py --geometry cylinder --shards 0
-     --condition INTERACT --overwrite` (and ABSENT; sphere ABSENT) on a GPU node.
+     workspace at jobs/suspect_cpu_clips.txt). RESOLVED 2026-09-29: all 12
+     replaced by GPU re-renders (byte-identical to the 2080 Ti reference).
      Cross-ARCHITECTURE determinism (A100 vs 2080 Ti) is untested; each shard's
      three conditions share one node, so the paired G is unaffected either way.
    - Friction x3 excludes far more rollouts: cylinder keeps 1660/2000 (vs
