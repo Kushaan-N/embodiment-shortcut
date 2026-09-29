@@ -18,14 +18,18 @@ threshold.
 
 | Stage | Gate | Result |
 |---|---|---|
-| `distances.py` + tests | 101 unit tests | PASS |
-| `scene.py` + contact sheet | visual inspection | **NOT REVIEWED** |
+| `distances.py` + tests | 114 unit tests | PASS (on Unity, 2026-09-28) |
+| `scene.py` + contact sheet | visual inspection | reviewed by the agent 2026-09-29; human sign-off pending |
 | Exp 0 — state oracles | Gate C0 | PASS |
 | Exp A — contact deltas | thresholds written | done |
 | Exp B — encoder floor | Gate B | PASS (DINOv3 only) |
 | Exp C — injectivity | Gate C | PASS |
-| Corpus + `validate_corpus.py` | T11, T7 | **PASS, but STALE — see below** |
-| Everything from Exp D onward | — | not run |
+| Exp 0 re-run on Unity (`results/exp_0_repro`) | Gate C0 | PASS (0.7-0.9 % / 10-48 % / 97-98 %) |
+| Corpus + `validate_corpus.py` | T11, T7, completeness, clips | **PASS 2026-09-29** (real corpus) |
+| Architecture A, 30 items | content checks | done 2026-09-29 |
+| Exp D floors + power | headroom | done 2026-09-29 (`results/exp_d`, `results/power`) |
+| Architecture B + masking | — | **blocked: DINOv3 is gated, needs `HF_TOKEN`** |
+| Pre-registration | §0.5 lock | **next -- human** |
 
 **The headline numbers you already own:**
 
@@ -45,9 +49,10 @@ threshold.
   sphere 2.3 %, cylinder 3.4 %, against a pre-declared 25 % threshold. T3 does
   not bite at this horizon.
 
-### Two things that are wrong right now
+### Status notes (items 1-2 RESOLVED 2026-09-29: the real corpus is built and
+### passed the strengthened gate; the smoke corpus is gone)
 
-1. **The corpus gate is stale.** `validate_corpus` PASSED 2026-08-17 23:40.
+1. **(resolved) The corpus gate was stale.** `validate_corpus` PASSED 2026-08-17 23:40.
    The corpus on disk was regenerated 2026-08-18 12:05 — 12.5 hours later,
    during a masking debug. The committed report describes 180 tuples for box;
    the shards on disk hold 24, box only. The T11/T7 PASS does not certify the
