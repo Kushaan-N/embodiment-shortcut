@@ -1,0 +1,1055 @@
+{
+  "argv": [
+    "validate_corpus.py"
+  ],
+  "arrays": {
+    "dummy": [
+      1
+    ]
+  },
+  "arrays_file": "empty.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-09-29T04:27:29+0000",
+  "created_unix": 1790656049.0905287,
+  "experiment": "validate_corpus",
+  "extra": {
+    "report": {
+      "all_per_rollout_validators_clean": false,
+      "clips": {
+        "checked": 36000,
+        "clip_root": "/scratch4/workspace/knaskar_umass_edu-ogaf/data/clips",
+        "examples": [],
+        "missing": 0,
+        "name": "clip_completeness",
+        "passed": true,
+        "variants": [
+          "A-std",
+          "A-clip-del"
+        ]
+      },
+      "completeness": {
+        "cells_present": [
+          "box/ABSENT",
+          "box/DECOY",
+          "box/INTERACT",
+          "cylinder/ABSENT",
+          "cylinder/DECOY",
+          "cylinder/INTERACT",
+          "sphere/ABSENT",
+          "sphere/DECOY",
+          "sphere/INTERACT"
+        ],
+        "cells_with_wrong_tuples": {},
+        "expected_tuples_per_cell": 2000,
+        "missing_cells": [],
+        "name": "corpus_completeness",
+        "passed": true,
+        "shards_missing_validators_json": []
+      },
+      "exclusion_cap": 0.05,
+      "geometry_checks": [
+        {
+          "clearance_m": 0.014227251902965449,
+          "corridor_radius_m": 0.10649071579427946,
+          "geometry": "box",
+          "name": "T11_corridor_decoy_disjoint",
+          "nearest_decoy_surface_m": 0.12071796769724491,
+          "passed": true,
+          "threshold_m": 0.005
+        },
+        {
+          "clearance_m": 0.014227251902965449,
+          "corridor_radius_m": 0.10649071579427946,
+          "geometry": "sphere",
+          "name": "T11_corridor_decoy_disjoint",
+          "nearest_decoy_surface_m": 0.12071796769724491,
+          "passed": true,
+          "threshold_m": 0.005
+        },
+        {
+          "clearance_m": 0.014227251902965449,
+          "corridor_radius_m": 0.10649071579427946,
+          "geometry": "cylinder",
+          "name": "T11_corridor_decoy_disjoint",
+          "nearest_decoy_surface_m": 0.12071796769724491,
+          "passed": true,
+          "threshold_m": 0.005
+        }
+      ],
+      "passed": true,
+      "split_integrity": {
+        "counts_by_geometry": {
+          "box": {
+            "test": 579,
+            "train": 4845,
+            "val": 576
+          },
+          "cylinder": {
+            "test": 579,
+            "train": 4791,
+            "val": 630
+          },
+          "sphere": {
+            "test": 687,
+            "train": 4659,
+            "val": 654
+          }
+        },
+        "n_tuples_checked": 6000,
+        "name": "T7_no_tuple_spans_splits",
+        "note": "split unit is (geometry, tuple_index); NEVER the rollout, NEVER the frame",
+        "offenders": [],
+        "passed": true,
+        "threshold": 0.0,
+        "value": 0.0
+      },
+      "t11_gate": {
+        "name": "T11_decoy_placement_independent_of_action",
+        "note": "cross-validated ridge R^2 from DECOY placement to each action dim; run BEFORE any IDM trains (\u00a74-T11)",
+        "passed": true,
+        "per_geometry": {
+          "box": {
+            "approach_angle": {
+              "n": 2000,
+              "r2": -0.00413403632974374
+            },
+            "contact_offset": {
+              "n": 2000,
+              "r2": -0.0063647698149464915
+            },
+            "push_speed": {
+              "n": 2000,
+              "r2": -0.005129941350954459
+            }
+          },
+          "cylinder": {
+            "approach_angle": {
+              "n": 2000,
+              "r2": -0.002033455286093
+            },
+            "contact_offset": {
+              "n": 2000,
+              "r2": -0.0023699609376812703
+            },
+            "push_speed": {
+              "n": 2000,
+              "r2": -0.006871328970968538
+            }
+          },
+          "sphere": {
+            "approach_angle": {
+              "n": 2000,
+              "r2": -0.006398656572468742
+            },
+            "contact_offset": {
+              "n": 2000,
+              "r2": -0.0026945183304183384
+            },
+            "push_speed": {
+              "n": 2000,
+              "r2": -0.005595452071464058
+            }
+          }
+        },
+        "threshold": 0.01,
+        "value": 0.0
+      },
+      "t11_geometries_skipped": [],
+      "validators": {
+        "box/ABSENT": {
+          "checks": {
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -1.0,
+              "value_median": -1.0,
+              "value_p95": -1.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "box/DECOY": {
+          "checks": {
+            "T10_decoy_no_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.25,
+              "value_median": 0.0,
+              "value_p95": 0.07914723301407205
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 4.2146848510894035e-08,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -4.917303661265493,
+              "value_median": -24.001167679325327,
+              "value_p95": -9.54752243291698
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 475.0,
+              "value_median": 475.0,
+              "value_p95": 475.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "box/INTERACT": {
+          "checks": {
+            "T10_contact_before_sstd": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 446.0,
+              "value_median": 357.0,
+              "value_p95": 397.0
+            },
+            "T10_interact_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 474.0,
+              "value_median": 474.0,
+              "value_p95": 474.0
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.5304878048780488,
+              "value_median": 0.0,
+              "value_p95": 0.22803821776112715
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 4.2146848510894035e-08,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -41.891873994387424,
+              "value_median": -69.28242257307267,
+              "value_p95": -55.60030666392839
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 533.0,
+              "value_median": 507.0,
+              "value_p95": 524.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "cylinder/ABSENT": {
+          "checks": {
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -1.0,
+              "value_median": -1.0,
+              "value_p95": -1.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "cylinder/DECOY": {
+          "checks": {
+            "T10_decoy_no_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.3373333333333333,
+              "value_median": 0.0,
+              "value_p95": 0.071646059163029
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 1.4901161193847656e-08,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0005,
+              "n": 2000,
+              "n_failed": 1,
+              "value_max": 20.646491766351858,
+              "value_median": -23.513637102248524,
+              "value_p95": -9.634107100665465
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 475.0,
+              "value_median": 475.0,
+              "value_p95": 475.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0004999999999999449,
+          "n_kept": 1999,
+          "n_rollouts": 2000
+        },
+        "cylinder/INTERACT": {
+          "checks": {
+            "T10_contact_before_sstd": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 449.0,
+              "value_median": 377.0,
+              "value_p95": 423.0
+            },
+            "T10_interact_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 511.0,
+              "value_median": 474.0,
+              "value_p95": 475.04999999999995
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.011,
+              "n": 2000,
+              "n_failed": 22,
+              "value_max": 11.079769770535075,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.6454445664105378,
+              "value_median": 0.0,
+              "value_p95": 0.19406567607872852
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.007,
+              "n": 2000,
+              "n_failed": 14,
+              "value_max": 0.01623094690445013,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0005774442772849882,
+              "value_median": 0.0,
+              "value_p95": 1.4901161193847656e-08
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -31.91982057864655,
+              "value_median": -70.73089769982043,
+              "value_p95": -56.083278014751244
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 603.0,
+              "value_median": 510.0,
+              "value_p95": 528.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.01100000000000001,
+          "n_kept": 1978,
+          "n_rollouts": 2000
+        },
+        "sphere/ABSENT": {
+          "checks": {
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -1.0,
+              "value_median": -1.0,
+              "value_p95": -1.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "sphere/DECOY": {
+          "checks": {
+            "T10_decoy_no_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.38362068965517243,
+              "value_median": 0.0,
+              "value_p95": 0.004267622924339339
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -4.982803609458884,
+              "value_median": -23.132273504702184,
+              "value_p95": -9.362179300634427
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 475.0,
+              "value_median": 475.0,
+              "value_p95": 475.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        },
+        "sphere/INTERACT": {
+          "checks": {
+            "T10_contact_before_sstd": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 451.0,
+              "value_median": 376.0,
+              "value_p95": 421.0
+            },
+            "T10_interact_contact": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 474.0,
+              "value_median": 474.0,
+              "value_p95": 474.0
+            },
+            "T5_no_contact_after_withdraw": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_occlusion_match": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.7398373983739838,
+              "value_median": 0.0,
+              "value_p95": 0.24157930295405824
+            },
+            "T5_settled_pose_match_pos": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T5_settled_pose_match_rot": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "T9_arm_deviation": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            },
+            "in_frustum": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": -44.86694553090186,
+              "value_median": -69.17256679691042,
+              "value_p95": -54.05851153403699
+            },
+            "settled": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 531.0,
+              "value_median": 507.0,
+              "value_p95": 527.0
+            },
+            "shared_prefix": {
+              "fail_rate": 0.0,
+              "n": 2000,
+              "n_failed": 0,
+              "value_max": 0.0,
+              "value_median": 0.0,
+              "value_p95": 0.0
+            }
+          },
+          "exclusion_rate": 0.0,
+          "n_kept": 2000,
+          "n_rollouts": 2000
+        }
+      },
+      "validators_over_exclusion_cap": {}
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "3cd30c1",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "3cd30c16892fb87c261e6b9bfbf91c752903a945"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": false,
+    "cuda_device": null,
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": null
+}

@@ -1,5 +1,37 @@
 {
-  "all_per_rollout_validators_clean": true,
+  "all_per_rollout_validators_clean": false,
+  "clips": {
+    "checked": 36000,
+    "clip_root": "/scratch4/workspace/knaskar_umass_edu-ogaf/data/clips",
+    "examples": [],
+    "missing": 0,
+    "name": "clip_completeness",
+    "passed": true,
+    "variants": [
+      "A-std",
+      "A-clip-del"
+    ]
+  },
+  "completeness": {
+    "cells_present": [
+      "box/ABSENT",
+      "box/DECOY",
+      "box/INTERACT",
+      "cylinder/ABSENT",
+      "cylinder/DECOY",
+      "cylinder/INTERACT",
+      "sphere/ABSENT",
+      "sphere/DECOY",
+      "sphere/INTERACT"
+    ],
+    "cells_with_wrong_tuples": {},
+    "expected_tuples_per_cell": 2000,
+    "missing_cells": [],
+    "name": "corpus_completeness",
+    "passed": true,
+    "shards_missing_validators_json": []
+  },
+  "exclusion_cap": 0.05,
   "geometry_checks": [
     {
       "clearance_m": 0.014227251902965449,
@@ -33,12 +65,22 @@
   "split_integrity": {
     "counts_by_geometry": {
       "box": {
-        "test": 18,
-        "train": 144,
-        "val": 18
+        "test": 579,
+        "train": 4845,
+        "val": 576
+      },
+      "cylinder": {
+        "test": 579,
+        "train": 4791,
+        "val": 630
+      },
+      "sphere": {
+        "test": 687,
+        "train": 4659,
+        "val": 654
       }
     },
-    "n_tuples_checked": 60,
+    "n_tuples_checked": 6000,
     "name": "T7_no_tuple_spans_splits",
     "note": "split unit is (geometry, tuple_index); NEVER the rollout, NEVER the frame",
     "offenders": [],
@@ -53,34 +95,57 @@
     "per_geometry": {
       "box": {
         "approach_angle": {
-          "n": 60,
-          "r2": -0.13950539073921897
+          "n": 2000,
+          "r2": -0.00413403632974374
         },
         "contact_offset": {
-          "n": 60,
-          "r2": -0.13099448744503728
+          "n": 2000,
+          "r2": -0.0063647698149464915
         },
         "push_speed": {
-          "n": 60,
-          "r2": -0.20626894515014427
+          "n": 2000,
+          "r2": -0.005129941350954459
         }
       },
       "cylinder": {
-        "skipped": "no DECOY rollouts found"
+        "approach_angle": {
+          "n": 2000,
+          "r2": -0.002033455286093
+        },
+        "contact_offset": {
+          "n": 2000,
+          "r2": -0.0023699609376812703
+        },
+        "push_speed": {
+          "n": 2000,
+          "r2": -0.006871328970968538
+        }
       },
       "sphere": {
-        "skipped": "no DECOY rollouts found"
+        "approach_angle": {
+          "n": 2000,
+          "r2": -0.006398656572468742
+        },
+        "contact_offset": {
+          "n": 2000,
+          "r2": -0.0026945183304183384
+        },
+        "push_speed": {
+          "n": 2000,
+          "r2": -0.005595452071464058
+        }
       }
     },
     "threshold": 0.01,
     "value": 0.0
   },
+  "t11_geometries_skipped": [],
   "validators": {
     "box/ABSENT": {
       "checks": {
         "T5_no_contact_after_withdraw": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -88,7 +153,7 @@
         },
         "T5_occlusion_match": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -96,7 +161,7 @@
         },
         "T9_arm_deviation": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -104,7 +169,7 @@
         },
         "settled": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": -1.0,
           "value_median": -1.0,
@@ -112,7 +177,7 @@
         },
         "shared_prefix": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -120,14 +185,14 @@
         }
       },
       "exclusion_rate": 0.0,
-      "n_kept": 60,
-      "n_rollouts": 60
+      "n_kept": 2000,
+      "n_rollouts": 2000
     },
     "box/DECOY": {
       "checks": {
         "T10_decoy_no_contact": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -135,7 +200,7 @@
         },
         "T5_no_contact_after_withdraw": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -143,15 +208,15 @@
         },
         "T5_occlusion_match": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 0.182548794489093,
+          "value_max": 0.25,
           "value_median": 0.0,
-          "value_p95": 0.09066385723702786
+          "value_p95": 0.07914723301407205
         },
         "T5_settled_pose_match_pos": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -159,15 +224,15 @@
         },
         "T5_settled_pose_match_rot": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 0.0,
+          "value_max": 4.2146848510894035e-08,
           "value_median": 0.0,
           "value_p95": 0.0
         },
         "T9_arm_deviation": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -175,15 +240,15 @@
         },
         "in_frustum": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": -8.815350748893536,
-          "value_median": -29.994644283662588,
-          "value_p95": -10.754884663863708
+          "value_max": -4.917303661265493,
+          "value_median": -24.001167679325327,
+          "value_p95": -9.54752243291698
         },
         "settled": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 475.0,
           "value_median": 475.0,
@@ -191,7 +256,7 @@
         },
         "shared_prefix": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -199,22 +264,22 @@
         }
       },
       "exclusion_rate": 0.0,
-      "n_kept": 60,
-      "n_rollouts": 60
+      "n_kept": 2000,
+      "n_rollouts": 2000
     },
     "box/INTERACT": {
       "checks": {
         "T10_contact_before_sstd": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 401.0,
-          "value_median": 353.5,
-          "value_p95": 390.15
+          "value_max": 446.0,
+          "value_median": 357.0,
+          "value_p95": 397.0
         },
         "T10_interact_contact": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 474.0,
           "value_median": 474.0,
@@ -222,7 +287,7 @@
         },
         "T5_no_contact_after_withdraw": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -230,15 +295,15 @@
         },
         "T5_occlusion_match": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 0.2593144560357675,
+          "value_max": 0.5304878048780488,
           "value_median": 0.0,
-          "value_p95": 0.08648608306624483
+          "value_p95": 0.22803821776112715
         },
         "T5_settled_pose_match_pos": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -246,15 +311,15 @@
         },
         "T5_settled_pose_match_rot": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 0.0,
+          "value_max": 4.2146848510894035e-08,
           "value_median": 0.0,
           "value_p95": 0.0
         },
         "T9_arm_deviation": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -262,23 +327,23 @@
         },
         "in_frustum": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": -51.15815232246587,
-          "value_median": -67.61407213354006,
-          "value_p95": -57.248934296293974
+          "value_max": -41.891873994387424,
+          "value_median": -69.28242257307267,
+          "value_p95": -55.60030666392839
         },
         "settled": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
-          "value_max": 523.0,
-          "value_median": 506.0,
-          "value_p95": 521.1
+          "value_max": 533.0,
+          "value_median": 507.0,
+          "value_p95": 524.0
         },
         "shared_prefix": {
           "fail_rate": 0.0,
-          "n": 60,
+          "n": 2000,
           "n_failed": 0,
           "value_max": 0.0,
           "value_median": 0.0,
@@ -286,8 +351,435 @@
         }
       },
       "exclusion_rate": 0.0,
-      "n_kept": 60,
-      "n_rollouts": 60
+      "n_kept": 2000,
+      "n_rollouts": 2000
+    },
+    "cylinder/ABSENT": {
+      "checks": {
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": -1.0,
+          "value_median": -1.0,
+          "value_p95": -1.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 2000,
+      "n_rollouts": 2000
+    },
+    "cylinder/DECOY": {
+      "checks": {
+        "T10_decoy_no_contact": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.3373333333333333,
+          "value_median": 0.0,
+          "value_p95": 0.071646059163029
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 1.4901161193847656e-08,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0005,
+          "n": 2000,
+          "n_failed": 1,
+          "value_max": 20.646491766351858,
+          "value_median": -23.513637102248524,
+          "value_p95": -9.634107100665465
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 475.0,
+          "value_median": 475.0,
+          "value_p95": 475.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0004999999999999449,
+      "n_kept": 1999,
+      "n_rollouts": 2000
+    },
+    "cylinder/INTERACT": {
+      "checks": {
+        "T10_contact_before_sstd": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 449.0,
+          "value_median": 377.0,
+          "value_p95": 423.0
+        },
+        "T10_interact_contact": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 511.0,
+          "value_median": 474.0,
+          "value_p95": 475.04999999999995
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.011,
+          "n": 2000,
+          "n_failed": 22,
+          "value_max": 11.079769770535075,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.6454445664105378,
+          "value_median": 0.0,
+          "value_p95": 0.19406567607872852
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.007,
+          "n": 2000,
+          "n_failed": 14,
+          "value_max": 0.01623094690445013,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0005774442772849882,
+          "value_median": 0.0,
+          "value_p95": 1.4901161193847656e-08
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": -31.91982057864655,
+          "value_median": -70.73089769982043,
+          "value_p95": -56.083278014751244
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 603.0,
+          "value_median": 510.0,
+          "value_p95": 528.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.01100000000000001,
+      "n_kept": 1978,
+      "n_rollouts": 2000
+    },
+    "sphere/ABSENT": {
+      "checks": {
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": -1.0,
+          "value_median": -1.0,
+          "value_p95": -1.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 2000,
+      "n_rollouts": 2000
+    },
+    "sphere/DECOY": {
+      "checks": {
+        "T10_decoy_no_contact": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.38362068965517243,
+          "value_median": 0.0,
+          "value_p95": 0.004267622924339339
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": -4.982803609458884,
+          "value_median": -23.132273504702184,
+          "value_p95": -9.362179300634427
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 475.0,
+          "value_median": 475.0,
+          "value_p95": 475.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 2000,
+      "n_rollouts": 2000
+    },
+    "sphere/INTERACT": {
+      "checks": {
+        "T10_contact_before_sstd": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 451.0,
+          "value_median": 376.0,
+          "value_p95": 421.0
+        },
+        "T10_interact_contact": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 474.0,
+          "value_median": 474.0,
+          "value_p95": 474.0
+        },
+        "T5_no_contact_after_withdraw": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_occlusion_match": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.7398373983739838,
+          "value_median": 0.0,
+          "value_p95": 0.24157930295405824
+        },
+        "T5_settled_pose_match_pos": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T5_settled_pose_match_rot": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "T9_arm_deviation": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        },
+        "in_frustum": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": -44.86694553090186,
+          "value_median": -69.17256679691042,
+          "value_p95": -54.05851153403699
+        },
+        "settled": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 531.0,
+          "value_median": 507.0,
+          "value_p95": 527.0
+        },
+        "shared_prefix": {
+          "fail_rate": 0.0,
+          "n": 2000,
+          "n_failed": 0,
+          "value_max": 0.0,
+          "value_median": 0.0,
+          "value_p95": 0.0
+        }
+      },
+      "exclusion_rate": 0.0,
+      "n_kept": 2000,
+      "n_rollouts": 2000
     }
-  }
+  },
+  "validators_over_exclusion_cap": {}
 }
