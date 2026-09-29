@@ -1,0 +1,364 @@
+{
+  "argv": [
+    "power.py"
+  ],
+  "arrays": {
+    "placeholder": [
+      1
+    ]
+  },
+  "arrays_file": "empty.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-09-29T07:03:52+0000",
+  "created_unix": 1790665432.77968,
+  "experiment": "power_analysis",
+  "extra": {
+    "results": {
+      "_needs_extension": false,
+      "alpha": 0.05,
+      "assumed_rho": 0.0,
+      "mde_frac_of_floor": 0.25,
+      "per_geometry": {
+        "box": {
+          "err_sd": 0.0033519251737743616,
+          "floor_mae": 0.0055211155981771225,
+          "mde": 0.0013802788995442806,
+          "n_available_per_geometry": 2000,
+          "n_preregistered": 102,
+          "n_required": 102,
+          "n_test_available": 200,
+          "needs_corpus_extension": false,
+          "sd_of_paired_diff": 0.004740338040811496,
+          "test_split_fraction": 0.1
+        },
+        "cylinder": {
+          "err_sd": 0.002584991278126836,
+          "floor_mae": 0.00455688845734888,
+          "mde": 0.00113922211433722,
+          "n_available_per_geometry": 2000,
+          "n_preregistered": 89,
+          "n_required": 89,
+          "n_test_available": 200,
+          "needs_corpus_extension": false,
+          "sd_of_paired_diff": 0.003655729724143133,
+          "test_split_fraction": 0.1
+        },
+        "pooled": {
+          "err_sd": 0.0028454926796257496,
+          "floor_mae": 0.0048154567205852036,
+          "mde": 0.0012038641801463009,
+          "n_available_per_geometry": 2000,
+          "n_preregistered": 96,
+          "n_required": 96,
+          "n_test_available": 200,
+          "needs_corpus_extension": false,
+          "sd_of_paired_diff": 0.004024134339160095,
+          "test_split_fraction": 0.1
+        },
+        "sphere": {
+          "err_sd": 0.0024520959705114365,
+          "floor_mae": 0.004434134617425485,
+          "mde": 0.0011085336543563713,
+          "n_available_per_geometry": 2000,
+          "n_preregistered": 84,
+          "n_required": 84,
+          "n_test_available": 200,
+          "needs_corpus_extension": false,
+          "sd_of_paired_diff": 0.0034677873777376905,
+          "test_split_fraction": 0.1
+        }
+      },
+      "power": 0.9,
+      "prior": {
+        "per_dim": {
+          "approach_angle": {
+            "mae": 0.7853981633974483,
+            "mae_norm": 0.25,
+            "mse": 0.8224670334241132,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -1.5707963267948966,
+              1.5707963267948966
+            ]
+          },
+          "contact_offset": {
+            "mae": 0.0175,
+            "mae_norm": 0.25,
+            "mse": 0.0004083333333333334,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -0.035,
+              0.035
+            ]
+          },
+          "push_speed": {
+            "mae": 0.06,
+            "mae_norm": 0.25,
+            "mse": 0.0048,
+            "mse_norm": 0.08333333333333333,
+            "range": [
+              0.12,
+              0.36
+            ]
+          }
+        },
+        "pooled_mae_norm": 0.25,
+        "pooled_mse_norm": 0.08333333333333333
+      },
+      "variant": "A-std"
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "3cd30c1",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "3cd30c16892fb87c261e6b9bfbf91c752903a945"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": false,
+    "cuda_device": null,
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": null
+}

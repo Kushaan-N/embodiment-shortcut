@@ -1,0 +1,94 @@
+{
+  "_needs_extension": false,
+  "alpha": 0.05,
+  "assumed_rho": 0.0,
+  "mde_frac_of_floor": 0.25,
+  "per_geometry": {
+    "box": {
+      "err_sd": 0.0033519251737743616,
+      "floor_mae": 0.0055211155981771225,
+      "mde": 0.0013802788995442806,
+      "n_available_per_geometry": 2000,
+      "n_preregistered": 102,
+      "n_required": 102,
+      "n_test_available": 200,
+      "needs_corpus_extension": false,
+      "sd_of_paired_diff": 0.004740338040811496,
+      "test_split_fraction": 0.1
+    },
+    "cylinder": {
+      "err_sd": 0.002584991278126836,
+      "floor_mae": 0.00455688845734888,
+      "mde": 0.00113922211433722,
+      "n_available_per_geometry": 2000,
+      "n_preregistered": 89,
+      "n_required": 89,
+      "n_test_available": 200,
+      "needs_corpus_extension": false,
+      "sd_of_paired_diff": 0.003655729724143133,
+      "test_split_fraction": 0.1
+    },
+    "pooled": {
+      "err_sd": 0.0028454926796257496,
+      "floor_mae": 0.0048154567205852036,
+      "mde": 0.0012038641801463009,
+      "n_available_per_geometry": 2000,
+      "n_preregistered": 96,
+      "n_required": 96,
+      "n_test_available": 200,
+      "needs_corpus_extension": false,
+      "sd_of_paired_diff": 0.004024134339160095,
+      "test_split_fraction": 0.1
+    },
+    "sphere": {
+      "err_sd": 0.0024520959705114365,
+      "floor_mae": 0.004434134617425485,
+      "mde": 0.0011085336543563713,
+      "n_available_per_geometry": 2000,
+      "n_preregistered": 84,
+      "n_required": 84,
+      "n_test_available": 200,
+      "needs_corpus_extension": false,
+      "sd_of_paired_diff": 0.0034677873777376905,
+      "test_split_fraction": 0.1
+    }
+  },
+  "power": 0.9,
+  "prior": {
+    "per_dim": {
+      "approach_angle": {
+        "mae": 0.7853981633974483,
+        "mae_norm": 0.25,
+        "mse": 0.8224670334241132,
+        "mse_norm": 0.08333333333333334,
+        "range": [
+          -1.5707963267948966,
+          1.5707963267948966
+        ]
+      },
+      "contact_offset": {
+        "mae": 0.0175,
+        "mae_norm": 0.25,
+        "mse": 0.0004083333333333334,
+        "mse_norm": 0.08333333333333334,
+        "range": [
+          -0.035,
+          0.035
+        ]
+      },
+      "push_speed": {
+        "mae": 0.06,
+        "mae_norm": 0.25,
+        "mse": 0.0048,
+        "mse_norm": 0.08333333333333333,
+        "range": [
+          0.12,
+          0.36
+        ]
+      }
+    },
+    "pooled_mae_norm": 0.25,
+    "pooled_mse_norm": 0.08333333333333333
+  },
+  "variant": "A-std"
+}
