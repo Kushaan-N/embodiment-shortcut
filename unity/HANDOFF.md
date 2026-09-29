@@ -572,6 +572,22 @@ ones that would have cost a GPU allocation or produced a wrong result:
    re-clone resets it); the public push timestamp is the real anchor.
 6. The committed `results/exp_0/results.json` used 3 probe seeds; §2's command
    uses 5.
-7. `preflight.py`'s EGL check times context creation plus one frame against a
+7. **Findings from the first Unity runs (2026-09-28/29):**
+   - Compute nodes DO have outbound HTTPS (pip, HF, pytorch.org all reachable
+     from a cpu-partition job). The offline env vars stay as a safety net.
+   - Rendering is reproducible on the same GPU type (two 2080 Ti nodes: <=2
+     grey levels on <0.03% of pixels) but NOT between hardware GL and a
+     software fallback (~8% of pixels, up to 80 levels). Never render on the
+     cpu partition. Twelve WM clips were rendered that way by mistake
+     (cylinder INTERACT/ABSENT tuples 0-5, sphere ABSENT tuple 0; list in the
+     workspace at jobs/suspect_cpu_clips.txt) and must be replaced before WM
+     training, e.g. `render_clips.py --geometry cylinder --shards 0
+     --condition INTERACT --overwrite` (and ABSENT; sphere ABSENT) on a GPU node.
+     Cross-ARCHITECTURE determinism (A100 vs 2080 Ti) is untested; each shard's
+     three conditions share one node, so the paired G is unaffected either way.
+   - Friction x3 excludes far more rollouts: cylinder keeps 1660/2000 (vs
+     1978 at x1), box 1920, sphere 2000. WM-physics-corrupted therefore trains
+     on ~16% fewer cylinder clips than WM-base -- a data-size confound to state.
+8. `preflight.py`'s EGL check times context creation plus one frame against a
    0.5 s heuristic; a cold context on a healthy node can trip it -- re-run
    before believing an osmesa diagnosis.
