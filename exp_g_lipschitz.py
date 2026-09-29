@@ -145,9 +145,13 @@ def main() -> int:
             z = np.load(args.gaps, allow_pickle=False)
             gvals, gids = _collect_gaps(z, args.variant, geometry)
             if gvals is not None:
-                idmap = {int(t): i for i, t in enumerate(tuples)}
                 for s in range(args.strata):
-                    sel_t = set(tuples[strat == s].tolist())
+                    # Experiment E's pair ids are stats.pair_id values
+                    # (geometry-encoded); compare like with like.  Raw tuple
+                    # indices only coincided for box (geometry ordinal 0), so
+                    # sphere and cylinder silently got no strata.
+                    in_s = tuples[strat == s]
+                    sel_t = set(stats.pair_id(np.full(len(in_s), geometry), in_s).tolist())
                     vals, ids = {}, {}
                     for seed, (v, pid) in gvals.items():
                         m = np.asarray([int(p) in sel_t for p in pid])
