@@ -28,8 +28,11 @@ threshold.
 | Corpus + `validate_corpus.py` | T11, T7, completeness, clips | **PASS 2026-09-29** (real corpus) |
 | Architecture A, 30 items | content checks | done 2026-09-29 |
 | Exp D floors + power | headroom | done 2026-09-29 (`results/exp_d`, `results/power`) |
-| Architecture B + masking | — | **blocked: DINOv3 is gated, needs `HF_TOKEN`** |
-| Pre-registration | §0.5 lock | **next -- human** |
+| Architecture B + masking | — | done 2026-09-29 (DINOv3 staged) |
+| Pre-registration | §0.5 lock | **PASS** 2026-09-29, commit d2fdc9e (decisions delegated; see prereg.md §9) |
+| Experiment E | C1, C2 | **both SUPPORTED** (Holm p = 0.0002 each); T5, T8 hold |
+| Experiments F, G, masking | exploratory | done; two mis-specified predictions recorded in `DEVIATIONS.md` |
+| Experiment H | C3 | launched 2026-10-01 (VAE -> 3 runs -> 5 x generation + ABSENT controls -> exp_h) |
 
 **The headline numbers you already own:**
 
