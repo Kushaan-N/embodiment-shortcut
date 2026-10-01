@@ -33,8 +33,10 @@ occupied in RL.
 | 7. Corpus + `validate_corpus.py` | T11, T7, completeness | **PASS** 2026-09-29 — 9×2000 tuples, 36k clips, T11 R²≈0, ≤1.1 % excluded |
 | 8. IDMs — Architecture A (30) | content checks | **done** 2026-09-29 (Arch B blocked: DINOv3 needs `HF_TOKEN`) |
 | 9. Experiment D — floors, + power | headroom vs prior | **done** — A-std 1.9 %, A-del 44.7 % of prior; n ≤ 102/geometry |
-| 10. Pre-registration (`prereg.md`, public push) | §0.5 lock | ✋ **next — human** |
-| 11–12. Experiments E/F/G, H | — | not run (E, H sealed until the lock passes) |
+| 10. Pre-registration (`prereg.md`, public push) | §0.5 lock | **PASS** 2026-09-29 (`d2fdc9e`) |
+| 11. Experiment E — the confound | **C1, C2** (Holm) | **both SUPPORTED** — G(A-std)/floor 0.151 [0.115, 0.188] < 0.25; err(A-del) 44.7 % < 72 %; T5, T8 hold |
+| 11. Experiments F, G, masking (exploratory) | — | done; see `DEVIATIONS.md` for two mis-specified predictions |
+| 12. Experiment H — world-model ladder | C3 | **running** (launched 2026-10-01) |
 
 Measured gate values are in `results/*/results.json`; `python analyze.py`
 prints them all with thresholds and PASS/FAIL.
