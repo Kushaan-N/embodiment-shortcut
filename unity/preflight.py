@@ -177,6 +177,10 @@ def c_egl_render():
     """The check that actually matters (§13.4)."""
     import mj_env
 
+    # Warm up once: the timed region includes EGL context creation, and a cold
+    # context on a healthy node can exceed the 0.5 s osmesa heuristic.  Time
+    # the second render.
+    mj_env.assert_real_render()
     info = mj_env.assert_real_render()
     slow = info["render_seconds"] > 0.5
     return (not slow), (f"backend={info['mujoco_gl_env']} "
