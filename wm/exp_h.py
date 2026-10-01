@@ -68,6 +68,36 @@ def cohens_d(a, b) -> float:
     return float((a.mean() - b.mean()) / s) if s > 0 else 0.0
 
 
+def paired_effect(a_scores, a_ids, b_scores, b_ids, *, n_boot: int = 10_000,
+                  rng_seed: int = C.BOOTSTRAP_SEED) -> dict:
+    """Paired between-model effect on the SAME held-out actions.
+
+    Every ladder model is generated from the same held-out (action, seed)
+    tuples (§9-H), so the natural estimator is the per-tuple difference
+    b - a, not two independent samples.  d_paired = mean(diff) / sd(diff),
+    with a percentile bootstrap CI over tuples (seeded, deterministic).
+    Reported ALONGSIDE the registered unpaired Cohen's d (DEVIATIONS.md).
+    """
+    a_map = {int(t): float(s) for t, s in zip(a_ids, a_scores)}
+    b_map = {int(t): float(s) for t, s in zip(b_ids, b_scores)}
+    common = sorted(set(a_map) & set(b_map))
+    if len(common) < 3:
+        return {"n_pairs": len(common), "note": "fewer than 3 matched tuples"}
+    diff = np.array([b_map[t] - a_map[t] for t in common], dtype=np.float64)
+    sd = diff.std(ddof=1)
+    d = float(diff.mean() / sd) if sd > 0 else 0.0
+    rng = np.random.default_rng(rng_seed)
+    boot = np.empty(n_boot)
+    for i in range(n_boot):
+        s = diff[rng.integers(0, len(diff), size=len(diff))]
+        ssd = s.std(ddof=1)
+        boot[i] = s.mean() / ssd if ssd > 0 else 0.0
+    return {"n_pairs": int(len(common)), "mean_diff": float(diff.mean()),
+            "d_paired": d, "ci_low": float(np.percentile(boot, 2.5)),
+            "ci_high": float(np.percentile(boot, 97.5)),
+            "unmatched": int(len(a_map) + len(b_map) - 2 * len(common))}
+
+
 def load_generated(model_name: str, geometry: str, root: Path) -> dict:
     d = Path(root) / model_name / geometry
     items = sorted(d.glob("*.npz"))
@@ -260,7 +290,22 @@ def main() -> int:
             "dino_effect": cohens_d(b["dino"], a["dino"]),
             "ground_truth_effect": cohens_d(b["ground_truth"], a["ground_truth"]),
         }
+        # Paired companion to each unpaired d: same tuples, per-tuple differences.
+        ta, tb = arrays["WM-base-100_tuple_index"], arrays["WM-physics-corrupted_tuple_index"]
+        results["between_model"]["corrupted_vs_base_paired"] = {
+            k: paired_effect(a[k], ta, b[k], tb)
+            for k in ("standard", "standard_clean", "ogaf", "dino", "ground_truth")
+        }
         e = results["between_model"]["corrupted_vs_base"]
+        ep = results["between_model"]["corrupted_vs_base_paired"]
+        print(f"\n  C3(b) physics-corrupted vs base  (unpaired d = registered; paired d on "
+              f"the same {ep['ogaf'].get('n_pairs', 0)} tuples alongside):")
+        for k, lab in (("standard", "standard-metric"), ("ogaf", "OG-AF"), ("dino", "DINO @ s_del"),
+                       ("ground_truth", "ground truth")):
+            p = ep[k]
+            if "d_paired" in p:
+                print(f"    {lab:16s} paired d = {p['d_paired']:+.3f} "
+                      f"[{p['ci_low']:+.3f}, {p['ci_high']:+.3f}]")
         print(f"\n  C3(b) physics-corrupted vs base:")
         print(f"    standard-metric  d = {e['standard_effect']:+.3f}   "
               f"(prediction: near zero -- the metric cannot see wrong physics)")
