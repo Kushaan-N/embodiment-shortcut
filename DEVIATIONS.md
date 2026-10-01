@@ -52,3 +52,19 @@ stand. The notes say what the data show; neither is offered as a claim.
 `paired_gap` dropped 4 DECOY samples with no INTERACT partner (cylinder
 validator exclusions differ per condition, as the inclusion policy allows); G
 uses 611 matched pairs. Reported, not a deviation of method.
+
+## 2026-10-01 — Experiment H: paired between-model effect reported alongside the registered unpaired one (addition, before H ran)
+
+- **What:** `exp_h.py` reports C3(b) as unpaired Cohen's d between the
+  physics-corrupted and base models' per-rollout scores. Every ladder model is
+  generated from the *same* held-out (action, seed) tuples (§9-H), so a paired
+  estimator -- per-tuple difference, d = mean/sd, seeded percentile-bootstrap
+  CI -- is the natural one and matches the paper's paired G.
+- **Change:** `paired_effect()` added; written as
+  `between_model.corrupted_vs_base_paired` next to the unchanged registered
+  entry, printed side by side by `exp_h.py` and `analyze.py --exp h`.
+- **Status:** made and committed **before** any Experiment H generation or
+  score existed (H launched the same day; see the job chain in HANDOFF §0).
+  The registered unpaired d remains the pre-registered quantity; the paired d
+  is an addition, not a replacement. **Confirmatory impact: none** (C1/C2 are
+  Experiment E).
