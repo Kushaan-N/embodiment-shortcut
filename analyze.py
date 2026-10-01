@@ -470,6 +470,11 @@ def analyze_h(root: Path) -> None:
         if not isinstance(v, dict):          # e.g. {"void": "ladder not monotone"}
             print(f"  C3(b) {name}: {v}")
             continue
+        if name.endswith("_paired"):
+            cells = ", ".join(f"{k}={p['d_paired']:+.3f} [{p['ci_low']:+.3f},{p['ci_high']:+.3f}]"
+                              for k, p in v.items() if isinstance(p, dict) and "d_paired" in p)
+            print(f"  C3(b) {name} (same tuples, n={v.get('ogaf', {}).get('n_pairs', '?')}): {cells}")
+            continue
         print(f"  C3(b) {name}: standard d={v['standard_effect']:+.3f}, "
               f"OG-AF d={v['ogaf_effect']:+.3f}, DINO d={v['dino_effect']:+.3f}")
     if res.get("domain_shift"):
