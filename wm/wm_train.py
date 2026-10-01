@@ -293,10 +293,14 @@ def build_latent_cache(vae: CompactVAE, clip_root: Path, geometries, cache_path:
 class Trainer:
     """Training loop with wall-clock-budgeted, signal-safe checkpointing."""
 
-    def __init__(self, outdir: Path, max_hours: float | None):
+    def __init__(self, outdir: Path, max_hours: float | None, keep_steps=()):
         self.outdir = Path(outdir)
         self.outdir.mkdir(parents=True, exist_ok=True)
         self.deadline = None if not max_hours else time.time() + max_hours * 3600
+        # Periodic checkpoints the ladder needs by name (checkpoint_at steps);
+        # every other periodic checkpoint is pruned once a newer one lands.
+        # ~1.1 GB each x 60 per run was ~70 GB/model of scratch for nothing.
+        self.keep_steps = {int(s) for s in keep_steps}
         self._stop = False
         for sig in (signal.SIGTERM, signal.SIGUSR1, signal.SIGINT):
             try:
@@ -342,7 +346,26 @@ class Trainer:
             fh.flush()
             os.fsync(fh.fileno())
         os.replace(tmp, path)
+        if tag is None:
+            self._prune(keep=path)
         return path
+
+    def _prune(self, keep: Path) -> None:
+        """Delete periodic checkpoints that are neither the newest nor a ladder
+        checkpoint_at step.  Only after the newer one is fully on disk."""
+        for p in sorted(self.outdir.glob("ckpt_step*.pt")):
+            if p == keep:
+                continue
+            try:
+                step = int(p.stem.replace("ckpt_step", ""))
+            except ValueError:
+                continue
+            if step in self.keep_steps:
+                continue
+            try:
+                p.unlink()
+            except OSError as exc:  # never let housekeeping kill training
+                print(f"  prune: could not remove {p.name}: {exc}", flush=True)
 
     def load(self, model, opt, sched, scaler) -> int:
         ck_path = self.latest()
@@ -378,6 +401,9 @@ def main() -> int:
     ap.add_argument("--ckpt-every", type=int, default=2000)
     ap.add_argument("--budget-only", action="store_true",
                     help="print the FLOP/GPU-hour budget and exit without training")
+    ap.add_argument("--cache-only", action="store_true",
+                    help="build this model's latent cache and exit (a short pre-job, so the "
+                         "first 2 h training window is spent training)")
     args = ap.parse_args()
 
     cfg = resolve_model(args.model)
@@ -428,14 +454,24 @@ def main() -> int:
     # first window that spends minutes encoding and only then starts its 1.8 h
     # budget would overrun the 2 h SLURM limit and be killed mid-checkpoint.
     outdir = Path(args.out) / args.model
-    trainer = Trainer(outdir, args.max_hours)
+    ladder_doc = yaml.safe_load(LADDER_PATH.read_text())
+    keep_steps = [m["checkpoint_at"] for m in ladder_doc["models"] if "checkpoint_at" in m]
+    trainer = Trainer(outdir, args.max_hours, keep_steps=keep_steps)
 
     cache = C.DATA_ROOT / "wm_latents" / f"{args.model}.npy"
     latents, actions, meta = build_latent_cache(
         vae, clip_root, args.geometries, cache, dev, frac, args.seed
     )
     print(f"  latents {latents.shape}  actions {actions.shape}", flush=True)
-    opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"], weight_decay=0.01)
+    if args.cache_only:
+        print("  --cache-only: latent cache is built; exiting before training")
+        return 0
+    # TF32 for any fp32 matmul/conv left outside bf16 autocast (A100/L40S);
+    # the fused AdamW kernel is a free ~10-20% on the optimiser step.
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+    opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"], weight_decay=0.01,
+                            fused=(dev.type == "cuda"))
     steps = cfg["train"]["steps"]
     warm = cfg["train"]["warmup"]
     sched = torch.optim.lr_scheduler.LambdaLR(
