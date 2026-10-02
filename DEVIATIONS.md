@@ -68,3 +68,49 @@ uses 611 matched pairs. Reported, not a deviation of method.
   The registered unpaired d remains the pre-registered quantity; the paired d
   is an addition, not a replacement. **Confirmatory impact: none** (C1/C2 are
   Experiment E).
+
+## 2026-10-02 — Experiment H: per-item generation validator used the MIN consecutive-frame difference (bug fix, after seeing data)
+
+- **What:** `wm_generate.validate_item` required every consecutive pair of
+  generated frames to differ by > 1.0 grey level on average. The first two
+  frames of every WM clip sample the 0.1 s hold phase before the arm moves, so
+  the REAL video is still there, and a correct generation (difference 0.007,
+  matching the real clip) failed. All 75 generation tasks aborted on their
+  first five items (§13.5 fail-fast) with the trained models otherwise fine
+  (S1 determinism / two-action divergence / temporal-motion checks all
+  passed; |gen − real| ≈ 0.16 grey levels on frame 0).
+- **Fix:** the check now uses the clip-MEAN consecutive difference, the same
+  statistic as the S1 `temporal_motion` check (a "model emits a still"
+  detector); the max is reported alongside. Existing items are re-validated
+  with the current checks on a re-run instead of being skipped as done.
+- **Confirmatory impact: none.** This is a pipeline-sanity validator, not a
+  registered metric; no H score existed when it was changed.
+- **Addendum (same day, before any H score):** (a) `unity/validate.py` carried
+  an identical min-based copy of the check; both now use the clip mean with
+  **one** floor, 0.5, the S1 `temporal_motion` threshold (the per-item copy had
+  used 1.0 on the same statistic, so a correct free-space control could have
+  failed one and passed the other); a max-difference check is reported
+  alongside. (b) `exp_h.py` previously scored every item on disk, including
+  those that failed per-item validation (the generator saves before it
+  validates); it now reads the shard manifests and drops failures, and refuses
+  to score a model whose generation did not finish. (c) `exp_h.py` now refuses
+  non-finite scores (which `cohens_d` would have reported as d = 0) and refuses
+  a ladder whose models were scored on different tuple sets. (d) Registered
+  `n_rollouts_per_model: 1500` and `controls.n_rollouts: 300` are not
+  reachable: the held-out test split of the box corpus holds **193** tuples, so
+  every ladder model and every control is scored on the same 193.
+
+## 2026-10-02 — Reporting notes (no change made)
+
+- `analyze.py`'s C1/C2 verdicts use the two-sided 95 % percentile CI
+  (97.5th percentile as the upper bound) where prereg §3 says "one-sided 95 %
+  CI". This is the stricter reading; the Holm p-values use the one-sided
+  inversion. Neither was borderline (C1 upper bound 0.188 vs 0.25; C2 upper
+  0.115 vs 0.181). Left as is.
+- `results/exp_e/results.json` `G.pooled.n_pairs` is the seed-pooled count
+  (5 seeds × 611 = 3055); unique held-out pairs per seed = 611.
+- Architecture A resume (`idm.train_idm`) does not reproduce the uninterrupted
+  shuffle order bitwise after a relaunch (persistent-worker iterator seed);
+  no production Architecture A item was ever resumed (0 restarts in the 30
+  logs), so every reported IDM is an uninterrupted run. `resume.pt` now carries
+  a config fingerprint and refuses a mismatched relaunch.
