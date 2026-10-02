@@ -103,6 +103,26 @@ def load_generated(model_name: str, geometry: str, root: Path) -> dict:
     items = sorted(d.glob("*.npz"))
     if not items:
         raise FileNotFoundError(f"no generated rollouts under {d}")
+    # Content gate (§13.5): the generator writes every item to disk BEFORE its
+    # per-item validation, so the analysis must consult the shard manifests
+    # and drop what failed -- otherwise "validate content" never gated anything.
+    manifests = sorted(d.glob("manifest_shard*.json"))
+    if not manifests:
+        raise FileNotFoundError(f"{d}: no manifest_shard*.json -- generation did not finish "
+                                f"(or aborted); not scoring unvalidated items")
+    status: dict = {}
+    for m in manifests:
+        for it in json.loads(m.read_text())["items"]:
+            status[it["id"]] = bool(it["passed"])
+    unlisted = [p.stem for p in items if p.stem not in status]
+    if unlisted:
+        raise FileNotFoundError(f"{d}: {len(unlisted)} item(s) on disk are in no manifest "
+                                f"(e.g. {unlisted[:3]}); re-run generation for this model")
+    failed = [p for p in items if not status[p.stem]]
+    if failed:
+        print(f"  {model_name}/{geometry}: dropping {len(failed)}/{len(items)} items that "
+              f"failed per-item validation", flush=True)
+    items = [p for p in items if status[p.stem]]
     gen, cond, act, real, ids, fidx = [], [], [], [], [], []
     for p in items:
         with np.load(p) as z:
@@ -207,6 +227,11 @@ def score_generated(name: str, g: dict, args, dev) -> dict:
 
     print(f"  {name:24s} standard={std_e.mean():.5f}  ogaf={del_e.mean():.5f}  "
           f"dino={dino.mean():.5f}  gt={gt.mean():.5f}")
+    for k, v in (("standard", std_e), ("ogaf", del_e), ("standard_clean", std_clean),
+                 ("dino", dino), ("ground_truth", gt)):
+        if not np.isfinite(v).all():
+            # cohens_d / paired_effect would turn a NaN into "no effect" (d = 0).
+            raise RuntimeError(f"{name}: non-finite {k} scores ({int((~np.isfinite(v)).sum())})")
     return {"standard": std_e, "ogaf": del_e, "standard_clean": std_clean,
             "dino": dino, "ground_truth": gt}
 
@@ -253,6 +278,13 @@ def main() -> int:
 
     # ---- ladder verification (do this FIRST) -----------------------------
     present = [n for n in names if n in per_model]
+    # Every ladder model must be scored on the SAME held-out tuples (§9-H), or
+    # the per-model means (and the paired effects) compare different items.
+    tuple_sets = {n: set(arrays[f"{n}_tuple_index"].tolist()) for n in present}
+    if len({frozenset(s) for s in tuple_sets.values()}) > 1:
+        sizes = {n: len(s) for n, s in tuple_sets.items()}
+        raise RuntimeError(f"ladder models were scored on different tuple sets: {sizes}; "
+                           f"finish/redo generation so every model has the same items")
     if len(present) >= 3:
         gts = [per_model[n]["ground_truth"].mean() for n in present]
         rho = spearman(np.arange(len(present)), gts)
