@@ -95,7 +95,11 @@ def _first_commit_of(path: Path, repo: Path) -> tuple[str | None, float | None, 
     failure mode this lock exists to make impossible.
     """
     rel = path.relative_to(repo).as_posix()
-    r = _git("log", "--follow", "--reverse", "--format=%H%x09%ct%x09%cI", "--", rel, repo=repo)
+    # --diff-filter=A --no-renames: the commit that ADDED this path, with rename
+    # detection off, so a sibling draft file can never be attributed as this
+    # file's history under some clone's diff.renames setting.
+    r = _git("log", "--diff-filter=A", "--no-renames", "--reverse",
+             "--format=%H%x09%ct%x09%cI", "--", rel, repo=repo)
     if r.returncode != 0 or not r.stdout.strip():
         return None, None, None
     sha, ct, iso = r.stdout.strip().splitlines()[0].split("\t")
