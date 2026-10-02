@@ -526,14 +526,15 @@ def main() -> int:
 
         stop, why = trainer.should_stop()
         if stop or (step > start and step % args.ckpt_every == 0):
-            p = trainer.save(step, model, opt, sched, scaler, cfg)
+            p = trainer.save(step, model, opt, sched, scaler, cfg, extra={"vae": str(args.vae)})
             if stop:
                 print(f"[trainer] stopped at step {step} ({why}); saved {p.name}.\n"
                       f"[trainer] re-run the SAME command to resume -- SLURM --requeue "
                       f"does exactly that.", flush=True)
                 return 0
 
-    trainer.save(steps, model, opt, sched, scaler, cfg, tag="final.pt")
+    trainer.save(steps, model, opt, sched, scaler, cfg, extra={"vae": str(args.vae)},
+                 tag="final.pt")
     provenance.save_run(outdir, f"wm_train::{args.model}",
                         {"loss": np.asarray([h["loss"] for h in hist])},
                         seeds={"seed": args.seed},
