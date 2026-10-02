@@ -307,11 +307,19 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
     training history; per-sample errors come from ``evaluate_idm``.
 
     ``resume_path``: after every epoch the full state (model, optimizer,
-    schedule, scaler, history, best-so-far, every RNG incl. the loader's
-    shuffle generator) is written there atomically; if the file exists at
-    start, training continues from the next epoch.  This is what lets an
-    Architecture A item survive gpu-preempt's 2 h kill instead of restarting
-    from zero on every requeue.
+    schedule, scaler, history, best-so-far, the torch/CUDA/numpy RNGs and the
+    loader's shuffle generator) is written there atomically; if the file
+    exists at start, training continues from the next epoch.  This is what
+    lets an Architecture A item survive gpu-preempt's 2 h kill instead of
+    restarting from zero on every requeue.
+
+    Honest limits: with ``persistent_workers`` the relaunched process creates
+    a NEW loader iterator, which draws one extra base seed from the restored
+    generator, so the post-resume shuffle order is a valid but DIFFERENT draw
+    from the uninterrupted run's (not bitwise identical).  The LR trajectory
+    is identical as long as the config is unchanged, which the fingerprint
+    below enforces (epochs excluded: a longer run may legitimately resume a
+    shorter one's state, re-basing the cosine schedule).
     """
     dev = dev or device()
     torch.manual_seed(cfg.seed)
@@ -327,8 +335,14 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
     best = {"val_mae": float("inf"), "epoch": -1, "state": None}
 
     start_epoch = 0
+    fingerprint = {k: v for k, v in cfg.to_dict().items() if k not in ("epochs", "num_workers")}
+    fingerprint["n_train_batches"] = len(train_loader)
     if resume_path is not None and Path(resume_path).exists():
         ck = torch.load(resume_path, map_location="cpu", weights_only=False)
+        if ck.get("fingerprint", fingerprint) != fingerprint:
+            raise RuntimeError(f"{resume_path} was written by a different configuration: "
+                               f"{ck.get('fingerprint')} != {fingerprint}; delete it or use "
+                               f"a different --out")
         model.load_state_dict(ck["model"])
         opt.load_state_dict(ck["optimizer"])
         sched.load_state_dict(ck["scheduler"])
@@ -379,7 +393,7 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
                   f"val_mae={val['mae']:.5f}  lr={history['lr'][-1]:.2e}", flush=True)
         if resume_path is not None:
             _save_resume(resume_path, epoch, model, opt, sched, scaler, history, best,
-                         train_loader, dev)
+                         train_loader, dev, fingerprint)
 
     if best["state"] is not None:
         model.load_state_dict(best["state"])
@@ -388,7 +402,8 @@ def train_idm(model: nn.Module, train_loader, val_loader, cfg: TrainConfig,
     return history
 
 
-def _save_resume(path, epoch, model, opt, sched, scaler, history, best, train_loader, dev):
+def _save_resume(path, epoch, model, opt, sched, scaler, history, best, train_loader, dev,
+                 fingerprint=None):
     """Atomic per-epoch resume state (tmp -> fsync -> rename)."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -405,6 +420,7 @@ def _save_resume(path, epoch, model, opt, sched, scaler, history, best, train_lo
         "cuda_rng": torch.cuda.get_rng_state() if dev.type == "cuda" else None,
         "numpy_rng": np.random.get_state(),
         "loader_rng": gen.get_state() if gen is not None else None,
+        "fingerprint": fingerprint,
     }
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "wb") as fh:
