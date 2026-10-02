@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 DEFAULTS = {
     "pixel_std_floor": 2.0,       # blank output
-    "frame_diff_floor": 1.0,      # frozen output
+    "frame_diff_floor": 0.5,      # frozen output (== wm_generate / S1 temporal_motion)
     "frame0_max_delta": 40.0,     # wrong or dropped conditioning
 }
 
@@ -54,8 +54,12 @@ def validate_array_item(path: Path, *, expected_frames: int = 1, **kw) -> dict:
         diffs = [float(np.abs(frames[i + 1].astype(np.int32)
                               - frames[i].astype(np.int32)).mean())
                  for i in range(len(frames) - 1)]
-        add("consecutive_frame_difference", min(diffs) > cfg["frame_diff_floor"],
-            min(diffs), cfg["frame_diff_floor"])
+        # Clip MEAN (same statistic as wm_generate.validate_item and the S1
+        # temporal_motion check): the first two clip frames sample the hold
+        # phase, so the real video is still there and a per-pair minimum
+        # failed every correct item (DEVIATIONS.md 2026-10-02).
+        add("consecutive_frame_difference", float(np.mean(diffs)) > cfg["frame_diff_floor"],
+            float(np.mean(diffs)), cfg["frame_diff_floor"])
     c0 = cond[0] if cond.ndim == 4 else cond
     d0 = float(np.abs(frames[0].astype(np.int32) - c0.astype(np.int32)).mean())
     add("frame0_close_to_conditioning", d0 < cfg["frame0_max_delta"],
