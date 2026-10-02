@@ -120,7 +120,9 @@ def generate_video(model, vae, first_frame: np.ndarray, action: np.ndarray,
 
 
 def validate_item(frames: np.ndarray, conditioning: np.ndarray, expected_count: int,
-                  *, pixel_std_floor: float = 2.0, diff_floor: float = 1.0) -> dict:
+                  *, pixel_std_floor: float = 2.0, diff_floor: float = 0.5) -> dict:
+    # diff_floor 0.5 == the S1 temporal_motion threshold on the SAME statistic
+    # (clip-mean consecutive difference); one floor, not two.
     checks = {}
 
     def add(name, passed, value, threshold):
@@ -134,8 +136,14 @@ def validate_item(frames: np.ndarray, conditioning: np.ndarray, expected_count: 
     if len(frames) > 1:
         diffs = [float(np.abs(frames[i + 1].astype(np.int32) - frames[i].astype(np.int32)).mean())
                  for i in range(len(frames) - 1)]
-        add("consecutive_frame_difference_above_floor", min(diffs) > diff_floor,
-            min(diffs), diff_floor)
+        # MEAN over the clip, the same statistic as s1_checks' temporal_motion:
+        # this is a "model emits a still" detector.  The first two clip frames
+        # sample the 0.1 s hold phase before the arm moves, so the REAL video is
+        # still there too, and requiring every consecutive pair to move failed
+        # every correct generation (DEVIATIONS.md, 2026-10-02).
+        add("consecutive_frame_difference_above_floor", float(np.mean(diffs)) > diff_floor,
+            float(np.mean(diffs)), diff_floor)
+        add("max_consecutive_frame_difference", max(diffs) > diff_floor, max(diffs), diff_floor)
     d0 = float(np.abs(frames[0].astype(np.int32) - conditioning.astype(np.int32)).mean())
     add("frame0_close_to_conditioning", d0 < 40.0, d0, 40.0)
     checks["_all_passed"] = all(v["passed"] for v in checks.values() if isinstance(v, dict))
@@ -244,6 +252,16 @@ def main() -> int:
         item_id = f"{tup:07d}"
         path = outdir / f"{item_id}.npz"
         if path.exists():
+            # Already generated (requeue, or a re-run after a validator change):
+            # re-validate it with the CURRENT checks and carry it in this shard's
+            # manifest, instead of silently skipping it as done.
+            with np.load(path) as z:
+                gen0, cond0 = z["generated"], z["conditioning"]
+            checks = validate_item(gen0, cond0[0], expected_count=n_frames)
+            manifest.append({"id": item_id, "sha256": hashlib.sha256(gen0.tobytes()).hexdigest(),
+                             "passed": checks["_all_passed"], "checks": checks,
+                             "existing": True})
+            n_fail += int(not checks["_all_passed"])
             continue
         with np.load(clip_path) as z:
             real = z["clip"].copy()
