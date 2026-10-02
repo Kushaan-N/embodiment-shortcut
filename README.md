@@ -36,7 +36,7 @@ occupied in RL.
 | 10. Pre-registration (`prereg.md`, public push) | §0.5 lock | **PASS** 2026-09-29 (`d2fdc9e`) |
 | 11. Experiment E — the confound | **C1, C2** (Holm) | **both SUPPORTED** — G(A-std)/floor 0.151 [0.115, 0.188] < 0.25; err(A-del) 44.7 % < 72 %; T5, T8 hold |
 | 11. Experiments F, G, masking (exploratory) | — | done; see `DEVIATIONS.md` for two mis-specified predictions |
-| 12. Experiment H — world-model ladder | C3 | **running** (launched 2026-10-01) |
+| 12. Experiment H — world-model ladder | C3 | 3 models trained (120k steps); generation re-running after a validator fix (`DEVIATIONS.md` 2026-10-02) |
 
 Measured gate values are in `results/*/results.json`; `python analyze.py`
 prints them all with thresholds and PASS/FAIL.
@@ -178,8 +178,8 @@ prereg_lock.py       the §0.5 mechanical lock (no skip flag)
 exp_*.py             one file per experiment
 analyze.py           the ONLY place that turns arrays into verdicts
 wm/                  Experiment H: vae.py, wm_train.py, wm_generate.py, exp_h.py, ladder.yaml
-unity/               preflight.py, validate.py, env.sh, sbatch: corpus/probes/train_idm/
-                     wm_train/wm_generate/run (generic), escalation ladder, HANDOFF.md
+unity/               pipeline.sh (one-command chain), preflight.py, validate.py, env.sh,
+                     sync_results.sh, sbatch: corpus/probes/train_idm/wm_train/wm_generate/run
 tests/               114 tests: distances, priors, stats, splits, validators, clips
 ```
 
