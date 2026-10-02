@@ -153,6 +153,11 @@ Every command below was checked against the actual argparse surface on
 Each :hand: is a human checkpoint. **If a gate fails, STOP** and report the
 measured number against its threshold.
 
+**One command runs the chain.** `bash unity/pipeline.sh --from <stage>` submits
+every stage from there on as one SLURM dependency chain (stages: `corpus idm
+floors prereg-check e h gen`); a failed gate stops everything after it. The
+per-stage commands below are what it submits.
+
 **Nothing computes on a login node.** CPU steps go through `unity/run.sbatch`
 (a CPU allocation by default); one-off GPU steps use the same file with the
 hardware on the command line; the big stages have their own array scripts.
