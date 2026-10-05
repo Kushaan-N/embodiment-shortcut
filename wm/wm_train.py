@@ -162,17 +162,21 @@ class VideoWorldModel(nn.Module):
 # ==========================================================================
 
 
-def resolve_model(name: str) -> dict:
-    doc = yaml.safe_load(LADDER_PATH.read_text())
+def resolve_model(name: str, ladder_path: Path = LADDER_PATH) -> dict:
+    doc = yaml.safe_load(Path(ladder_path).read_text())
     base = doc["base"]
     for m in doc["models"]:
-        if m["name"] == name or m["name"].startswith(name):
-            cfg = json.loads(json.dumps(base))
-            for k, v in (m.get("overrides") or {}).items():
-                cfg[k].update(v)
-            cfg["_model"] = m
-            cfg["_evaluation"] = doc["evaluation"]
-            return cfg
+        if m["name"] == name:
+            break
+    else:
+        m = next((m for m in doc["models"] if m["name"].startswith(name)), None)
+    if m is not None:   # exact name first; prefix match only as a fallback
+        cfg = json.loads(json.dumps(base))
+        for k, v in (m.get("overrides") or {}).items():
+            cfg[k].update(v)
+        cfg["_model"] = m
+        cfg["_evaluation"] = doc["evaluation"]
+        return cfg
     raise SystemExit(f"unknown model {name!r}; options: "
                      f"{[m['name'] for m in doc['models']]}")
 
@@ -389,6 +393,8 @@ class Trainer:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--model", default="WM-base")
+    ap.add_argument("--ladder", type=Path, default=LADDER_PATH,
+                    help="ladder spec (wm/ladder_v2.yaml for prereg_addendum_H2.md)")
     ap.add_argument("--vae", type=Path, default=C.CHECKPOINT_ROOT / "wm" / "vae" / "vae.pt")
     ap.add_argument("--clips", type=Path, default=C.DATA_ROOT / "wm_clips")
     ap.add_argument("--steps", type=int, default=None)
@@ -406,7 +412,7 @@ def main() -> int:
                          "first 2 h training window is spent training)")
     args = ap.parse_args()
 
-    cfg = resolve_model(args.model)
+    cfg = resolve_model(args.model, args.ladder)
     if args.steps:
         cfg["train"]["steps"] = args.steps
     t = cfg["transformer"]
@@ -454,7 +460,7 @@ def main() -> int:
     # first window that spends minutes encoding and only then starts its 1.8 h
     # budget would overrun the 2 h SLURM limit and be killed mid-checkpoint.
     outdir = Path(args.out) / args.model
-    ladder_doc = yaml.safe_load(LADDER_PATH.read_text())
+    ladder_doc = yaml.safe_load(Path(args.ladder).read_text())
     keep_steps = [m["checkpoint_at"] for m in ladder_doc["models"] if "checkpoint_at" in m]
     trainer = Trainer(outdir, args.max_hours, keep_steps=keep_steps)
 
