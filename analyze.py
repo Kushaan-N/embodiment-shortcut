@@ -446,11 +446,39 @@ def analyze_masking(root: Path) -> None:
           "  mask probes never remove the object from the SCENE, only from the INPUT.")
 
 
+def analyze_h2(root: Path) -> None:
+    """prereg_addendum_H2.md: the rebuilt ladder, sealed by its own lock."""
+    out = root / "exp_h2"
+    add = C.REPO_ROOT / "prereg_addendum_H2.md"
+    rep = prereg_lock.check([out / "results.json"], prereg_path=add)
+    rule("EXPERIMENT H2 -- rebuilt world-model ladder (prereg_addendum_H2.md)")
+    print(rep.render())
+    if not rep.passed:
+        raise prereg_lock.PreregViolation("H2 is sealed until prereg_addendum_H2.md's lock passes")
+    cal = _load(root / "exp_h2_calibration" / "results.json")
+    if cal:
+        print(f"\n  corruption: friction x{cal['selected_k']}  (threshold T={cal['threshold_T']:.5f})")
+        for k, c in cal["candidates"].items():
+            print(f"    x{k:<5s} D={c['D']:.5f} ({c['D_over_T']:.2f} T) keep_min="
+                  f"{min(c['keep'].values()):.2f}  {'qualifies' if c['qualifies'] else '-'}")
+    _print_ladder(out, "H2")
+    res = _load(out / "results.json") or {}
+    pc = res.get("c3b_h2")
+    if pc:
+        verdict("C3(b)-H2  OG-AF separates the wrong-physics model more than the standard metric",
+                pc["delta"], 0.0, pc["verdict"] == "SUPPORTED", ci=tuple(pc["delta_ci"]))
+        print(f"    d_std ={pc['d_std']:+.3f} {pc['d_std_ci']}   d_ogaf={pc['d_ogaf']:+.3f} "
+              f"{pc['d_ogaf_ci']}   n={pc['n_pairs']}   -> {pc['verdict']}")
+
+
 def analyze_h(root: Path) -> None:
-    out = root / "exp_h"
-    prereg_lock.require("h", [out / "results.json"])
-    res = _load(out / "results.json")
+    prereg_lock.require("h", [root / "exp_h" / "results.json"])
     rule("EXPERIMENT H -- world-model ladder (C3) (§9-H)")
+    _print_ladder(root / "exp_h", "H")
+
+
+def _print_ladder(out: Path, label: str) -> None:
+    res = _load(out / "results.json")
     if res is None:
         print("  not run")
         return
@@ -523,7 +551,7 @@ ANALYSES = {
     "0": analyze_0, "a": analyze_a, "b": analyze_b, "c": analyze_c,
     "corpus": analyze_corpus, "d": analyze_d, "power": analyze_power,
     "e": analyze_e, "f": analyze_f, "g": analyze_g,
-    "masking": analyze_masking, "subset": analyze_subset, "h": analyze_h,
+    "masking": analyze_masking, "subset": analyze_subset, "h": analyze_h, "h2": analyze_h2,
 }
 UNSEALED_ORDER = ["0", "a", "b", "c", "subset", "corpus", "d", "power", "masking"]
 SEALED_ORDER = ["e", "f", "g", "h"]
