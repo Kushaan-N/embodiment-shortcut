@@ -178,6 +178,70 @@ def dino_state_distance(generated: np.ndarray, real: np.ndarray, encoder_name: s
     return expb.cosine_distance(a, b)
 
 
+OBJECT_MASK_THRESHOLD = 20   # grey levels; prereg_addendum_H2.md §4
+
+
+def object_region_error(generated: np.ndarray, real: np.ndarray, absent: np.ndarray,
+                        thr: int = OBJECT_MASK_THRESHOLD) -> np.ndarray:
+    """Per-item error on the OBJECT's pixels only (prereg_addendum_H2.md §4).
+
+    Mask M_t = pixels where max_channel |real_t - absent_t| > thr, i.e. where
+    the real INTERACT frame differs from the same-tuple ABSENT frame (same arm,
+    no object): the object and its shadow.  Error = sum |gen - real| over M,
+    normalised by 3 * |M| * 255.  Whole-clip pixel error is dominated by the
+    arm and background (the object is ~2 % of the frame), which is why
+    Experiment H's ladder gate could not see a physics corruption.
+    """
+    out = np.empty(len(generated), dtype=np.float64)
+    for i in range(len(generated)):
+        r = real[i].astype(np.int16)
+        m = (np.abs(r - absent[i].astype(np.int16)).max(axis=-1) > thr)        # (T, H, W)
+        n = int(m.sum())
+        if n == 0:
+            out[i] = np.nan
+            continue
+        d = np.abs(generated[i].astype(np.int16) - r)                          # (T, H, W, 3)
+        out[i] = float(d[m].sum()) / (3.0 * n * 255.0)
+    return out
+
+
+def load_real_clips(tuple_ids, geometry: str, condition: str, clip_root: Path) -> np.ndarray:
+    """Real WM clips (same renderer and time grid as training) for these tuples."""
+    clips = []
+    for t in tuple_ids:
+        p = Path(clip_root) / geometry / condition / f"{int(t):07d}.npz"
+        with np.load(p) as z:
+            clips.append(z["clip"])
+    return np.stack(clips)
+
+
+def paired_contrast(std_a, std_b, og_a, og_b, ids_a, ids_b, *, n_boot: int = 10_000,
+                    rng_seed: int = C.BOOTSTRAP_SEED) -> dict:
+    """prereg_addendum_H2.md §5: paired d for the standard metric and OG-AF,
+    and their contrast, on the SAME bootstrap resamples of tuples."""
+    a_s = {int(t): float(v) for t, v in zip(ids_a, std_a)}
+    b_s = {int(t): float(v) for t, v in zip(ids_b, std_b)}
+    a_o = {int(t): float(v) for t, v in zip(ids_a, og_a)}
+    b_o = {int(t): float(v) for t, v in zip(ids_b, og_b)}
+    common = sorted(set(a_s) & set(b_s))
+    ds = np.array([b_s[t] - a_s[t] for t in common])
+    do = np.array([b_o[t] - a_o[t] for t in common])
+
+    def d(x):
+        sd = x.std(ddof=1)
+        return float(x.mean() / sd) if sd > 0 else 0.0
+
+    rng = np.random.default_rng(rng_seed)
+    bs, bo = np.empty(n_boot), np.empty(n_boot)
+    for i in range(n_boot):
+        idx = rng.integers(0, len(common), size=len(common))
+        bs[i], bo[i] = d(ds[idx]), d(do[idx])
+    q = lambda x: [float(np.percentile(x, 2.5)), float(np.percentile(x, 97.5))]  # noqa: E731
+    return {"n_pairs": len(common), "d_std": d(ds), "d_std_ci": q(bs),
+            "d_ogaf": d(do), "d_ogaf_ci": q(bo),
+            "delta": d(do) - d(ds), "delta_ci": q(bo - bs)}
+
+
 def ground_truth_error(generated: np.ndarray, real: np.ndarray) -> np.ndarray:
     """Privileged comparison against the simulator's own video.
 
@@ -244,12 +308,25 @@ def main() -> int:
     ap.add_argument("--seeds", type=int, nargs="+", default=[0])
     ap.add_argument("--encoder", default=C.GATE_B_SELECTED_ENCODER)
     ap.add_argument("--out", type=Path, default=C.RESULTS_ROOT / "exp_h")
+    ap.add_argument("--ladder", type=Path, default=LADDER_PATH)
+    ap.add_argument("--clips", type=Path, default=C.DATA_ROOT / "wm_clips",
+                    help="real WM clips (INTERACT + ABSENT) for the object-region ground truth")
     args = ap.parse_args()
 
     lock = prereg_lock.require("h", [args.out / "results.json"])
     print(lock.render(), "\n")
 
-    ladder = yaml.safe_load(LADDER_PATH.read_text())
+    ladder = yaml.safe_load(Path(args.ladder).read_text())
+    gate_gt = ladder.get("ladder_gt", "whole_clip")
+    c3b = ladder.get("c3b", {"base": "WM-base-100", "corrupted": "WM-physics-corrupted"})
+    if ladder.get("addendum"):
+        # A ladder registered by an addendum is sealed by THAT document's lock.
+        add = C.REPO_ROOT / ladder["addendum"]
+        cal = C.RESULTS_ROOT / "exp_h2_calibration" / "results.json"
+        rep = prereg_lock.check([args.out / "results.json", cal], prereg_path=add)
+        print(rep.render(), "\n")
+        if not rep.passed:
+            raise prereg_lock.PreregViolation(f"{add.name} lock failed; H2 is sealed")
     names = [m["name"] for m in ladder["models"]]
     dev = idm.device()
 
@@ -269,6 +346,12 @@ def main() -> int:
         # never saw, and every C3 number would be an artefact.  The clip's
         # frame_indices (video-rate) locate the frame nearest s_std per item.
         scores = score_generated(name, g, args, dev)
+        absent = load_real_clips(g["tuple_index"], args.geometry, "ABSENT", args.clips)
+        og = object_region_error(g["generated"], g["real"], absent)
+        if not np.isfinite(og).all():
+            raise RuntimeError(f"{name}: empty object mask for {int((~np.isfinite(og)).sum())} items")
+        scores["object_gt"] = og
+        print(f"  {name:24s} object-region GT={og.mean():.5f}", flush=True)
         for k, v in scores.items():
             arrays[f"{name}_{k}"] = v
         arrays[f"{name}_tuple_index"] = g["tuple_index"]
@@ -286,10 +369,13 @@ def main() -> int:
         raise RuntimeError(f"ladder models were scored on different tuple sets: {sizes}; "
                            f"finish/redo generation so every model has the same items")
     if len(present) >= 3:
-        gts = [per_model[n]["ground_truth"].mean() for n in present]
+        gt_key = "object_gt" if gate_gt == "object_region" else "ground_truth"
+        gts = [float(per_model[n][gt_key].mean()) for n in present]
         rho = spearman(np.arange(len(present)), gts)
         results["ladder_monotone"] = {
-            "models": present, "ground_truth_means": gts, "spearman": rho,
+            "models": present, "ground_truth_means": gts, "spearman": rho, "gt_metric": gt_key,
+            "object_gt_means": [float(per_model[n]["object_gt"].mean()) for n in present],
+            "whole_clip_gt_means": [float(per_model[n]["ground_truth"].mean()) for n in present],
             "passed": bool(rho > 0.9),
             "note": "if this fails the ladder is not a ladder and the between-model "
                     "C3(b) claims are void (§9-H)",
@@ -313,8 +399,19 @@ def main() -> int:
         results["between_model"]["void"] = ("ladder not verified monotone; C3(b) is "
                                             "void and was not computed (§9-H)")
         print("\n  C3(b): VOID -- ladder not verified monotone; not computed (§9-H)")
-    if ladder_ok and "WM-base-100" in per_model and "WM-physics-corrupted" in per_model:
-        a, b = per_model["WM-base-100"], per_model["WM-physics-corrupted"]
+    if ladder_ok and c3b["base"] in per_model and c3b["corrupted"] in per_model:
+        a, b = per_model[c3b["base"]], per_model[c3b["corrupted"]]
+        if ladder.get("addendum"):
+            pc = paired_contrast(a["standard"], b["standard"], a["ogaf"], b["ogaf"],
+                                 arrays[f"{c3b['base']}_tuple_index"],
+                                 arrays[f"{c3b['corrupted']}_tuple_index"])
+            sup = pc["d_ogaf_ci"][0] > 0 and pc["delta_ci"][0] > 0
+            ref = pc["delta_ci"][1] < 0
+            pc["verdict"] = "SUPPORTED" if sup else ("REFUTED" if ref else "INCONCLUSIVE")
+            results["c3b_h2"] = pc
+            print(f"\n  C3(b)-H2 (prereg_addendum_H2.md §5): d_std={pc['d_std']:+.3f} "
+                  f"{pc['d_std_ci']}  d_ogaf={pc['d_ogaf']:+.3f} {pc['d_ogaf_ci']}  "
+                  f"delta={pc['delta']:+.3f} {pc['delta_ci']}  -> {pc['verdict']}")
         results["between_model"]["corrupted_vs_base"] = {
             "standard_effect": cohens_d(b["standard"], a["standard"]),
             "standard_clean_effect": cohens_d(b["standard_clean"], a["standard_clean"]),
@@ -323,7 +420,7 @@ def main() -> int:
             "ground_truth_effect": cohens_d(b["ground_truth"], a["ground_truth"]),
         }
         # Paired companion to each unpaired d: same tuples, per-tuple differences.
-        ta, tb = arrays["WM-base-100_tuple_index"], arrays["WM-physics-corrupted_tuple_index"]
+        ta, tb = arrays[f"{c3b['base']}_tuple_index"], arrays[f"{c3b['corrupted']}_tuple_index"]
         results["between_model"]["corrupted_vs_base_paired"] = {
             k: paired_effect(a[k], ta, b[k], tb)
             for k in ("standard", "standard_clean", "ogaf", "dino", "ground_truth")
