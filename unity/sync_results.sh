@@ -8,9 +8,14 @@
 set -euo pipefail
 : "${OGAF_RESULTS:?source unity/env.sh (or the workspace activate.sh) first}"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Directories whose COMMITTED record is the original (pre-Unity) measurement;
+# the Unity re-runs of these live in results/<name>_repro and must not
+# overwrite the originals.
+SKIP=" exp_0 verification_subset exp_b exp_c exp_a "
 n=0
 for d in "$OGAF_RESULTS"/*/; do
   name=$(basename "$d")
+  [[ "$SKIP" == *" $name "* ]] && continue
   for f in results.json report.json floors.json power.json thresholds.json metadata.json; do
     [[ -f "$d/$f" ]] || continue
     mkdir -p "$REPO/results/$name"
