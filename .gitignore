@@ -16,6 +16,9 @@ results/*/*
 !results/*/metadata.json
 !results/exp_d/floors.json
 !results/power/power.json
+# Experiment H per-item scores (83 KB): the paper tables and any re-analysis
+# of C3 need them, and they are tiny.
+!results/exp_h/ladder.npz
 logs/
 *.npz
 *.npy
