@@ -1,0 +1,150 @@
+{
+  "between_model": {
+    "void": "ladder not verified monotone; C3(b) is void and was not computed (\u00a79-H)"
+  },
+  "domain_gap": {
+    "WM-base-10": {
+      "dino": 0.09490381926298141,
+      "ground_truth": 0.0032679791374442954,
+      "n": 193,
+      "note": "no object -> physics divergence is zero by construction; these are the rendering/domain-gap floors of each metric",
+      "ogaf": 0.2402213766002593,
+      "standard": 0.16111232382111587,
+      "standard_clean": 0.19362681993199166
+    },
+    "WM-base-100": {
+      "dino": 0.09352928400039673,
+      "ground_truth": 0.00279625883967632,
+      "n": 193,
+      "note": "no object -> physics divergence is zero by construction; these are the rendering/domain-gap floors of each metric",
+      "ogaf": 0.23870046843431988,
+      "standard": 0.15244109387470267,
+      "standard_clean": 0.18518293938338648
+    },
+    "WM-base-30": {
+      "dino": 0.0955120250582695,
+      "ground_truth": 0.002915844365759108,
+      "n": 193,
+      "note": "no object -> physics divergence is zero by construction; these are the rendering/domain-gap floors of each metric",
+      "ogaf": 0.2385825840225144,
+      "standard": 0.1539739655574051,
+      "standard_clean": 0.18650922755008023
+    },
+    "WM-data-poor": {
+      "dino": 0.10217497497797012,
+      "ground_truth": 0.0040591276020196165,
+      "n": 193,
+      "note": "no object -> physics divergence is zero by construction; these are the rendering/domain-gap floors of each metric",
+      "ogaf": 0.23826748817962906,
+      "standard": 0.2219217255125627,
+      "standard_clean": 0.23615854973807332
+    },
+    "WM-physics-corrupted": {
+      "dino": 0.08671993017196655,
+      "ground_truth": 0.002686170430538507,
+      "n": 193,
+      "note": "no object -> physics divergence is zero by construction; these are the rendering/domain-gap floors of each metric",
+      "ogaf": 0.24413408535807937,
+      "standard": 0.14929378388186007,
+      "standard_clean": 0.1855409269553123
+    }
+  },
+  "domain_shift": {
+    "WM-base-10": {
+      "clean_minus_augmented": 0.032806150095314957,
+      "dino_generated_vs_real": 0.08238305151462555,
+      "standard_augmented": 0.14331555412492789,
+      "standard_clean": 0.17612170422024284
+    },
+    "WM-base-100": {
+      "clean_minus_augmented": 0.03342402611015238,
+      "dino_generated_vs_real": 0.07030593603849411,
+      "standard_augmented": 0.1409185868098053,
+      "standard_clean": 0.17434261291995767
+    },
+    "WM-base-30": {
+      "clean_minus_augmented": 0.033842459219543014,
+      "dino_generated_vs_real": 0.06961057335138321,
+      "standard_augmented": 0.14122287179487641,
+      "standard_clean": 0.17506533101441943
+    },
+    "WM-data-poor": {
+      "clean_minus_augmented": 0.022854837147441576,
+      "dino_generated_vs_real": 0.16334210336208344,
+      "standard_augmented": 0.18317206103531722,
+      "standard_clean": 0.2060268981827588
+    },
+    "WM-physics-corrupted": {
+      "clean_minus_augmented": 0.033028901120386756,
+      "dino_generated_vs_real": 0.07084837555885315,
+      "standard_augmented": 0.1422149213565131,
+      "standard_clean": 0.17524382247689985
+    }
+  },
+  "geometry": "box",
+  "ladder_monotone": {
+    "ground_truth_means": [
+      0.0034462911344138904,
+      0.0036092292859182962,
+      0.004276844508810449,
+      0.007040260359607043,
+      0.004018738361123398
+    ],
+    "models": [
+      "WM-base-100",
+      "WM-base-30",
+      "WM-base-10",
+      "WM-data-poor",
+      "WM-physics-corrupted"
+    ],
+    "note": "if this fails the ladder is not a ladder and the between-model C3(b) claims are void (\u00a79-H)",
+    "passed": false,
+    "spearman": 0.7
+  },
+  "prereg_lock": {
+    "artifacts_checked": [],
+    "commit_iso": "2026-09-29T14:37:07+00:00",
+    "commit_precedes_artifacts": true,
+    "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+    "commit_unix": 1790692627.0,
+    "committed": true,
+    "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+    "earliest_artifact_unix": null,
+    "exists_in_worktree": true,
+    "identical": true,
+    "messages": [],
+    "passed": true,
+    "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+    "push_evidence": {
+      "commit_is_ancestor_of_upstream": true,
+      "public_anonymous_https": true,
+      "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+      "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+      "upstream": "origin/main"
+    },
+    "pushed_verified": true,
+    "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+  },
+  "within_model": {
+    "WM-base-10": {
+      "disagreement": 0.8768945969766573,
+      "spearman": 0.12310540302334277
+    },
+    "WM-base-100": {
+      "disagreement": 0.9489560520271353,
+      "spearman": 0.0510439479728647
+    },
+    "WM-base-30": {
+      "disagreement": 0.9743319667752791,
+      "spearman": 0.0256680332247209
+    },
+    "WM-data-poor": {
+      "disagreement": 0.7216795310079589,
+      "spearman": 0.27832046899204105
+    },
+    "WM-physics-corrupted": {
+      "disagreement": 1.009661609956733,
+      "spearman": -0.00966160995673308
+    }
+  }
+}
