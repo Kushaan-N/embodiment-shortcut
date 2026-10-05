@@ -1,0 +1,304 @@
+=== cpu036 :: python analyze.py --exp all ===
+Fri Oct  2 06:58:13 PM UTC 2026
+
+==============================================================================
+EXPERIMENT 0 -- state-space oracles (Gate C0, §9-0)
+==============================================================================
+  [box]
+  C0 arm-only @ s_std (frac of prior)                       0.01177  vs    0.10000  PASS
+  object-only @ s_del (frac of prior)                       0.44533  vs    0.80000  PASS
+  arm channel INTERACT == DECOY @ s_std                     0.00000  vs    0.05000  PASS
+  T9 arm residual carries no action                         0.97241  vs    0.80000  PASS
+  [cylinder]
+  C0 arm-only @ s_std (frac of prior)                       0.01031  vs    0.10000  PASS
+  object-only @ s_del (frac of prior)                       0.41450  vs    0.80000  PASS
+  arm channel INTERACT == DECOY @ s_std                     0.00000  vs    0.05000  PASS
+  T9 arm residual carries no action                         0.98427  vs    0.80000  PASS
+  [sphere]
+  C0 arm-only @ s_std (frac of prior)                       0.01082  vs    0.10000  PASS
+  object-only @ s_del (frac of prior)                       0.11210  vs    0.80000  PASS
+  arm channel INTERACT == DECOY @ s_std                     0.00000  vs    0.05000  PASS
+  T9 arm residual carries no action                         0.97095  vs    0.80000  PASS
+
+  GATE C0: PASS
+
+==============================================================================
+EXPERIMENT A -- contact-regime deltas (§9-A)
+==============================================================================
+  measured at stride 25 steps (20 fps), 5th percentile of nonzero active-phase deltas
+  box       delta_pos_min=  4.7600 mm   delta_rot_min=0.1413 deg               settle_lin=  95.20 mm/s
+  sphere    delta_pos_min=  4.5161 mm   delta_rot_min=n/a (rotation-invariant) settle_lin=  90.32 mm/s
+  cylinder  delta_pos_min=  5.3678 mm   delta_rot_min=0.0204 deg               settle_lin= 107.36 mm/s
+  (these are the sole source of every downstream threshold; nothing is hardcoded)
+
+==============================================================================
+EXPERIMENT B -- encoder resolution floor (Gate B, §9-B, T4)
+==============================================================================
+  dinov2-large / cls: translation @ delta_min               0.54705 sigma  vs    3.00000 sigma  FAIL
+  dinov2-large / cls: rotation @ delta_min                 -1.10089 sigma  vs    3.00000 sigma  FAIL
+  dinov2-large / mean_patch: translation @ delta_min        0.18980 sigma  vs    3.00000 sigma  FAIL
+  dinov2-large / mean_patch: rotation @ delta_min          -1.07573 sigma  vs    3.00000 sigma  FAIL
+  dinov3-vitl16-pretrain-lvd1689m / cls: translation @ delta_min     13.90345 sigma  vs    3.00000 sigma  PASS
+  dinov3-vitl16-pretrain-lvd1689m / cls: rotation @ delta_min     -1.49844 sigma  vs    3.00000 sigma  FAIL
+  dinov3-vitl16-pretrain-lvd1689m / mean_patch: translation @ delta_min      7.00349 sigma  vs    3.00000 sigma  PASS
+  dinov3-vitl16-pretrain-lvd1689m / mean_patch: rotation @ delta_min     -1.55820 sigma  vs    3.00000 sigma  FAIL
+
+  GATE B: PASS
+
+==============================================================================
+EXPERIMENT C -- injectivity (Gate C, §9-C, T3)
+==============================================================================
+  box: unidentifiable frac @ s_del (eps_a=0.1)              0.00000  vs    0.25000  PASS
+                                                         unquotiented 0.00000, s_std 0.00000; binding: quotiented
+  cylinder: unidentifiable frac @ s_del (eps_a=0.1)         0.03448  vs    0.25000  PASS
+                                                         unquotiented 0.00000, s_std 0.00000; binding: quotiented
+  sphere: unidentifiable frac @ s_del (eps_a=0.1)           0.02273  vs    0.25000  PASS
+                                                         unquotiented 0.01136, s_std 0.03409; binding: quotiented
+
+  GATE C: PASS
+
+==============================================================================
+VERIFICATION SUBSET -- arXiv:2604.01985 Prop. 3.1 conditions, descriptive
+==============================================================================
+  geometry   horizon   (i) scene-indep  (iii) subset  object-only
+  box        s_0                  True         97.4%        98.6%
+  box        s_std                True          0.9%        46.7%
+  box        s_del                True         97.4%        44.1%
+  box        s_time               True          0.9%        44.1%
+  sphere     s_0                  True         98.3%       101.1%
+  sphere     s_std                True          0.8%         9.1%
+  sphere     s_del                True         98.3%         9.8%
+  sphere     s_time               True          0.8%         9.8%
+  cylinder   s_0                  True         97.4%       101.8%
+  cylinder   s_std                True          0.7%        46.5%
+  cylinder   s_del                True         97.4%        48.3%
+  cylinder   s_time               True          0.7%        48.3%
+
+  Both (i) and (iii) hold at: s_std, s_time
+
+  Read: the conditions that make a manipulator-only subset a sound
+  VERIFIER are satisfied exactly at the horizon the standard metric uses,
+  and fail at the OG-AF horizon.  Condition (i) IS object-blindness, so a
+  score built on that subset has G = 0 by construction.  The guarantee and
+  the confound are the same property read for different purposes.
+
+  (ii) NOT MEASURABLE in this corpus: (ii) concerns out-of-support transitions, which this corpus does not contain by construction. Reported as unmeasured rather than estimated.
+
+==============================================================================
+CORPUS VALIDATION -- §6 validators, T11 gate, T7 split integrity
+==============================================================================
+  T11 DECOY placement -> action, max ridge R^2              0.00000  vs    0.01000  PASS
+  T7 tuples spanning splits                                 0.00000  vs    0.00000  PASS
+  box/ABSENT             n=  2000  excluded= 0.00%
+  box/DECOY              n=  2000  excluded= 0.00%
+  box/INTERACT           n=  2000  excluded= 0.00%
+  cylinder/ABSENT        n=  2000  excluded= 0.00%
+  cylinder/DECOY         n=  2000  excluded= 0.05%
+      in_frustum                             1 failed (0.05%)  max=20.65
+  cylinder/INTERACT      n=  2000  excluded= 1.10%
+      T5_no_contact_after_withdraw          22 failed (1.10%)  max=11.08
+      T5_settled_pose_match_pos             14 failed (0.70%)  max=0.01623
+  sphere/ABSENT          n=  2000  excluded= 0.00%
+  sphere/DECOY           n=  2000  excluded= 0.00%
+  sphere/INTERACT        n=  2000  excluded= 0.00%
+
+  CORPUS GATE: PASS
+
+==============================================================================
+EXPERIMENT D -- identifiability floors, INTERACT held-out only (§9-D)
+==============================================================================
+  prior baseline (normalised MAE) = 0.25000
+
+  variant       geometry       floor  % of prior   seed min   seed max
+  A-clip-del    box          0.00603        2.4%    0.00571    0.00621
+  A-clip-del    cylinder     0.00549        2.2%    0.00529    0.00575
+  A-clip-del    pooled       0.00556        2.2%    0.00541    0.00573
+  A-clip-del    sphere       0.00522        2.1%    0.00511    0.00533
+  A-del         box          0.11718       46.9%    0.11364    0.12157
+  A-del         cylinder     0.10374       41.5%    0.10135    0.10940
+  A-del         pooled       0.11171       44.7%    0.10984    0.11614
+  A-del         sphere       0.11368       45.5%    0.11079    0.11712
+  A-std         box          0.00552        2.2%    0.00529    0.00581
+  A-std         cylinder     0.00456        1.8%    0.00437    0.00479
+  A-std         pooled       0.00482        1.9%    0.00469    0.00498
+  A-std         sphere       0.00443        1.8%    0.00434    0.00452
+  A-time        box          0.01220        4.9%    0.01175    0.01292
+  A-time        cylinder     0.00939        3.8%    0.00912    0.00951
+  A-time        pooled       0.01026        4.1%    0.01001    0.01054
+  A-time        sphere       0.00935        3.7%    0.00912    0.00981
+
+==============================================================================
+POWER ANALYSIS -> pre-registered n (§9)
+==============================================================================
+  variant=A-std  MDE=25% of floor  alpha=0.05  power=0.9  assumed rho=0.0 (conservative)
+  box: required n vs held-out pairs available             102.00000  vs  200.00000  PASS
+  cylinder: required n vs held-out pairs available         89.00000  vs  200.00000  PASS
+  pooled: required n vs held-out pairs available           96.00000  vs  200.00000  PASS
+  sphere: required n vs held-out pairs available           84.00000  vs  200.00000  PASS
+
+==============================================================================
+MASKING DECOMPOSITION (§8.4) -- Architecture B, descriptive support
+==============================================================================
+  B-del    (s_del ) arm_masked     MAE=0.12181 [0.11952,0.12405]   48.7% of prior
+  B-del    (s_del ) full           MAE=0.11648 [0.11431,0.11851]   46.6% of prior
+  B-del    (s_del ) object_masked  MAE=0.15649 [0.15327,0.15984]   62.6% of prior
+  B-std    (s_std ) arm_masked     MAE=0.12008 [0.11666,0.12374]   48.0% of prior
+  B-std    (s_std ) full           MAE=0.02935 [0.02890,0.02980]   11.7% of prior
+  B-std    (s_std ) object_masked  MAE=0.02465 [0.02403,0.02529]    9.9% of prior
+  B-time   (s_time) arm_masked     MAE=0.12168 [0.11887,0.12451]   48.7% of prior
+  B-time   (s_time) full           MAE=0.02926 [0.02880,0.02973]   11.7% of prior
+  B-time   (s_time) object_masked  MAE=0.02388 [0.02330,0.02448]    9.6% of prior
+
+  s_del: object-pixels informative, arm-pixels ~ prior      0.46591  vs          -  FAIL
+    full=46.6%  arm_px=62.6%  obj_px=48.7%  (of prior)
+  s_std: arm-pixels ~ full << prior, object-pixels ~ p      0.11738  vs          -  FAIL
+    full=11.7%  arm_px=9.9%  obj_px=48.0%  (of prior)
+  s_time: object-pixels informative, arm-pixels ~ prio      0.11704  vs          -  FAIL
+    full=11.7%  arm_px=9.6%  obj_px=48.7%  (of prior)
+
+  If these agree with the DECOY-based Experiment E result, T2 is dead: the
+  mask probes never remove the object from the SCENE, only from the INPUT.
+
+==============================================================================
+EXPERIMENT E -- the confound (C1, C2, T5, T8) (§9-E)
+==============================================================================
+PRE-REGISTRATION LOCK: PASS
+  prereg file        : /work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md
+  in working tree    : True
+  committed          : True  (d2fdc9e44517 @ 2026-09-29T14:37:07+00:00)
+  byte-identical     : True
+  precedes artifacts : True
+  pushed (public)    : True  {'upstream': 'origin/main', 'commit_is_ancestor_of_upstream': True, 'remote_url': 'git@github.com:Kushaan-N/embodiment-shortcut.git', 'public_probe_url': 'https://github.com/Kushaan-N/embodiment-shortcut.git', 'public_anonymous_https': True}
+
+  prior=0.25000   tau_1=0.25 (fraction of the s_std floor, pre-declared before E)
+
+  [A-clip-del]  floor=0.00556
+    err(ABSENT   ) = 0.00499 [0.00483,0.00515]    2.0% of prior
+    err(DECOY    ) = 0.00631 [0.00615,0.00648]    2.5% of prior
+    err(INTERACT ) = 0.00556 [0.00540,0.00571]    2.2% of prior
+    G = +0.00075 [+0.00063,+0.00089]   = +0.136 x floor
+  [A-del]  floor=0.11171
+    err(ABSENT   ) = 0.24636 [0.24334,0.24939]   98.5% of prior
+    err(DECOY    ) = 0.24757 [0.24453,0.25056]   99.0% of prior
+    err(INTERACT ) = 0.11172 [0.10900,0.11476]   44.7% of prior
+    G = +0.13524 [+0.13136,+0.13873]   = +1.211 x floor
+  [A-std]  floor=0.00482
+    err(ABSENT   ) = 0.00384 [0.00374,0.00395]    1.5% of prior
+    err(DECOY    ) = 0.00555 [0.00539,0.00572]    2.2% of prior
+    err(INTERACT ) = 0.00482 [0.00468,0.00496]    1.9% of prior
+    G = +0.00073 [+0.00055,+0.00090]   = +0.151 x floor
+  [A-time]  floor=0.01026
+    err(ABSENT   ) = 0.00800 [0.00783,0.00818]    3.2% of prior
+    err(DECOY    ) = 0.01047 [0.01017,0.01081]    4.2% of prior
+    err(INTERACT ) = 0.01024 [0.00996,0.01054]    4.1% of prior
+    G = +0.00022 [-0.00015,+0.00057]   = +0.021 x floor
+  [B-del]  floor=nan
+    err(ABSENT   ) = 0.24544 [0.24333,0.24761]   98.2% of prior
+    err(DECOY    ) = 0.25236 [0.24912,0.25574]  100.9% of prior
+    err(INTERACT ) = 0.11648 [0.11431,0.11851]   46.6% of prior
+    G = +0.13541 [+0.13133,+0.13969]
+  [B-std]  floor=nan
+    err(ABSENT   ) = 0.01390 [0.01370,0.01411]    5.6% of prior
+    err(DECOY    ) = 0.02767 [0.02717,0.02818]   11.1% of prior
+    err(INTERACT ) = 0.02935 [0.02890,0.02980]   11.7% of prior
+    G = -0.00181 [-0.00243,-0.00117]
+  [B-time]  floor=nan
+    err(ABSENT   ) = 0.01419 [0.01397,0.01441]    5.7% of prior
+    err(DECOY    ) = 0.02799 [0.02752,0.02848]   11.2% of prior
+    err(INTERACT ) = 0.02926 [0.02880,0.02973]   11.7% of prior
+    G = -0.00140 [-0.00200,-0.00081]
+
+  C1  G(A-std)/floor  (supported if CI upper < tau_1)       0.15106  vs    0.25000  PASS  95% CI [0.11517, 0.18763]
+  C2  err(A-del, INTERACT) < midpoint(floor, prior)         0.11172  vs    0.18086  PASS  95% CI [0.10900, 0.11476]
+  C2  err(A-del, DECOY) ~ prior (construction check)        0.24757  vs    0.25000  PASS  95% CI [0.24453, 0.25056]
+    This one is expected by construction: at s_del the arm is at
+    canonical rest in every condition, so the DECOY frame pair contains
+    literally zero information about the action.  It is a pipeline
+    sanity check, not evidence (§1).
+  T5  |G(A-time)-G(A-std)| < |G(A-time)-G(A-del)|           0.00051  vs    0.13502  PASS
+    T5 cleared means the effect is driven by arm RETRACTION, not by
+    elapsed time.
+  T8  G(A-clip-del) closer to G(A-std) than to G(A-del)      0.00075  vs    0.00073  PASS  95% CI [0.00063, 0.00089]
+    Prediction: granting clip access re-opens the shortcut.  This turns
+    the would-be bug into a supporting result (§4-T8).
+
+  Holm-Bonferroni over the confirmatory family (2 tests; T5 descriptive), one-sided bootstrap p:
+    C1: G(A-std) < tau_1 * floor                 p=0.0001   Holm-adjusted=0.0002
+    C2: err(A-del, INTERACT) < midpoint          p=0.0001   Holm-adjusted=0.0002
+
+  Architecture B and all ablations are reported as descriptive support only (§10.2).
+
+==============================================================================
+EXPERIMENT F -- friction dose-response (§9-F)
+==============================================================================
+  [A-del]  slope(d MAE / d log friction) = -0.00810  spearman=-0.300  NOT monotone
+    x0.25   MAE=0.15312 [0.14797,0.15835]   61.2% of prior
+    x0.5    MAE=0.11947 [0.11468,0.12431]   47.8% of prior
+    x1      MAE=0.11172 [0.10900,0.11476]   44.7% of prior
+    x2      MAE=0.11872 [0.11294,0.12463]   47.5% of prior
+    x4      MAE=0.12541 [0.11803,0.13318]   50.2% of prior
+  [A-std]  slope(d MAE / d log friction) = -0.00007  spearman=-0.600  NOT monotone
+    x0.25   MAE=0.00474 [0.00451,0.00498]    1.9% of prior
+    x0.5    MAE=0.00474 [0.00451,0.00498]    1.9% of prior
+    x1      MAE=0.00482 [0.00468,0.00496]    1.9% of prior
+    x2      MAE=0.00471 [0.00441,0.00501]    1.9% of prior
+    x4      MAE=0.00451 [0.00420,0.00483]    1.8% of prior
+
+  Prediction: delayed-horizon error responds monotonically; standard-horizon
+  error stays flat.  The IDMs never trained on varied friction BY DESIGN --
+  detecting off-distribution dynamics is the metric's job (§9-F).
+
+==============================================================================
+EXPERIMENT G -- Lipschitz stratification (§9-G)
+==============================================================================
+  L estimated from k=8 sampled perturbations at eps=0.05.
+  max over k sampled perturbations; biased DOWNWARD as an estimate of the true local Lipschitz constant
+  [box] n=300  L_del quantiles(5/25/50/75/95) = 364.33, 780.59, 1137.09, 1505.35, 3397.90
+    stratum 0 L in [159.96,780.59]  n=   55  G=-0.00067 [-0.00208,+0.00088]
+    stratum 1 L in [780.59,1137.09]  n=   30  G=+0.00092 [-0.00031,+0.00234]
+    stratum 2 L in [1137.09,1505.35]  n=   40  G=+0.00085 [-0.00046,+0.00205]
+    stratum 3 L in [1505.35,6057.63]  n=   45  G=+0.00079 [-0.00111,+0.00273]
+  [cylinder] n=294  L_del quantiles(5/25/50/75/95) = 13.56, 19.37, 32.16, 44.69, 88.45
+    stratum 0 L in [10.87,19.37]  n=   35  G=+0.00319 [+0.00139,+0.00542]
+    stratum 1 L in [19.37,32.16]  n=   30  G=+0.00123 [-0.00087,+0.00331]
+    stratum 2 L in [32.16,44.69]  n=   30  G=-0.00044 [-0.00122,+0.00031]
+    stratum 3 L in [44.69,618.04]  n=   20  G=+0.00148 [-0.00014,+0.00300]
+  [sphere] n=300  L_del quantiles(5/25/50/75/95) = 17.46, 24.98, 37.77, 52.77, 67.49
+    stratum 0 L in [12.17,24.98]  n=   35  G=+0.00045 [-0.00106,+0.00173]
+    stratum 1 L in [24.98,37.77]  n=   50  G=+0.00025 [-0.00053,+0.00097]
+    stratum 2 L in [37.77,52.77]  n=   35  G=+0.00200 [+0.00007,+0.00448]
+    stratum 3 L in [52.77,77.40]  n=   30  G=-0.00027 [-0.00110,+0.00049]
+
+  Expect the shortcut worst in the LOW-sensitivity stratum and the fix to
+  matter most in the HIGH one.
+
+==============================================================================
+EXPERIMENT H -- world-model ladder (C3) (§9-H)
+==============================================================================
+  ladder is a ladder: ground-truth error monotone across models 1-5      0.70000  vs    0.90000  FAIL
+    The ladder FAILED.  Between-model claims are void (§9-H); fix the
+    ladder before reporting C3(b).
+  C3(a) WM-base-10: Spearman(standard rank, OG-AF rank) < 0.9      0.12311  vs    0.90000  PASS
+  C3(a) WM-base-100: Spearman(standard rank, OG-AF rank) < 0.9      0.05104  vs    0.90000  PASS
+  C3(a) WM-base-30: Spearman(standard rank, OG-AF rank) < 0.9      0.02567  vs    0.90000  PASS
+  C3(a) WM-data-poor: Spearman(standard rank, OG-AF rank) < 0.9      0.27832  vs    0.90000  PASS
+  C3(a) WM-physics-corrupted: Spearman(standard rank, OG-AF rank) < 0.9     -0.00966  vs    0.90000  PASS
+  C3(b) void: ladder not verified monotone; C3(b) is void and was not computed (§9-H)
+
+  domain shift (INTERACT generations): DINO(gen, real), clean-vs-augmented IDM delta
+    WM-base-10               dino=0.08238  std_aug=0.14332  std_clean=0.17612  delta=+0.03281
+    WM-base-100              dino=0.07031  std_aug=0.14092  std_clean=0.17434  delta=+0.03342
+    WM-base-30               dino=0.06961  std_aug=0.14122  std_clean=0.17507  delta=+0.03384
+    WM-data-poor             dino=0.16334  std_aug=0.18317  std_clean=0.20603  delta=+0.02285
+    WM-physics-corrupted     dino=0.07085  std_aug=0.14221  std_clean=0.17524  delta=+0.03303
+
+  appearance-gap control (ABSENT: no object, physics divergence = 0 by construction)
+    WM-base-10               n= 193 standard=0.16111  ogaf=0.24022  dino=0.09490  gt=0.00327
+    WM-base-100              n= 193 standard=0.15244  ogaf=0.23870  dino=0.09353  gt=0.00280
+    WM-base-30               n= 193 standard=0.15397  ogaf=0.23858  dino=0.09551  gt=0.00292
+    WM-data-poor             n= 193 standard=0.22192  ogaf=0.23827  dino=0.10217  gt=0.00406
+    WM-physics-corrupted     n= 193 standard=0.14929  ogaf=0.24413  dino=0.08672  gt=0.00269
+
+==============================================================================
+Fri Oct  2 06:58:17 PM UTC 2026
+=== exit 0 ===
