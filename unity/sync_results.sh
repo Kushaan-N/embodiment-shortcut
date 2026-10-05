@@ -15,7 +15,8 @@ for d in "$OGAF_RESULTS"/*/; do
     [[ -f "$d/$f" ]] || continue
     mkdir -p "$REPO/results/$name"
     if ! cmp -s "$d/$f" "$REPO/results/$name/$f"; then
-      cp -p "$d/$f" "$REPO/results/$name/$f"; echo "updated results/$name/$f"; n=$((n+1))
+      # no -p: /work does not support preserving mode and set -e would abort the loop
+      cp "$d/$f" "$REPO/results/$name/$f"; echo "updated results/$name/$f"; n=$((n+1))
     fi
   done
 done
