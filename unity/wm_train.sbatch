@@ -57,7 +57,10 @@ source "$_OGAF_REPO/unity/env.sh"
 # it (re)builds the latent cache.
 export OGAF_MAX_HOURS=${OGAF_MAX_HOURS:-1.8}
 
-MODELS=(WM-base WM-data-poor WM-physics-corrupted)
+# OGAF_WM_MODELS / OGAF_WM_LADDER select another ladder (prereg_addendum_H2.md):
+#   OGAF_WM_MODELS=WM-physics-corrupted-v2 OGAF_WM_LADDER=wm/ladder_v2.yaml sbatch --array=0 ...
+read -r -a MODELS <<< "${OGAF_WM_MODELS:-WM-base WM-data-poor WM-physics-corrupted}"
+LADDER_ARGS=(); [[ -n "${OGAF_WM_LADDER:-}" ]] && LADDER_ARGS=(--ladder "$OGAF_WM_LADDER")
 
 if [[ "${1:-}" == "--smoke" ]]; then
   echo "S1: budget report, then 400 steps with a forced checkpoint + resume"
@@ -90,7 +93,7 @@ fi
 # The trainer handles USR1/TERM itself; run it in the foreground so the signal
 # reaches it.  `srun` would forward the signal to the step, which is what we
 # want, but the trap below is the belt-and-braces path.
-srun --unbuffered python wm/wm_train.py --model "$MODEL" &
+srun --unbuffered python wm/wm_train.py --model "$MODEL" "${LADDER_ARGS[@]}" &
 PID=$!
 trap 'echo "forwarding signal to trainer"; kill -USR1 $PID 2>/dev/null || true' USR1 TERM
 # `wait` returns the moment a trapped signal arrives -- while the trainer is
