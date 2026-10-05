@@ -1,0 +1,58 @@
+{
+  "rule": "prereg_addendum_H2.md \u00a72",
+  "data_poor_object_error": 0.11381767727062894,
+  "threshold_T": 0.14227209658828618,
+  "factor": 1.25,
+  "min_keep": 0.8,
+  "candidates": {
+    "0.1": {
+      "k": 0.1,
+      "n_tuples": 173,
+      "D": 0.15453908205574243,
+      "D_over_T": 1.0862220053096923,
+      "keep": {
+        "box": 0.865,
+        "sphere": 0.91,
+        "cylinder": 0.845
+      },
+      "qualifies": true
+    },
+    "0.25": {
+      "k": 0.25,
+      "n_tuples": 200,
+      "D": 0.09597853032169304,
+      "D_over_T": 0.6746124688064471,
+      "keep": {
+        "box": 1.0,
+        "sphere": 1.0,
+        "cylinder": 1.0
+      },
+      "qualifies": false
+    },
+    "4": {
+      "k": 4.0,
+      "n_tuples": 139,
+      "D": 0.07366591338594147,
+      "D_over_T": 0.5177818781930192,
+      "keep": {
+        "box": 0.695,
+        "sphere": 1.0,
+        "cylinder": 0.535
+      },
+      "qualifies": false
+    },
+    "10": {
+      "k": 10.0,
+      "n_tuples": 30,
+      "D": 0.09679093345380964,
+      "D_over_T": 0.6803226758786572,
+      "keep": {
+        "box": 0.15,
+        "sphere": 0.475,
+        "cylinder": 0.1
+      },
+      "qualifies": false
+    }
+  },
+  "selected_k": 0.1
+}
