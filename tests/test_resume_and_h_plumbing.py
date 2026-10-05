@@ -131,3 +131,34 @@ def test_generation_validator_accepts_a_correct_still_start():
     assert chk["_all_passed"], {k: v for k, v in chk.items() if isinstance(v, dict) and not v["passed"]}
     still = np.stack([base] * 16)
     assert not validate_item(still, base, expected_count=16)["_all_passed"]
+
+
+def test_object_region_error_sees_the_object_only():
+    from wm.exp_h import object_region_error
+
+    T, H, W = 4, 32, 32
+    absent = np.full((1, T, H, W, 3), 100, np.uint8)
+    real = absent.copy()
+    real[:, :, 10:14, 10:14] = 250                      # the object
+    gen_moved = absent.copy()
+    gen_moved[:, :, 20:24, 20:24] = 250                 # object in the wrong place
+    gen_good = real.copy()
+    gen_bg = real.copy()
+    gen_bg[:, :, 0:8, :] = 0                            # background wrong, object right
+    assert object_region_error(gen_good, real, absent)[0] == 0.0
+    assert object_region_error(gen_bg, real, absent)[0] == 0.0       # blind to background
+    assert object_region_error(gen_moved, real, absent)[0] > 0.5     # sees the misplaced object
+
+
+def test_paired_contrast_detects_which_metric_separates():
+    from wm.exp_h import paired_contrast
+
+    rng = np.random.default_rng(1)
+    t = np.arange(150)
+    base_s, base_o = rng.normal(0, 1, 150), rng.normal(0, 1, 150)
+    cor_s = base_s + rng.normal(0, 0.3, 150)            # standard: no shift
+    cor_o = base_o + 0.5 + rng.normal(0, 0.3, 150)      # OG-AF: clear shift
+    pc = paired_contrast(base_s, cor_s, base_o, cor_o, t, t, n_boot=500)
+    assert pc["n_pairs"] == 150
+    assert pc["d_ogaf_ci"][0] > 0 and pc["delta_ci"][0] > 0
+    assert pc["d_std_ci"][0] < 0 < pc["d_std_ci"][1]
