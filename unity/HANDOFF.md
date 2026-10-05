@@ -32,7 +32,7 @@ threshold.
 | Pre-registration | §0.5 lock | **PASS** 2026-09-29, commit d2fdc9e (decisions delegated; see prereg.md §9) |
 | Experiment E | C1, C2 | **both SUPPORTED** (Holm p = 0.0002 each); T5, T8 hold |
 | Experiments F, G, masking | exploratory | done; two mis-specified predictions recorded in `DEVIATIONS.md` |
-| Experiment H | C3 | launched 2026-10-01 (VAE -> 3 runs -> 5 x generation + ABSENT controls -> exp_h) |
+| Experiment H | C3(a), C3(b) | done 2026-10-02: C3(a) PASS x5; ladder NOT monotone (0.70 < 0.9) -> C3(b) VOID (§9-H, prereg §7). Standard metric on generated video = 56 % of prior for every base model vs 1.9 % on real video, and the same (61 %) on the no-physics ABSENT control: it is reading the domain gap. OG-AF on generated INTERACT = 47 % of prior ~ its real-video floor (44.7 %). |
 
 **The headline numbers you already own:**
 
