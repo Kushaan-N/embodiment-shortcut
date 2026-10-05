@@ -36,7 +36,7 @@ occupied in RL.
 | 10. Pre-registration (`prereg.md`, public push) | §0.5 lock | **PASS** 2026-09-29 (`d2fdc9e`) |
 | 11. Experiment E — the confound | **C1, C2** (Holm) | **both SUPPORTED** — G(A-std)/floor 0.151 [0.115, 0.188] < 0.25; err(A-del) 44.7 % < 72 %; T5, T8 hold |
 | 11. Experiments F, G, masking (exploratory) | — | done; see `DEVIATIONS.md` for two mis-specified predictions |
-| 12. Experiment H — world-model ladder | C3 | 3 models trained (120k steps); generation re-running after a validator fix (`DEVIATIONS.md` 2026-10-02) |
+| 12. Experiment H — world-model ladder | C3(a), C3(b) | **done** 2026-10-02 — C3(a) PASS for all 5 models (standard/OG-AF rank ρ ≤ 0.28 vs 0.9); **ladder not monotone (ρ = 0.70 < 0.9) → C3(b) void, as registered** |
 
 Measured gate values are in `results/*/results.json`; `python analyze.py`
 prints them all with thresholds and PASS/FAIL.
