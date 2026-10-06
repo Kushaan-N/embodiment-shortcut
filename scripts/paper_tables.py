@@ -107,6 +107,24 @@ def main() -> int:
         sections.append("## Experiment 0 — state oracles (Gate C0), % of prior\n\n"
                         + table(["Geometry", "arm-only @ s_std", "object-only @ s_del", "arm-only @ s_del"], rows))
 
+    rz = _load(R, "exp_resolution", "results.json")
+    if rz:
+        rows = []
+        for b in rz["bins"]:
+            lab = (f"{b['lo_mm']:g}–{b['hi_mm']:g}" if b["hi_mm"] is not None else f"> {b['lo_mm']:g}")
+            cell = lambda v: (f"{b[v]['delta_pct_prior']:+.2f} % [{100 * b[v]['ci'][0] / 0.25:+.2f}, "  # noqa: E731
+                              f"{100 * b[v]['ci'][1] / 0.25:+.2f}], d = {b[v]['d']:+.2f}") if v in b else "n too small"
+            rows.append([lab, b["n"], cell("A-std"), cell("A-del")])
+        thr = rz["detection_threshold_mm"]
+        sections.append("## Resolution curve — error change vs. physics-induced object displacement "
+                        "(post-hoc, exploratory)\n\n"
+                        f"{rz['n_pairs']} (held-out tuple, friction ×k) pairs, k ∈ {rz['multipliers']}; same IDMs, "
+                        "5 seeds averaged.  Δ = error at ×k − error at ×1, as % of the prior; 95 % bootstrap CI.  "
+                        f"Smallest displacement detected (CI > 0 from that bin on): standard (A-std) "
+                        f"≥ {thr.get('A-std')} mm, OG-AF (A-del) ≥ {thr.get('A-del')} mm.  "
+                        "One video frame of motion ≈ 4.9 mm.\n\n"
+                        + table(["Settled-position shift (mm)", "n", "standard Δ", "OG-AF Δ"], rows))
+
     for sub, title in (("exp_h", "Experiment H — world-model ladder"),
                        ("exp_h2", "Experiment H2 — rebuilt ladder (prereg_addendum_H2.md)")):
         _h_section(R, sub, title, sections)
