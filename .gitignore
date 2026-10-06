@@ -19,6 +19,7 @@ results/*/*
 # Experiment H per-item scores (83 KB): the paper tables and any re-analysis
 # of C3 need them, and they are tiny.
 !results/exp_h/ladder.npz
+!results/exp_h2/ladder.npz
 logs/
 *.npz
 *.npy
