@@ -61,6 +61,21 @@ Prior (uniform-action) normalised MAE = 0.25.  G = mean of per-pair [err(DECOY) 
 | sphere | 1.1 % | 11.2 % | 97.1 % |
 | cylinder | 1.0 % | 41.5 % | 98.4 % |
 
+## Resolution curve — error change vs. physics-induced object displacement (post-hoc, exploratory)
+
+1570 (held-out tuple, friction ×k) pairs, k ∈ [0.1, 0.25, 0.5, 2.0, 3.0, 4.0]; same IDMs, 5 seeds averaged.  Δ = error at ×k − error at ×1, as % of the prior; 95 % bootstrap CI.  Smallest displacement detected (CI > 0 from that bin on): standard (A-std) ≥ 80.0 mm, OG-AF (A-del) ≥ 2.5 mm.  One video frame of motion ≈ 4.9 mm.
+
+| Settled-position shift (mm) | n | standard Δ | OG-AF Δ |
+|---|---|---|---|
+| 0–1 | 1 | n too small | n too small |
+| 1–2.5 | 39 | +0.01 % [-0.05, +0.08], d = +0.06 | -0.01 % [-1.36, +1.09], d = -0.00 |
+| 2.5–5 | 204 | +0.03 % [-0.02, +0.07], d = +0.09 | +2.33 % [+1.81, +2.82], d = +0.64 |
+| 5–10 | 389 | -0.01 % [-0.05, +0.03], d = -0.03 | +5.65 % [+5.02, +6.28], d = +0.90 |
+| 10–20 | 288 | +0.02 % [-0.02, +0.06], d = +0.05 | +10.80 % [+9.83, +11.78], d = +1.24 |
+| 20–40 | 217 | +0.04 % [-0.02, +0.10], d = +0.09 | +30.36 % [+28.32, +32.40], d = +1.97 |
+| 40–80 | 226 | +0.02 % [-0.05, +0.09], d = +0.04 | +56.19 % [+53.86, +58.46], d = +3.27 |
+| > 80 | 206 | +0.15 % [+0.07, +0.23], d = +0.26 | +41.11 % [+37.37, +44.94], d = +1.50 |
+
 ## Experiment H — world-model ladder (box, 193 held-out tuples per model)
 
 Ladder gate (ground_truth): Spearman +0.700 vs 0.9 → FAIL; C3(b) between-model claims are void (§9-H).  C3(a) passes when the standard and OG-AF rankings correlate below 0.9.  ABSENT = appearance-gap control (no object: physics divergence is zero by construction).
