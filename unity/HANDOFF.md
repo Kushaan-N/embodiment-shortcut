@@ -32,6 +32,7 @@ threshold.
 | Pre-registration | §0.5 lock | **PASS** 2026-09-29, commit d2fdc9e (decisions delegated; see prereg.md §9) |
 | Experiment E | C1, C2 | **both SUPPORTED** (Holm p = 0.0002 each); T5, T8 hold |
 | Experiments F, G, masking | exploratory | done; two mis-specified predictions recorded in `DEVIATIONS.md` |
+| Experiment H2 (addendum, registered d7ee1f5 before calibration) | C3(b)-H2 | **SUPPORTED** 2026-10-05: calibrated corruption friction x0.1; object-region ladder monotone (rho 1.00); OG-AF paired d +1.94 [1.73, 2.22] vs standard +0.46 [0.37, 0.56]. The standard metric's shift is no larger than its shift on the no-physics ABSENT control (+0.050 vs +0.042 abs. MAE): it registers the corrupted model's poorer rendering, not its physics. OG-AF moves +0.114 on INTERACT and ~0 on ABSENT. |
 | Experiment H | C3(a), C3(b) | done 2026-10-02: C3(a) PASS x5; ladder NOT monotone (0.70 < 0.9) -> C3(b) VOID (§9-H, prereg §7). Standard metric on generated video = 56 % of prior for every base model vs 1.9 % on real video, and the same (61 %) on the no-physics ABSENT control: it is reading the domain gap. OG-AF on generated INTERACT = 47 % of prior ~ its real-video floor (44.7 %). |
 
 **The headline numbers you already own:**
