@@ -1,0 +1,47 @@
+=== uri-cpu082 :: python analyze.py --exp h2 ===
+Mon Oct  5 11:06:01 AM UTC 2026
+
+==============================================================================
+EXPERIMENT H2 -- rebuilt world-model ladder (prereg_addendum_H2.md)
+==============================================================================
+PRE-REGISTRATION LOCK: PASS
+  prereg file        : /work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg_addendum_H2.md
+  in working tree    : True
+  committed          : True  (d7ee1f502558 @ 2026-10-05T03:01:09+00:00)
+  byte-identical     : True
+  precedes artifacts : True
+  pushed (public)    : True  {'upstream': 'origin/main', 'commit_is_ancestor_of_upstream': True, 'remote_url': 'git@github.com:Kushaan-N/embodiment-shortcut.git', 'public_probe_url': 'https://github.com/Kushaan-N/embodiment-shortcut.git', 'public_anonymous_https': True}
+
+  corruption: friction x0.1  (threshold T=0.14227)
+    x0.1   D=0.15454 (1.09 T) keep_min=0.84  qualifies
+    x0.25  D=0.09598 (0.67 T) keep_min=1.00  -
+    x4     D=0.07367 (0.52 T) keep_min=0.54  -
+    x10    D=0.09679 (0.68 T) keep_min=0.10  -
+  ladder is a ladder: ground-truth error monotone across models 1-5      1.00000  vs    0.90000  PASS
+  C3(a) WM-base-10: Spearman(standard rank, OG-AF rank) < 0.9      0.12174  vs    0.90000  PASS
+  C3(a) WM-base-100: Spearman(standard rank, OG-AF rank) < 0.9      0.05152  vs    0.90000  PASS
+  C3(a) WM-base-30: Spearman(standard rank, OG-AF rank) < 0.9      0.02602  vs    0.90000  PASS
+  C3(a) WM-data-poor: Spearman(standard rank, OG-AF rank) < 0.9      0.27930  vs    0.90000  PASS
+  C3(a) WM-physics-corrupted-v2: Spearman(standard rank, OG-AF rank) < 0.9     -0.12101  vs    0.90000  PASS
+  C3(b) corrupted_vs_base: standard d=+0.474, OG-AF d=+1.704, DINO d=+0.072
+  C3(b) corrupted_vs_base_paired (same tuples, n=193): dino=+0.077 [-0.065,+0.218], ground_truth=+1.628 [+1.500,+1.785], ogaf=+1.943 [+1.726,+2.219], standard=+0.463 [+0.369,+0.562], standard_clean=+0.541 [+0.434,+0.652]
+
+  domain shift (INTERACT generations): DINO(gen, real), clean-vs-augmented IDM delta
+    WM-base-10               dino=0.08238  std_aug=0.14332  std_clean=0.17612  delta=+0.03280
+    WM-base-100              dino=0.07031  std_aug=0.14091  std_clean=0.17432  delta=+0.03341
+    WM-base-30               dino=0.06960  std_aug=0.14122  std_clean=0.17504  delta=+0.03382
+    WM-data-poor             dino=0.16336  std_aug=0.18317  std_clean=0.20605  delta=+0.02288
+    WM-physics-corrupted-v2  dino=0.07277  std_aug=0.18316  std_clean=0.21671  delta=+0.03355
+
+  appearance-gap control (ABSENT: no object, physics divergence = 0 by construction)
+    WM-base-10               n= 193 standard=0.16112  ogaf=0.24024  dino=0.09491  gt=0.00327
+    WM-base-100              n= 193 standard=0.15245  ogaf=0.23872  dino=0.09356  gt=0.00280
+    WM-base-30               n= 193 standard=0.15399  ogaf=0.23860  dino=0.09552  gt=0.00292
+    WM-data-poor             n= 193 standard=0.22198  ogaf=0.23828  dino=0.10220  gt=0.00406
+    WM-physics-corrupted-v2  n= 193 standard=0.20314  ogaf=0.24603  dino=0.04966  gt=0.00428
+  C3(b)-H2  OG-AF separates the wrong-physics model more than the standard metric      1.47957  vs    0.00000  PASS  95% CI [1.21554, 1.78616]
+    d_std =+0.463 [0.3692674432475045, 0.5621505080825576]   d_ogaf=+1.943 [1.725855639587291, 2.218502354177312]   n=193   -> SUPPORTED
+
+==============================================================================
+Mon Oct  5 11:06:04 AM UTC 2026
+=== exit 0 ===
