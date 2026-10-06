@@ -63,7 +63,7 @@ Prior (uniform-action) normalised MAE = 0.25.  G = mean of per-pair [err(DECOY) 
 
 ## Experiment H — world-model ladder (box, 193 held-out tuples per model)
 
-Ladder monotone under privileged ground-truth error: Spearman +0.700 vs 0.9 → FAIL; C3(b) between-model claims are void (§9-H).  C3(a) passes when the standard and OG-AF rankings correlate below 0.9.  ABSENT = appearance-gap control (no object: physics divergence is zero by construction).
+Ladder gate (ground_truth): Spearman +0.700 vs 0.9 → FAIL; C3(b) between-model claims are void (§9-H).  C3(a) passes when the standard and OG-AF rankings correlate below 0.9.  ABSENT = appearance-gap control (no object: physics divergence is zero by construction).
 
 | Model | GT error | standard (gen) | OG-AF (gen) | DINO(gen,real) | C3(a) ρ | standard (ABSENT) | OG-AF (ABSENT) |
 |---|---|---|---|---|---|---|---|
@@ -72,3 +72,17 @@ Ladder monotone under privileged ground-truth error: Spearman +0.700 vs 0.9 → 
 | WM-base-10 | 0.00428 | 57.3 % | 47.2 % | 0.0824 | +0.123 | 64.4 % | 96.1 % |
 | WM-data-poor | 0.00704 | 73.3 % | 53.3 % | 0.1633 | +0.278 | 88.8 % | 95.3 % |
 | WM-physics-corrupted | 0.00402 | 56.9 % | 48.4 % | 0.0708 | -0.010 | 59.7 % | 97.7 % |
+
+## Experiment H2 — rebuilt ladder (prereg_addendum_H2.md) (box, 193 held-out tuples per model)
+
+Ladder gate (object_gt): Spearman +1.000 vs 0.9 → PASS.  C3(a) passes when the standard and OG-AF rankings correlate below 0.9.  ABSENT = appearance-gap control (no object: physics divergence is zero by construction).
+
+| Model | GT error | standard (gen) | OG-AF (gen) | DINO(gen,real) | C3(a) ρ | standard (ABSENT) | OG-AF (ABSENT) |
+|---|---|---|---|---|---|---|---|
+| WM-base-100 | 0.05728 | 56.4 % | 46.9 % | 0.0703 | +0.052 | 61.0 % | 95.5 % |
+| WM-base-30 | 0.05930 | 56.5 % | 46.7 % | 0.0696 | +0.026 | 61.6 % | 95.4 % |
+| WM-base-10 | 0.06999 | 57.3 % | 47.2 % | 0.0824 | +0.122 | 64.4 % | 96.1 % |
+| WM-data-poor | 0.11382 | 73.3 % | 53.3 % | 0.1634 | +0.279 | 88.8 % | 95.3 % |
+| WM-physics-corrupted-v2 | 0.16196 | 73.3 % | 92.4 % | 0.0728 | -0.121 | 81.3 % | 98.4 % |
+
+**C3(b)-H2 (SUPPORTED)**: paired d, corrupted − base, n = 193: standard +0.46 [+0.37, +0.56], OG-AF +1.94 [+1.73, +2.22], Δ +1.48 [+1.22, +1.79].
