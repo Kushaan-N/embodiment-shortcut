@@ -21,6 +21,7 @@ results/*/*
 !results/exp_h/ladder.npz
 !results/exp_h2/ladder.npz
 !results/exp_resolution/resolution.npz
+!results/exp_resolution_v2/resolution.npz
 logs/
 *.npz
 *.npy
