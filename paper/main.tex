@@ -1,0 +1,282 @@
+% Workshop draft.  Generic article layout: swap in the venue's style file
+% before submission.  ANONYMISED for double-blind review -- the repository is
+% public under an identifying account, so replace every \repo / \prereg link
+% with an anonymous mirror (e.g. anonymous.4open.science) for submission.
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,booktabs,graphicx,xcolor}
+\usepackage[numbers,sort]{natbib}
+\usepackage{pgfplots}\pgfplotsset{compat=1.17}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\sstd}{s_{\mathrm{std}}}
+\newcommand{\sdel}{s_{\mathrm{del}}}
+\newcommand{\stime}{s_{\mathrm{time}}}
+\newcommand{\repo}{\texttt{[anonymised repository]}}
+
+\title{The Embodiment Shortcut: Action-Following Metrics\\Read the Robot, Not the Physics}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Video world models for robotics are routinely evaluated by \emph{action following}:
+an inverse dynamics model (IDM) infers the action from generated video and is
+compared with the action the generation was conditioned on. The metric is read as
+physics-sensitive. We show that it is dominated by \emph{embodiment rendering}:
+when the action is an actuator command, the manipulator's pose is a near-direct
+readout of it, so an IDM learns to read the arm and ignore the object. In a
+controlled MuJoCo push task with a pre-registered analysis, removing the object's
+physics entirely (a decoy placed outside every reachable push path) changes the
+standard metric's error by only 0.15$\times$ its own identifiability floor (95\%
+CI [0.12, 0.19]), and a 16-fold friction sweep leaves it flat at 1.9\% of the
+uninformed baseline. We propose \textbf{OG-AF} (Object-Grounded Action-Following),
+which scores at a delayed horizon after the arm has retracted. OG-AF recovers the
+action from the settled object (44.7\% of baseline versus 99.0\% with the decoy),
+detects physics changes that move the object by 2.5\,mm where the standard metric
+is blind below 80\,mm, and separates a world model trained on wrong physics from a
+correct one with a paired effect of $d=1.94$ versus $0.46$ for the standard metric,
+whose response is fully accounted for by a no-physics control.
+All thresholds were frozen and publicly time-stamped before the data existed.
+\end{abstract}
+
+\section{Introduction}
+
+A video world model conditioned on a robot action should produce video in which
+that action has its physical consequences. Action following has become a common way
+to check this \citep{multiworld2026,followactions2026}: train an IDM on real video,
+run it on generated video, and measure how well it recovers the conditioning action.
+A low error is taken as evidence that the model ``follows'' the action, and implicitly
+that it gets the interaction right.
+
+We argue that this inference fails for a structural reason. When the action is an
+actuator command, the manipulator's configuration after executing it is close to an
+invertible function of the action. An IDM trained to minimise action-prediction
+error will exploit that channel, not as a pathology but because it is the optimal
+solution to the task as posed. The metric then scores how faithfully a world model
+renders the robot, while being largely blind to whether contact physics was correct.
+We call this the \emph{embodiment shortcut}.
+
+\paragraph{Contributions.}
+(1) A controlled testbed and estimator that isolate the shortcut: paired
+\textsc{interact}/\textsc{decoy} rollouts with identical arm motion and a paired
+gap $G$ (\S\ref{sec:setup}). (2) Pre-registered evidence that the standard metric is
+insensitive to object physics and that a delayed-horizon variant, OG-AF, is not
+(\S\ref{sec:confound}). (3) A resolution analysis: OG-AF detects millimetre-scale
+physics changes the standard metric cannot see (\S\ref{sec:resolution}). (4) A world-model
+ladder in which OG-AF, but not the standard metric, separates a model trained on
+wrong physics, including a diagnosed failure of our own first ladder
+(\S\ref{sec:wm}).
+
+\section{Setup}
+\label{sec:setup}
+
+\paragraph{Task.} A 4-DOF paddle pushes one of three objects (box, sphere,
+cylinder) in MuJoCo \citep{todorov2012mujoco}, rendered at $224\times224$, 20\,fps.
+An action $a=(v,\theta,d)$ (push speed, approach angle, contact offset) is drawn
+uniformly; we report errors in normalised action units, where the uninformed
+(uniform-prior) baseline has MAE $0.25$. The arm is kinematically clamped to the
+commanded path, so its motion is identical across conditions by construction; a
+yaw joint makes $a\mapsto$ arm pose invertible, the situation under study.
+
+\paragraph{Conditions.} For each $(a,\text{seed})$ tuple we simulate
+\textsc{interact} (object in the push path), \textsc{decoy} (the same object placed
+in an annulus proven disjoint from every reachable push corridor, 14\,mm clearance,
+from an independent random stream) and \textsc{absent} (no object). 2\,000 tuples
+per geometry give 18\,000 rollouts; splits are by tuple so pairs never straddle them.
+
+\paragraph{Horizons.} $\sstd$ is the last frame of the push (arm mid-motion), the
+horizon the standard metric uses; $\sdel=\max(\text{object settled},\text{arm at rest})$;
+$\stime$ is the same time as $\sdel$ but with the arm only $\epsilon$-withdrawn
+(1.5\,mm), separating retraction from elapsed time.
+
+\paragraph{IDMs.} Architecture A follows the MultiWorld protocol
+\citep{multiworld2026}: an ImageNet-initialised ResNet-50 with a non-causal temporal
+transformer. \textbf{A-std} reads a 16-frame clip spanning $[s_0,\sstd]$ (VPT-style
+\citep{baker2022vpt}), the faithful reproduction of the standard metric;
+\textbf{A-del} (OG-AF) reads only the pair $(s_0,\sdel)$; \textbf{A-time} reads
+$(s_0,\stime)$; \textbf{A-clip-del} reads a clip ending at $\sdel$. Five seeds
+each, trained on all three conditions. Architecture B (frozen DINOv3 ViT-L/16 CLS
+features \citep{simeoni2025dinov3} and an MLP, ten seeds) is reported as
+descriptive support; DINOv3 was selected because it resolves a 1.7-pixel object
+shift at $+13.9\sigma$ where DINOv2 \citep{oquab2023dinov2} manages $+0.55\sigma$.
+
+\paragraph{Estimator.} On held-out tuples,
+$G=\operatorname{mean}_p[\mathrm{err}(\textsc{decoy}_p)-\mathrm{err}(\textsc{interact}_p)]$,
+the mean of per-pair differences. If a metric uses the object, \textsc{decoy}
+should be harder and $G$ large; if it reads only the arm, $G\approx0$. We express
+$G$ relative to each IDM's identifiability floor (its own held-out
+\textsc{interact} error) and report hierarchical-bootstrap 95\% CIs (tuples within
+seeds, then seeds; 10\,000 replicates).
+
+\paragraph{Pre-registration.} Thresholds, estimators and decision rules were
+committed and pushed to a public repository before the confirmatory experiments
+ran, and a mechanical lock refuses to unseal the analysis otherwise \repo. Post-hoc
+changes are listed in a deviations log; none affects a confirmatory result.
+
+\section{The shortcut exists and the standard metric falls for it}
+\label{sec:confound}
+
+\paragraph{State oracles.} Before any pixels: a probe on the arm's state alone
+recovers the action to 1.0--1.2\% of baseline at $\sstd$, identically in
+\textsc{interact} and \textsc{decoy}, while at $\sdel$ the arm carries nothing
+(97--98\%) and the settled object still carries signal (11--45\%).
+
+\begin{table}[t]
+\centering\small
+\caption{Experiment E (held-out, pooled over geometries; 611 pairs per seed, 5 seeds).
+Errors as \% of the uninformed baseline; $G$/floor with 95\% CI.}
+\label{tab:e}
+\begin{tabular}{lcccc}
+\toprule
+IDM & \textsc{interact} & \textsc{decoy} & \textsc{absent} & $G$ / floor \\
+\midrule
+A-std (standard) & 1.9 & 2.2 & 1.5 & $0.15\;[0.12, 0.19]$ \\
+A-clip-del       & 2.2 & 2.5 & 2.0 & $0.14\;[0.11, 0.16]$ \\
+A-time           & 4.1 & 4.2 & 3.2 & $0.02\;[-0.02, 0.06]$ \\
+\textbf{A-del (OG-AF)} & \textbf{44.7} & \textbf{99.0} & 98.5 & $\mathbf{1.21\;[1.18, 1.24]}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Confirmatory results (Table~\ref{tab:e}).}
+\textbf{C1}: the standard metric's gap is $0.15\times$ its floor, below the
+pre-registered threshold $\tau_1=0.25$ (CI upper bound 0.19; Holm-adjusted
+one-sided $p=0.0002$). Deleting the object's physics barely matters to it.
+\textbf{C2}: OG-AF recovers the action from the settled object at 44.7\% of
+baseline, below the registered midpoint of floor and baseline (Holm $p=0.0002$);
+with the decoy it is at chance (99.0\%), as it must be, since at $\sdel$ the arm is
+at rest in every condition. \textbf{T5}: A-time behaves like A-std
+($|\Delta G|=0.0005$) not A-del (0.135): the effect is driven by retraction, not
+elapsed time. \textbf{T8}: giving the IDM a clip that ends at $\sdel$ (A-clip-del)
+re-opens the shortcut, $G$ matching A-std.
+
+\section{Resolution: how large a physics error each metric can see}
+\label{sec:resolution}
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\linewidth}\input{figures/friction.tex}\end{minipage}\hfill
+\begin{minipage}{0.49\linewidth}\input{figures/resolution.tex}\end{minipage}
+\caption{\textbf{Left:} the same IDMs, trained at friction $\times1$, scored on
+rollouts with changed object friction (held-out tuples, 95\% CI). The standard
+metric stays at 1.8--1.9\% while the object's settled position moves by up to
+4\,cm; OG-AF rises on both sides of the training value. \textbf{Right:} error change
+versus the physics-induced shift of the object's settled position, 1\,570
+(tuple, friction) pairs (post-hoc, exploratory).}
+\label{fig:resolution}
+\end{figure}
+
+Experiment F scores the trained IDMs on rollouts whose object friction was changed
+from $\times0.25$ to $\times4$ (Fig.~\ref{fig:resolution}, left). Because the arm is
+identical across frictions, the standard metric cannot register the change: it
+stays at 1.8--1.9\% of baseline although the object comes to rest up to 4\,cm away.
+OG-AF's error rises away from the training friction in both directions (61.2\% at
+$\times0.25$). (Our pre-registered prediction of a \emph{monotone} response was
+mis-specified for an IDM trained at $\times1$; it is reported as failed.)
+
+Pooling every held-out tuple and friction level gives a resolution curve
+(Fig.~\ref{fig:resolution}, right). OG-AF detects physics changes that move the
+object by $\geq2.5$\,mm (half a video frame of motion; $d=0.64$ at 2.5--5\,mm,
+rising to $3.27$ at 40--80\,mm). The standard metric shows no detectable change
+below 80\,mm and $+0.15\%$ of baseline beyond. OG-AF's floor is higher (44.7\% versus
+1.9\% of baseline): it trades resolution of the action for sensitivity to the
+interaction, which is what an action-following metric is meant to measure.
+
+\section{World models: catching wrong physics}
+\label{sec:wm}
+
+We train factorised spatio-temporal video transformers (90.5M parameters,
+AdaLN action conditioning, strictly causal in time, 120k steps) on our corpus and
+generate the 193 held-out box tuples autoregressively from the first frame. The
+registered ladder is WM-base at 100\%, 30\% and 10\% of training, a model trained
+on 10\% of the data, and a model trained on wrong physics.
+
+\paragraph{C3(a).} On every model, the standard and OG-AF metrics rank the same
+generated rollouts almost independently (Spearman $\rho\leq0.28$; threshold
+$<0.9$).
+
+\paragraph{A diagnosed failure.} Our first ladder failed its validity gate (ground-truth
+error monotone across models; $\rho=0.70<0.9$), voiding the between-model claim as
+registered. The gate measured whole-frame pixel error, which is dominated by how
+the arm and background are rendered (the object covers $\sim$2\% of the frame), and
+the corruption (friction $\times3$) was never checked to be large. The validity check
+fell for the shortcut it was meant to guard against. We registered a second ladder
+before running it: an object-region ground truth (pixels where the real
+\textsc{interact} and \textsc{absent} frames differ), and a corruption chosen
+mechanically as the mildest friction multiplier whose \emph{real} video already
+exceeds the weakest correct model's object error ($\times0.1$).
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.5\linewidth}\input{figures/h2.tex}\end{minipage}\hfill
+\begin{minipage}{0.47\linewidth}\small
+\caption{Wrong-physics world model (friction $\times0.1$) minus the correct
+WM-base, mean IDM error on the same 193 held-out tuples. On \textsc{interact} the
+standard metric rises by about as much as on \textsc{absent}, where there is no
+object and physics cannot matter: it registers the corrupted model's slightly worse
+rendering. OG-AF rises sharply on \textsc{interact} and not on \textsc{absent}.}
+\label{fig:h2}
+\end{minipage}
+\end{figure}
+
+\paragraph{C3(b).} The rebuilt ladder is monotone under object-region error
+($\rho=1.00$; 0.057, 0.059, 0.070, 0.114, 0.162). Paired over the same tuples, the
+wrong-physics model differs from the correct one by $d=1.94$ [1.73, 2.22] under
+OG-AF and $d=0.46$ [0.37, 0.56] under the standard metric; the registered contrast
+is $\Delta d=1.48$ [1.22, 1.79], \emph{supported}. The standard metric's response is
+explained by a no-physics control (Fig.~\ref{fig:h2}).
+
+\paragraph{Domain gap.} On generated video the standard metric's error is 56\% of
+baseline for every base model, versus 1.9\% on real video, and 61\% on the
+\textsc{absent} control: on generated video it largely measures rendering
+fidelity. OG-AF sits at its real-video floor (47\% versus 44.7\%) and at chance on
+\textsc{absent}.
+
+\section{Related work}
+World-model evaluation increasingly uses action following
+\citep{multiworld2026}; a recent diagnosis of whether robotic world models follow
+actions measures end-effector trajectories, i.e.\ arm kinematics by design
+\citep{followactions2026}. A position paper argues
+that IDM-based recovery claims are claims about the whole pipeline
+\citep{pipeline2026}; we measure one way the pipeline is entangled. The World
+Action Verifier \citep{wav2026} assumes a verification subset whose next state depends
+only on its own state and the action, and proves a sparse inverse model transfers
+under it; read as an evaluation metric, that condition is object-blindness. Its
+conditions hold at $\sstd$ and fail at $\sdel$ in our data: the guarantee and the
+confound are the same property used for different purposes.
+
+\section{Limitations}
+Simulation only: one push task, three primitive objects, a kinematically clamped arm,
+and small world models trained on their own corpus; transfer to real robot data and
+published world models is the main open question. OG-AF requires a horizon at which
+the manipulator is at rest, and its floor is higher than the standard metric's. The
+world-model evaluation uses 193 held-out box tuples (the registration anticipated
+1\,500). The wrong-physics corpus loses 14--16\% of rollouts to the settling validator,
+so that model also saw less data, which is consistent with its worse rendering on
+\textsc{absent}. DINO features are blind to sub-degree rotation. The resolution curve
+is post-hoc. Two pre-registered exploratory predictions failed as worded (friction
+monotonicity; masking orderings) and are reported as such.
+
+\section{Conclusion}
+Action following, as practised, rewards rendering the robot correctly. Scoring at a
+horizon where the manipulator no longer encodes the action turns the same pipeline
+into a measurement of the interaction. We recommend that action-following results
+report an object-grounded variant and a no-physics control alongside the standard
+number.
+
+\paragraph{Reproducibility.} Code, pre-registrations, deviations log, every result
+record and the generators for all tables and figures are in \repo; one command
+re-submits the pipeline on a SLURM cluster.
+
+\paragraph{Use of AI assistance.} An AI coding agent implemented and audited
+substantial parts of the pipeline and, at the researchers' delegation, fixed the
+open registration decisions (recorded in both registration documents). The
+authors take responsibility for all decisions and claims.
+
+\small
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\end{document}
