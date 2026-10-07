@@ -471,6 +471,73 @@ def analyze_h2(root: Path) -> None:
               f"{pc['d_ogaf_ci']}   n={pc['n_pairs']}   -> {pc['verdict']}")
 
 
+def _object_share(entry: dict, prior: float = 0.25):
+    c = entry.get("conditions", {})
+    if "INTERACT" not in c or "DECOY" not in c:
+        return None
+    i, d = c["INTERACT"]["point"], c["DECOY"]["point"]
+    return (d - i) / (prior - i)
+
+
+def analyze_a3(root: Path) -> None:
+    """prereg_addendum_A3.md: compliant arm (K), mild corruptions (M), arm-masked
+    baseline (N).  Sealed by the addendum's own lock."""
+    add = C.REPO_ROOT / "prereg_addendum_A3.md"
+    arts = [root / s / "results.json" for s in ("exp_e_compliant", "exp_h3", "exp_e_armmask")]
+    rep = prereg_lock.check(arts, prereg_path=add)
+    rule("ADDENDUM A3 -- compliant arm (K), mild corruptions (M), arm-masked baseline (N)")
+    print(rep.render())
+    if not rep.passed:
+        raise prereg_lock.PreregViolation("A3 is sealed until prereg_addendum_A3.md's lock passes")
+
+    cal = _load(root / "exp_k_calibration" / "results.json")
+    print("\n  [K] compliant arm")
+    if cal:
+        print(f"    gain selected: {cal['selected_kp']}  (stiffest gain deflecting the arm by >= "
+              f"{1e3 * cal['delta_m']:.2f} mm median, keep >= 80%)")
+    ek = _load(root / "exp_e_compliant" / "results.json")
+    if ek:
+        g = ek["variants"]["A-std"]["G"]["pooled"]
+        lo, hi = g["ci_low_over_floor"], g["ci_high_over_floor"]
+        v = "SUPPORTED" if hi < 0.25 else ("REFUTED" if lo > 0.25 else "INCONCLUSIVE")
+        verdict("K1  C1 replicates: G(A-std)/reference < 0.25 under a compliant arm",
+                g["effect_over_floor"], 0.25, v == "SUPPORTED", ci=(lo, hi))
+        print(f"    -> {v}")
+        for vn in ("A-std", "A-del"):
+            e = ek["variants"].get(vn)
+            if e:
+                print(f"    {vn:6s} INTERACT {100 * e['conditions']['INTERACT']['point'] / 0.25:5.1f}%  "
+                      f"DECOY {100 * e['conditions']['DECOY']['point'] / 0.25:5.1f}%  "
+                      f"object share {_object_share(e):.3f}")
+    else:
+        print("    not run")
+
+    print("\n  [M] mild physics corruptions (97.5% CIs, Bonferroni over 2)")
+    h3 = _load(root / "exp_h3" / "results.json")
+    for name, pc in ((h3 or {}).get("c3b_addendum") or {}).items():
+        if "gate" not in pc:
+            print(f"    {name}: {pc.get('verdict')}"); continue
+        gt = pc["gate"]
+        print(f"    {name}: physics gate dGT={gt['mean_diff']:+.5f} [{gt['ci'][0]:+.5f},{gt['ci'][1]:+.5f}] "
+              f"{'PASS' if gt['passed'] else 'FAIL'}; d_std={pc['d_std']:+.2f} "
+              f"[{pc['d_std_ci'][0]:+.2f},{pc['d_std_ci'][1]:+.2f}]  d_ogaf={pc['d_ogaf']:+.2f} "
+              f"[{pc['d_ogaf_ci'][0]:+.2f},{pc['d_ogaf_ci'][1]:+.2f}]  delta={pc['delta']:+.2f} "
+              f"[{pc['delta_ci'][0]:+.2f},{pc['delta_ci'][1]:+.2f}] -> {pc['verdict']}")
+    if not h3:
+        print("    not run")
+
+    print("\n  [N] arm-masked standard horizon (descriptive)")
+    en, e0 = _load(root / "exp_e_armmask" / "results.json"), _load(root / "exp_e" / "results.json")
+    rows = [(vn, src) for vn, src in (("A-std", e0), ("A-std-armmask", en), ("A-del", e0)) if src]
+    for vn, src in rows:
+        e = src["variants"].get(vn)
+        if e:
+            g = e["G"]["pooled"]
+            print(f"    {vn:14s} INTERACT {100 * e['conditions']['INTERACT']['point'] / 0.25:5.1f}%  "
+                  f"G/reference {g.get('effect_over_floor', float('nan')):+.3f}  "
+                  f"object share {_object_share(e):.3f}")
+
+
 def analyze_h(root: Path) -> None:
     prereg_lock.require("h", [root / "exp_h" / "results.json"])
     rule("EXPERIMENT H -- world-model ladder (C3) (§9-H)")
@@ -551,7 +618,7 @@ ANALYSES = {
     "0": analyze_0, "a": analyze_a, "b": analyze_b, "c": analyze_c,
     "corpus": analyze_corpus, "d": analyze_d, "power": analyze_power,
     "e": analyze_e, "f": analyze_f, "g": analyze_g,
-    "masking": analyze_masking, "subset": analyze_subset, "h": analyze_h, "h2": analyze_h2,
+    "masking": analyze_masking, "subset": analyze_subset, "h": analyze_h, "h2": analyze_h2, "a3": analyze_a3,
 }
 UNSEALED_ORDER = ["0", "a", "b", "c", "subset", "corpus", "d", "power", "masking"]
 SEALED_ORDER = ["e", "f", "g", "h"]
