@@ -1,0 +1,702 @@
+{
+  "argv": [
+    "exp_e_confound.py",
+    "--variants",
+    "A-std-armmask",
+    "--floors",
+    "/scratch4/workspace/knaskar_umass_edu-ogaf/data/results/exp_d_armmask/floors.json",
+    "--out",
+    "/scratch4/workspace/knaskar_umass_edu-ogaf/data/results/exp_e_armmask",
+    "--num-workers",
+    "8"
+  ],
+  "arrays": {
+    "A-std-armmask_seed0_ABSENT_geometry": [
+      615
+    ],
+    "A-std-armmask_seed0_ABSENT_mae": [
+      615
+    ],
+    "A-std-armmask_seed0_ABSENT_tuple": [
+      615
+    ],
+    "A-std-armmask_seed0_DECOY_geometry": [
+      615
+    ],
+    "A-std-armmask_seed0_DECOY_mae": [
+      615
+    ],
+    "A-std-armmask_seed0_DECOY_tuple": [
+      615
+    ],
+    "A-std-armmask_seed0_G_pair_ids": [
+      611
+    ],
+    "A-std-armmask_seed0_G_paired": [
+      611
+    ],
+    "A-std-armmask_seed0_INTERACT_geometry": [
+      611
+    ],
+    "A-std-armmask_seed0_INTERACT_mae": [
+      611
+    ],
+    "A-std-armmask_seed0_INTERACT_tuple": [
+      611
+    ],
+    "A-std-armmask_seed1_ABSENT_geometry": [
+      615
+    ],
+    "A-std-armmask_seed1_ABSENT_mae": [
+      615
+    ],
+    "A-std-armmask_seed1_ABSENT_tuple": [
+      615
+    ],
+    "A-std-armmask_seed1_DECOY_geometry": [
+      615
+    ],
+    "A-std-armmask_seed1_DECOY_mae": [
+      615
+    ],
+    "A-std-armmask_seed1_DECOY_tuple": [
+      615
+    ],
+    "A-std-armmask_seed1_G_pair_ids": [
+      611
+    ],
+    "A-std-armmask_seed1_G_paired": [
+      611
+    ],
+    "A-std-armmask_seed1_INTERACT_geometry": [
+      611
+    ],
+    "A-std-armmask_seed1_INTERACT_mae": [
+      611
+    ],
+    "A-std-armmask_seed1_INTERACT_tuple": [
+      611
+    ],
+    "A-std-armmask_seed2_ABSENT_geometry": [
+      615
+    ],
+    "A-std-armmask_seed2_ABSENT_mae": [
+      615
+    ],
+    "A-std-armmask_seed2_ABSENT_tuple": [
+      615
+    ],
+    "A-std-armmask_seed2_DECOY_geometry": [
+      615
+    ],
+    "A-std-armmask_seed2_DECOY_mae": [
+      615
+    ],
+    "A-std-armmask_seed2_DECOY_tuple": [
+      615
+    ],
+    "A-std-armmask_seed2_G_pair_ids": [
+      611
+    ],
+    "A-std-armmask_seed2_G_paired": [
+      611
+    ],
+    "A-std-armmask_seed2_INTERACT_geometry": [
+      611
+    ],
+    "A-std-armmask_seed2_INTERACT_mae": [
+      611
+    ],
+    "A-std-armmask_seed2_INTERACT_tuple": [
+      611
+    ],
+    "A-std-armmask_seed3_ABSENT_geometry": [
+      615
+    ],
+    "A-std-armmask_seed3_ABSENT_mae": [
+      615
+    ],
+    "A-std-armmask_seed3_ABSENT_tuple": [
+      615
+    ],
+    "A-std-armmask_seed3_DECOY_geometry": [
+      615
+    ],
+    "A-std-armmask_seed3_DECOY_mae": [
+      615
+    ],
+    "A-std-armmask_seed3_DECOY_tuple": [
+      615
+    ],
+    "A-std-armmask_seed3_G_pair_ids": [
+      611
+    ],
+    "A-std-armmask_seed3_G_paired": [
+      611
+    ],
+    "A-std-armmask_seed3_INTERACT_geometry": [
+      611
+    ],
+    "A-std-armmask_seed3_INTERACT_mae": [
+      611
+    ],
+    "A-std-armmask_seed3_INTERACT_tuple": [
+      611
+    ],
+    "A-std-armmask_seed4_ABSENT_geometry": [
+      615
+    ],
+    "A-std-armmask_seed4_ABSENT_mae": [
+      615
+    ],
+    "A-std-armmask_seed4_ABSENT_tuple": [
+      615
+    ],
+    "A-std-armmask_seed4_DECOY_geometry": [
+      615
+    ],
+    "A-std-armmask_seed4_DECOY_mae": [
+      615
+    ],
+    "A-std-armmask_seed4_DECOY_tuple": [
+      615
+    ],
+    "A-std-armmask_seed4_G_pair_ids": [
+      611
+    ],
+    "A-std-armmask_seed4_G_paired": [
+      611
+    ],
+    "A-std-armmask_seed4_INTERACT_geometry": [
+      611
+    ],
+    "A-std-armmask_seed4_INTERACT_mae": [
+      611
+    ],
+    "A-std-armmask_seed4_INTERACT_tuple": [
+      611
+    ]
+  },
+  "arrays_file": "confound.npz",
+  "config": {
+    "action_dims": [
+      "push_speed",
+      "approach_angle",
+      "contact_offset"
+    ],
+    "action_ranges": {
+      "approach_angle": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "contact_offset": [
+        -0.035,
+        0.035
+      ],
+      "push_speed": [
+        0.12,
+        0.36
+      ]
+    },
+    "arch_a_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "arch_b_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "arm_control": "kinematic",
+    "arm_damping": 400.0,
+    "arm_dof_deviation": "4-DOF (x, y, z, yaw) instead of spec \u00a76's 2-3 DOF: a 3-DOF arm's single-horizon visible state is 2-dimensional and cannot be injective in a 3-dimensional action, which would refute C0 by dimension counting.",
+    "arm_joints": [
+      "arm_x",
+      "arm_y",
+      "arm_z",
+      "arm_yaw"
+    ],
+    "arm_kp": 40000.0,
+    "base_approach_dir": [
+      1.0,
+      0.0
+    ],
+    "bootstrap_ci": 0.95,
+    "bootstrap_seed": 987654321,
+    "camera": {
+      "fovy": 45.0,
+      "pos": [
+        0.375,
+        -0.375,
+        0.57
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.04
+      ]
+    },
+    "clip_length": 16,
+    "clip_variants": [
+      "A-std",
+      "A-clip-del"
+    ],
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "decoy_annulus": [
+      0.19,
+      0.21
+    ],
+    "encoders": [
+      "facebook/dinov2-large",
+      "facebook/dinov3-vitl16-pretrain-lvd1689m"
+    ],
+    "eps_withdraw_m": 0.0015,
+    "frame_stride": 25,
+    "friction_multipliers": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "gate_b_evidence": {
+      "rejected": {
+        "facebook/dinov2-large/cls": 0.55,
+        "facebook/dinov2-large/mean_patch": 0.19
+      },
+      "rotation_at_delta_rot_min_sigma": -1.5,
+      "rotation_resolvable_from_deg": 1.11,
+      "threshold_sigma": 3.0,
+      "translation_at_delta_min_sigma": 13.9
+    },
+    "gate_b_selected_encoder": "facebook/dinov3-vitl16-pretrain-lvd1689m",
+    "gate_b_selected_pooling": "cls",
+    "geom_size": {
+      "box": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "cylinder": [
+        0.04,
+        0.04
+      ],
+      "sphere": [
+        0.04
+      ]
+    },
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "idm_variants": {
+      "A-clip-del": "s_del",
+      "A-del": "s_del",
+      "A-std": "s_std",
+      "A-std-armmask": "s_std",
+      "A-time": "s_time",
+      "B-del": "s_del",
+      "B-std": "s_std",
+      "B-time": "s_time"
+    },
+    "interact_pos_jitter": 0.005,
+    "interact_yaw_jitter": true,
+    "masking_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "master_seed": 20260817,
+    "n_bootstrap": 10000,
+    "n_tuples_per_geometry": 2000,
+    "object_density": 500.0,
+    "object_friction_by_geometry": {
+      "box": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "cylinder": [
+        0.35,
+        0.005,
+        0.0005
+      ],
+      "sphere": [
+        0.35,
+        0.005,
+        0.02
+      ]
+    },
+    "paddle_half_extents": [
+      0.005,
+      0.028,
+      0.06
+    ],
+    "phase_seconds": {
+      "descend": 0.15,
+      "eps_withdraw": 0.02,
+      "hold0": 0.1,
+      "lift_home": 0.4,
+      "push": 0.3,
+      "retreat": 0.15,
+      "settle_max": 2.0,
+      "traverse": 0.4
+    },
+    "phase_steps": {
+      "descend": 75,
+      "eps_withdraw": 10,
+      "hold0": 50,
+      "lift_home": 200,
+      "push": 150,
+      "retreat": 75,
+      "settle_max": 1000,
+      "traverse": 200
+    },
+    "plane_friction": [
+      0.35,
+      0.005,
+      0.0001
+    ],
+    "push_height": 0.065,
+    "push_start_radius": 0.07,
+    "render_size": 224,
+    "rest_pose": [
+      -0.1,
+      -0.1,
+      0.25
+    ],
+    "rest_yaw": 0.0,
+    "retreat_distance_m": 0.03,
+    "sim_dt": 0.002,
+    "split_fractions": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "split_salt": "ogaf-v3-split",
+    "split_unit": "action_seed_tuple",
+    "stalk_radius": 0.012,
+    "tau_1_default": 0.25,
+    "tolerances": {
+      "arm_deviation_m": 0.0005,
+      "contact_force_zero_n": 1e-06,
+      "decoy_placement_r2_max": 0.01,
+      "frustum_margin_px": 4.0,
+      "occlusion_frac_delta": 0.05,
+      "settled_pose_pos_m": 0.002,
+      "settled_pose_rot_rad": 0.05
+    },
+    "video_fps": 20.0
+  },
+  "created_iso": "2026-10-07T15:14:33+0000",
+  "created_unix": 1791386073.2369576,
+  "experiment": "exp_e_confound",
+  "extra": {
+    "conditions": [
+      "INTERACT",
+      "DECOY",
+      "ABSENT"
+    ],
+    "geometries": [
+      "box",
+      "sphere",
+      "cylinder"
+    ],
+    "prereg_lock": {
+      "artifacts_checked": [],
+      "commit_iso": "2026-09-29T14:37:07+00:00",
+      "commit_precedes_artifacts": true,
+      "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+      "commit_unix": 1790692627.0,
+      "committed": true,
+      "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+      "earliest_artifact_unix": null,
+      "exists_in_worktree": true,
+      "identical": true,
+      "messages": [],
+      "passed": true,
+      "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+      "push_evidence": {
+        "commit_is_ancestor_of_upstream": true,
+        "public_anonymous_https": true,
+        "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+        "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+        "upstream": "origin/main"
+      },
+      "pushed_verified": true,
+      "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+    },
+    "results": {
+      "prereg_lock": {
+        "artifacts_checked": [],
+        "commit_iso": "2026-09-29T14:37:07+00:00",
+        "commit_precedes_artifacts": true,
+        "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+        "commit_unix": 1790692627.0,
+        "committed": true,
+        "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+        "earliest_artifact_unix": null,
+        "exists_in_worktree": true,
+        "identical": true,
+        "messages": [],
+        "passed": true,
+        "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+        "push_evidence": {
+          "commit_is_ancestor_of_upstream": true,
+          "public_anonymous_https": true,
+          "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+          "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+          "upstream": "origin/main"
+        },
+        "pushed_verified": true,
+        "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+      },
+      "prior": {
+        "per_dim": {
+          "approach_angle": {
+            "mae": 0.7853981633974483,
+            "mae_norm": 0.25,
+            "mse": 0.8224670334241132,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -1.5707963267948966,
+              1.5707963267948966
+            ]
+          },
+          "contact_offset": {
+            "mae": 0.0175,
+            "mae_norm": 0.25,
+            "mse": 0.0004083333333333334,
+            "mse_norm": 0.08333333333333334,
+            "range": [
+              -0.035,
+              0.035
+            ]
+          },
+          "push_speed": {
+            "mae": 0.06,
+            "mae_norm": 0.25,
+            "mse": 0.0048,
+            "mse_norm": 0.08333333333333333,
+            "range": [
+              0.12,
+              0.36
+            ]
+          }
+        },
+        "pooled_mae_norm": 0.25,
+        "pooled_mse_norm": 0.08333333333333333
+      },
+      "variants": {
+        "A-std-armmask": {
+          "G": {
+            "box": {
+              "boot_std": 0.0029797037593558757,
+              "ci_high": 0.13866002092842455,
+              "ci_high_over_floor": 1.191827727714564,
+              "ci_level": 0.95,
+              "ci_low": 0.12689041460174197,
+              "ci_low_over_floor": 1.0906641546060187,
+              "effect_over_floor": 1.140860614958767,
+              "floor": 0.11634233514126872,
+              "n_boot": 10000,
+              "n_pairs_total": 965,
+              "n_seeds": 5,
+              "point": 0.1327303880150068,
+              "seed_max": 0.13564941136484937,
+              "seed_means": {
+                "0": 0.12889123033886593,
+                "1": 0.135473419506817,
+                "2": 0.13564941136484937,
+                "3": 0.13316780603321876,
+                "4": 0.13047007283128295
+              },
+              "seed_min": 0.12889123033886593
+            },
+            "cylinder": {
+              "boot_std": 0.0028752154527861688,
+              "ci_high": 0.14241045274458847,
+              "ci_high_over_floor": 1.3701731755934834,
+              "ci_level": 0.95,
+              "ci_low": 0.13109819088594388,
+              "ci_low_over_floor": 1.2613345513542729,
+              "effect_over_floor": 1.3155369509542525,
+              "floor": 0.10393609748118454,
+              "n_boot": 10000,
+              "n_pairs_total": 945,
+              "n_seeds": 5,
+              "point": 0.13673177677448148,
+              "seed_max": 0.14150838908202276,
+              "seed_means": {
+                "0": 0.1355233054026646,
+                "1": 0.1377543577746976,
+                "2": 0.14150838908202276,
+                "3": 0.13138172886378707,
+                "4": 0.13749110274923543
+              },
+              "seed_min": 0.13138172886378707
+            },
+            "pooled": {
+              "boot_std": 0.0018967306446211266,
+              "ci_high": 0.13999784517821395,
+              "ci_high_over_floor": 1.2603073017624142,
+              "ci_level": 0.95,
+              "ci_low": 0.13263060854070358,
+              "ci_low_over_floor": 1.1939849800420597,
+              "effect_over_floor": 1.2267182442307036,
+              "floor": 0.11108230903878832,
+              "n_boot": 10000,
+              "n_pairs": 3055,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "point": 0.13626669510915485,
+              "seed_max": 0.14005382869959657,
+              "seed_means": {
+                "0": 0.13506108107435502,
+                "1": 0.13836080157967762,
+                "2": 0.14005382869959657,
+                "3": 0.1340693639478541,
+                "4": 0.13378840024429092
+              },
+              "seed_min": 0.13378840024429092
+            },
+            "sphere": {
+              "boot_std": 0.002995559918137589,
+              "ci_high": 0.1447952845794104,
+              "ci_high_over_floor": 1.2865299789506142,
+              "ci_level": 0.95,
+              "ci_low": 0.132940439156706,
+              "ci_low_over_floor": 1.1811977226106627,
+              "effect_over_floor": 1.2338227092326421,
+              "floor": 0.11254715160039705,
+              "n_boot": 10000,
+              "n_pairs_total": 1145,
+              "n_seeds": 5,
+              "point": 0.13886323150401877,
+              "seed_max": 0.14256535984949903,
+              "seed_means": {
+                "0": 0.13987951248876068,
+                "1": 0.1412947868163734,
+                "2": 0.14256535984949903,
+                "3": 0.13704737140817413,
+                "4": 0.13352912695728666
+              },
+              "seed_min": 0.13352912695728666
+            }
+          },
+          "conditions": {
+            "ABSENT": {
+              "boot_std": 0.0015548108884940578,
+              "ci_high": 0.24868194271067565,
+              "ci_level": 0.95,
+              "ci_low": 0.24260140998751623,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 2.211115062333611,
+              "over_prior": 0.9824630666978476,
+              "point": 0.2456157666744619,
+              "seed_max": 0.24680781364440918,
+              "seed_means": {
+                "0": 0.24578078091144562,
+                "1": 0.24496202170848846,
+                "2": 0.24639977514743805,
+                "3": 0.24412846565246582,
+                "4": 0.24680781364440918
+              },
+              "seed_min": 0.24412846565246582
+            },
+            "DECOY": {
+              "boot_std": 0.0016061785578582516,
+              "ci_high": 0.25116526956420115,
+              "ci_level": 0.95,
+              "ci_low": 0.24488648602192298,
+              "n_boot": 10000,
+              "n_pairs_total": 3075,
+              "n_seeds": 5,
+              "over_floor": 2.233091716389059,
+              "over_prior": 0.9922279366075508,
+              "point": 0.2480569841518877,
+              "seed_max": 0.2493945062160492,
+              "seed_means": {
+                "0": 0.24813039600849152,
+                "1": 0.24840757250785828,
+                "2": 0.2493945062160492,
+                "3": 0.24611027538776398,
+                "4": 0.24824216961860657
+              },
+              "seed_min": 0.24611027538776398
+            },
+            "INTERACT": {
+              "boot_std": 0.0013727634133519056,
+              "ci_high": 0.11380540354664737,
+              "ci_level": 0.95,
+              "ci_low": 0.10842986785176816,
+              "n_boot": 10000,
+              "n_pairs_total": 3055,
+              "n_seeds": 5,
+              "over_floor": 1.0001384585099455,
+              "over_prior": 0.44439075731911654,
+              "point": 0.11109768932977913,
+              "seed_max": 0.11379560083150864,
+              "seed_means": {
+                "0": 0.11242476105690002,
+                "1": 0.1092926636338234,
+                "2": 0.10857150703668594,
+                "3": 0.1114039197564125,
+                "4": 0.11379560083150864
+              },
+              "seed_min": 0.10857150703668594
+            }
+          },
+          "floor_mae": 0.11108230903878832
+        }
+      }
+    }
+  },
+  "git": {
+    "branch": "main",
+    "describe": "e91f9a0",
+    "dirty": false,
+    "dirty_files": [],
+    "sha": "e91f9a0c6cc49260d1ff471261c78c1adeae6b06"
+  },
+  "packages": {
+    "PIL": "12.3.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA A100-SXM4-80GB",
+    "imageio": "2.37.4",
+    "mujoco": "3.14.0",
+    "mujoco_gl": "egl",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Oct 23 2024, 16:07:01) [GCC 13.2.0]",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "timm": "1.0.30",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "torchvision": "0.29.0+cu130",
+    "transformers": "5.17.0",
+    "yaml": "6.0.3"
+  },
+  "seeds": null
+}

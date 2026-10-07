@@ -1,0 +1,227 @@
+{
+  "prereg_lock": {
+    "artifacts_checked": [],
+    "commit_iso": "2026-09-29T14:37:07+00:00",
+    "commit_precedes_artifacts": true,
+    "commit_sha": "d2fdc9e44517cf6c87693af74c2897ce529dcc4a",
+    "commit_unix": 1790692627.0,
+    "committed": true,
+    "committed_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac",
+    "earliest_artifact_unix": null,
+    "exists_in_worktree": true,
+    "identical": true,
+    "messages": [],
+    "passed": true,
+    "prereg_path": "/work/pi_donghyunkim_umass_edu/kushaan/embodiment-shortcut/prereg.md",
+    "push_evidence": {
+      "commit_is_ancestor_of_upstream": true,
+      "public_anonymous_https": true,
+      "public_probe_url": "https://github.com/Kushaan-N/embodiment-shortcut.git",
+      "remote_url": "git@github.com:Kushaan-N/embodiment-shortcut.git",
+      "upstream": "origin/main"
+    },
+    "pushed_verified": true,
+    "worktree_sha256": "53a619cab533358bab46de5fe476cc8d167e51fa76c5d04d8a67e8a33d3f2fac"
+  },
+  "prior": {
+    "per_dim": {
+      "approach_angle": {
+        "mae": 0.7853981633974483,
+        "mae_norm": 0.25,
+        "mse": 0.8224670334241132,
+        "mse_norm": 0.08333333333333334,
+        "range": [
+          -1.5707963267948966,
+          1.5707963267948966
+        ]
+      },
+      "contact_offset": {
+        "mae": 0.0175,
+        "mae_norm": 0.25,
+        "mse": 0.0004083333333333334,
+        "mse_norm": 0.08333333333333334,
+        "range": [
+          -0.035,
+          0.035
+        ]
+      },
+      "push_speed": {
+        "mae": 0.06,
+        "mae_norm": 0.25,
+        "mse": 0.0048,
+        "mse_norm": 0.08333333333333333,
+        "range": [
+          0.12,
+          0.36
+        ]
+      }
+    },
+    "pooled_mae_norm": 0.25,
+    "pooled_mse_norm": 0.08333333333333333
+  },
+  "variants": {
+    "A-std-armmask": {
+      "G": {
+        "box": {
+          "boot_std": 0.0029797037593558757,
+          "ci_high": 0.13866002092842455,
+          "ci_high_over_floor": 1.191827727714564,
+          "ci_level": 0.95,
+          "ci_low": 0.12689041460174197,
+          "ci_low_over_floor": 1.0906641546060187,
+          "effect_over_floor": 1.140860614958767,
+          "floor": 0.11634233514126872,
+          "n_boot": 10000,
+          "n_pairs_total": 965,
+          "n_seeds": 5,
+          "point": 0.1327303880150068,
+          "seed_max": 0.13564941136484937,
+          "seed_means": {
+            "0": 0.12889123033886593,
+            "1": 0.135473419506817,
+            "2": 0.13564941136484937,
+            "3": 0.13316780603321876,
+            "4": 0.13047007283128295
+          },
+          "seed_min": 0.12889123033886593
+        },
+        "cylinder": {
+          "boot_std": 0.0028752154527861688,
+          "ci_high": 0.14241045274458847,
+          "ci_high_over_floor": 1.3701731755934834,
+          "ci_level": 0.95,
+          "ci_low": 0.13109819088594388,
+          "ci_low_over_floor": 1.2613345513542729,
+          "effect_over_floor": 1.3155369509542525,
+          "floor": 0.10393609748118454,
+          "n_boot": 10000,
+          "n_pairs_total": 945,
+          "n_seeds": 5,
+          "point": 0.13673177677448148,
+          "seed_max": 0.14150838908202276,
+          "seed_means": {
+            "0": 0.1355233054026646,
+            "1": 0.1377543577746976,
+            "2": 0.14150838908202276,
+            "3": 0.13138172886378707,
+            "4": 0.13749110274923543
+          },
+          "seed_min": 0.13138172886378707
+        },
+        "pooled": {
+          "boot_std": 0.0018967306446211266,
+          "ci_high": 0.13999784517821395,
+          "ci_high_over_floor": 1.2603073017624142,
+          "ci_level": 0.95,
+          "ci_low": 0.13263060854070358,
+          "ci_low_over_floor": 1.1939849800420597,
+          "effect_over_floor": 1.2267182442307036,
+          "floor": 0.11108230903878832,
+          "n_boot": 10000,
+          "n_pairs": 3055,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "point": 0.13626669510915485,
+          "seed_max": 0.14005382869959657,
+          "seed_means": {
+            "0": 0.13506108107435502,
+            "1": 0.13836080157967762,
+            "2": 0.14005382869959657,
+            "3": 0.1340693639478541,
+            "4": 0.13378840024429092
+          },
+          "seed_min": 0.13378840024429092
+        },
+        "sphere": {
+          "boot_std": 0.002995559918137589,
+          "ci_high": 0.1447952845794104,
+          "ci_high_over_floor": 1.2865299789506142,
+          "ci_level": 0.95,
+          "ci_low": 0.132940439156706,
+          "ci_low_over_floor": 1.1811977226106627,
+          "effect_over_floor": 1.2338227092326421,
+          "floor": 0.11254715160039705,
+          "n_boot": 10000,
+          "n_pairs_total": 1145,
+          "n_seeds": 5,
+          "point": 0.13886323150401877,
+          "seed_max": 0.14256535984949903,
+          "seed_means": {
+            "0": 0.13987951248876068,
+            "1": 0.1412947868163734,
+            "2": 0.14256535984949903,
+            "3": 0.13704737140817413,
+            "4": 0.13352912695728666
+          },
+          "seed_min": 0.13352912695728666
+        }
+      },
+      "conditions": {
+        "ABSENT": {
+          "boot_std": 0.0015548108884940578,
+          "ci_high": 0.24868194271067565,
+          "ci_level": 0.95,
+          "ci_low": 0.24260140998751623,
+          "n_boot": 10000,
+          "n_pairs_total": 3075,
+          "n_seeds": 5,
+          "over_floor": 2.211115062333611,
+          "over_prior": 0.9824630666978476,
+          "point": 0.2456157666744619,
+          "seed_max": 0.24680781364440918,
+          "seed_means": {
+            "0": 0.24578078091144562,
+            "1": 0.24496202170848846,
+            "2": 0.24639977514743805,
+            "3": 0.24412846565246582,
+            "4": 0.24680781364440918
+          },
+          "seed_min": 0.24412846565246582
+        },
+        "DECOY": {
+          "boot_std": 0.0016061785578582516,
+          "ci_high": 0.25116526956420115,
+          "ci_level": 0.95,
+          "ci_low": 0.24488648602192298,
+          "n_boot": 10000,
+          "n_pairs_total": 3075,
+          "n_seeds": 5,
+          "over_floor": 2.233091716389059,
+          "over_prior": 0.9922279366075508,
+          "point": 0.2480569841518877,
+          "seed_max": 0.2493945062160492,
+          "seed_means": {
+            "0": 0.24813039600849152,
+            "1": 0.24840757250785828,
+            "2": 0.2493945062160492,
+            "3": 0.24611027538776398,
+            "4": 0.24824216961860657
+          },
+          "seed_min": 0.24611027538776398
+        },
+        "INTERACT": {
+          "boot_std": 0.0013727634133519056,
+          "ci_high": 0.11380540354664737,
+          "ci_level": 0.95,
+          "ci_low": 0.10842986785176816,
+          "n_boot": 10000,
+          "n_pairs_total": 3055,
+          "n_seeds": 5,
+          "over_floor": 1.0001384585099455,
+          "over_prior": 0.44439075731911654,
+          "point": 0.11109768932977913,
+          "seed_max": 0.11379560083150864,
+          "seed_means": {
+            "0": 0.11242476105690002,
+            "1": 0.1092926636338234,
+            "2": 0.10857150703668594,
+            "3": 0.1114039197564125,
+            "4": 0.11379560083150864
+          },
+          "seed_min": 0.10857150703668594
+        }
+      },
+      "floor_mae": 0.11108230903878832
+    }
+  }
+}
