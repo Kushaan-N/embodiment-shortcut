@@ -241,6 +241,27 @@ class ClipDataset(_Base):
         return x.contiguous().float() / 255.0, self._target(si, ri)
 
 
+_BACKGROUND: dict = {}
+
+
+def background_render() -> np.ndarray:
+    """Empty-scene fill for masked inputs (cached; no arm, no object)."""
+    if "bg" not in _BACKGROUND:
+        import scene
+        _BACKGROUND["bg"] = scene.render_empty_scene("box")
+    return _BACKGROUND["bg"]
+
+
+def pair_dataset(stores, split, variant: str) -> "PairDataset":
+    """The pair dataset a VARIANT is defined on, including any input masking
+    that is part of the variant (config.VARIANT_INPUT_MASK).  Every trainer and
+    evaluator builds Architecture-A pair inputs through this, so a masked
+    variant can never be scored on unmasked frames."""
+    mm = C.VARIANT_INPUT_MASK.get(variant, "full")
+    return PairDataset(stores, split, C.IDM_VARIANTS[variant], mask_mode=mm,
+                       background=background_render() if mm != "full" else None)
+
+
 class EmbeddingDataset(Dataset):
     """Pre-computed ``[embed(s_0), embed(s_h)]`` pairs for Architecture B."""
 
