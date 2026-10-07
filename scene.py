@@ -598,10 +598,18 @@ def _simulate(sm: SceneModel, path: np.ndarray, obj_init: np.ndarray | None,
     mujoco.mj_resetData(model, data)
     T = path.shape[0]
 
-    saved_contype = None
+    saved_contype = saved_conaff = None
     if disable_arm_object_contact:
+        # MuJoCo makes a contact if (contype_a & conaffinity_b) OR
+        # (contype_b & conaffinity_a).  The object's contype (4) matches the
+        # paddle's conaffinity (4), so zeroing only the paddle's contype left
+        # the contact on and the "contact-free" reference was identical to the
+        # real rollout (every T9 deflection read 0).  Zero both; the paddle has
+        # no other contacts (paddle-floor is already masked out).
         saved_contype = int(model.geom_contype[sm.paddle_gid])
+        saved_conaff = int(model.geom_conaffinity[sm.paddle_gid])
         model.geom_contype[sm.paddle_gid] = 0
+        model.geom_conaffinity[sm.paddle_gid] = 0
 
     try:
         data.qpos[sm.arm_qadr] = path[0]
@@ -646,6 +654,7 @@ def _simulate(sm: SceneModel, path: np.ndarray, obj_init: np.ndarray | None,
     finally:
         if saved_contype is not None:
             model.geom_contype[sm.paddle_gid] = saved_contype
+            model.geom_conaffinity[sm.paddle_gid] = saved_conaff
 
     return {
         "arm_qpos": arm_qpos,
