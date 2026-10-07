@@ -1,0 +1,103 @@
+{
+  "rule": "prereg_addendum_A3.md \u00a7K.1",
+  "delta_m": 0.004841690316229101,
+  "candidates": {
+    "40000": {
+      "kp": 40000,
+      "per_geometry": {
+        "box": {
+          "median_deflection_m": 0.0001615007814840371,
+          "p90_deflection_m": 0.00021784302079315993,
+          "keep": 0.9833333333333333,
+          "n": 60
+        },
+        "sphere": {
+          "median_deflection_m": 8.027191437034548e-05,
+          "p90_deflection_m": 9.935365709471037e-05,
+          "keep": 0.9833333333333333,
+          "n": 60
+        },
+        "cylinder": {
+          "median_deflection_m": 0.00012650226201890334,
+          "p90_deflection_m": 0.00020253739970492785,
+          "keep": 0.8833333333333333,
+          "n": 60
+        }
+      },
+      "qualifies": false
+    },
+    "10000": {
+      "kp": 10000,
+      "per_geometry": {
+        "box": {
+          "median_deflection_m": 0.00022015072647699175,
+          "p90_deflection_m": 0.00030129688631497746,
+          "keep": 0.5333333333333333,
+          "n": 60
+        },
+        "sphere": {
+          "median_deflection_m": 0.00011600948647286474,
+          "p90_deflection_m": 0.00014916304406870402,
+          "keep": 0.65,
+          "n": 60
+        },
+        "cylinder": {
+          "median_deflection_m": 0.00017186736741986583,
+          "p90_deflection_m": 0.0002819756619437705,
+          "keep": 0.36666666666666664,
+          "n": 60
+        }
+      },
+      "qualifies": false
+    },
+    "2500": {
+      "kp": 2500,
+      "per_geometry": {
+        "box": {
+          "median_deflection_m": 0.0002818436268494127,
+          "p90_deflection_m": 0.06682865813196516,
+          "keep": 0.05,
+          "n": 60
+        },
+        "sphere": {
+          "median_deflection_m": 0.00011868656855754642,
+          "p90_deflection_m": 0.00018635040664643734,
+          "keep": 0.18333333333333332,
+          "n": 60
+        },
+        "cylinder": {
+          "median_deflection_m": 0.00019568870639278987,
+          "p90_deflection_m": 0.00028855746332302626,
+          "keep": 0.05,
+          "n": 60
+        }
+      },
+      "qualifies": false
+    },
+    "625": {
+      "kp": 625,
+      "per_geometry": {
+        "box": {
+          "median_deflection_m": 0.0,
+          "p90_deflection_m": 0.0,
+          "keep": 0.0,
+          "n": 60
+        },
+        "sphere": {
+          "median_deflection_m": 0.0,
+          "p90_deflection_m": 0.0,
+          "keep": 0.0,
+          "n": 60
+        },
+        "cylinder": {
+          "median_deflection_m": 0.0,
+          "p90_deflection_m": 0.0,
+          "keep": 0.0,
+          "n": 60
+        }
+      },
+      "qualifies": false
+    }
+  },
+  "selected_kp": null
+}
