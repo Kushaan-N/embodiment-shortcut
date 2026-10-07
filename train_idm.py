@@ -198,7 +198,7 @@ def main() -> int:
         if is_clip:
             mk = lambda sp: idd.ClipDataset(train_stores, sp, args.variant)  # noqa: E731
         else:
-            mk = lambda sp: idd.PairDataset(train_stores, sp, horizon)       # noqa: E731
+            mk = lambda sp: idd.pair_dataset(train_stores, sp, args.variant)  # noqa: E731
         tr_ds, va_ds = mk("train"), mk("val")
         tr = idd.make_loader(tr_ds, cfg.batch_size, shuffle=True, seed=args.seed,
                              num_workers=cfg.num_workers)
@@ -247,7 +247,7 @@ def main() -> int:
         stores = build_stores(args.geometries, [cond], args.friction_mult)
         if is_arch_a:
             d = (idd.ClipDataset(stores, "test", args.variant) if is_clip
-                 else idd.PairDataset(stores, "test", horizon))
+                 else idd.pair_dataset(stores, "test", args.variant))
             loader = idd.make_loader(d, cfg.batch_size, shuffle=False,
                                      num_workers=min(2, cfg.num_workers))
             meta = d.meta()
