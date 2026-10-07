@@ -58,11 +58,15 @@ source "$_OGAF_REPO/unity/env.sh"
 # --- the work list ---------------------------------------------------------
 # One line per (variant, seed[, --augment]).  SLURM_ARRAY_TASK_ID indexes it,
 # so the same file drives S2's 5 items and S4's full sweep.
-VARIANTS=(A-std A-del A-time A-clip-del)
+# OGAF_IDM_VARIANTS / OGAF_IDM_AUG=0 select another work list (prereg_addendum_A3.md):
+#   OGAF_IDM_VARIANTS="A-std A-del" OGAF_IDM_AUG=0 sbatch --array=0-9 ...
+read -r -a VARIANTS <<< "${OGAF_IDM_VARIANTS:-A-std A-del A-time A-clip-del}"
 SEEDS=(0 1 2 3 4)
 WORK=()
 for v in "${VARIANTS[@]}"; do for s in "${SEEDS[@]}"; do WORK+=("$v $s"); done; done
-for v in A-std A-del; do for s in "${SEEDS[@]}"; do WORK+=("$v $s --augment"); done; done
+if [[ "${OGAF_IDM_AUG:-1}" != "0" ]]; then
+  for v in A-std A-del; do for s in "${SEEDS[@]}"; do WORK+=("$v $s --augment"); done; done
+fi
 
 if [[ "${1:-}" == "--smoke" ]]; then
   echo "S1 smoke test: preflight, then ONE short training run (isolated output dir)"
