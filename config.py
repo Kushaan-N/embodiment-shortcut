@@ -128,7 +128,15 @@ FRICTION_MULTIPLIERS: tuple[float, ...] = (0.25, 0.5, 1.0, 2.0, 4.0)
 ARM_CONTROL = os.environ.get("OGAF_ARM_CONTROL", "kinematic")
 assert ARM_CONTROL in ("kinematic", "position")
 
-ARM_KP = 40000.0          # position-actuator gain when ARM_CONTROL == "position"
+#: Position-actuator gain when ARM_CONTROL == "position".  OGAF_ARM_KP lowers
+#: it for the compliant-arm experiment (prereg_addendum_A3.md, Experiment K),
+#: where contact is allowed to deflect the arm.
+ARM_KP = float(os.environ.get("OGAF_ARM_KP", "40000"))
+#: Whether a T9 arm-deviation failure EXCLUDES a rollout.  True for the main
+#: study (the arm must not depend on the condition).  The compliant-arm
+#: experiment sets OGAF_T9_EXCLUDES=0: there, contact deflecting the arm is the
+#: effect under study, so T9 is recorded (value + exceeds flag), not excluded.
+T9_EXCLUDES = os.environ.get("OGAF_T9_EXCLUDES", "1") == "1"
 ARM_DAMPING = 400.0       # joint damping
 
 #: The pusher is a 4-DOF gantry: slide x, slide y, slide z, hinge yaw.
@@ -263,7 +271,13 @@ IDM_VARIANTS: dict[str, str] = {
     "B-std": "s_std",
     "B-del": "s_del",
     "B-time": "s_time",
+    # Arm-masked standard-horizon pair (prereg_addendum_A3.md, Experiment N):
+    # (s_0, s_std) with the arm's pixels replaced by the empty-scene render.
+    "A-std-armmask": "s_std",
 }
+
+#: Input masking that is PART OF a variant's definition (not a probe option).
+VARIANT_INPUT_MASK: dict[str, str] = {"A-std-armmask": "arm_masked"}
 
 #: Which variants consume a clip rather than a frame pair (§8.1, T8).
 #: MultiWorld §B.2 trains a *bidirectional* IDM "following VPT", so the standard
