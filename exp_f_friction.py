@@ -167,7 +167,7 @@ def _evaluate_at_friction(run_dir: Path, geometries, friction_mult: float) -> di
     batch = int(ck["cfg"]["batch_size"])
     if is_arch_a:
         d = (idd.ClipDataset(stores, "test", variant) if is_clip
-             else idd.PairDataset(stores, "test", horizon))
+             else idd.pair_dataset(stores, "test", variant))
         loader = idd.make_loader(d, batch, shuffle=False)
         meta = d.meta()
     else:
