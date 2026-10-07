@@ -216,7 +216,7 @@ def load_real_clips(tuple_ids, geometry: str, condition: str, clip_root: Path) -
 
 
 def paired_contrast(std_a, std_b, og_a, og_b, ids_a, ids_b, *, n_boot: int = 10_000,
-                    rng_seed: int = C.BOOTSTRAP_SEED) -> dict:
+                    rng_seed: int = C.BOOTSTRAP_SEED, ci_level: float = 0.95) -> dict:
     """prereg_addendum_H2.md §5: paired d for the standard metric and OG-AF,
     and their contrast, on the SAME bootstrap resamples of tuples."""
     a_s = {int(t): float(v) for t, v in zip(ids_a, std_a)}
@@ -236,7 +236,8 @@ def paired_contrast(std_a, std_b, og_a, og_b, ids_a, ids_b, *, n_boot: int = 10_
     for i in range(n_boot):
         idx = rng.integers(0, len(common), size=len(common))
         bs[i], bo[i] = d(ds[idx]), d(do[idx])
-    q = lambda x: [float(np.percentile(x, 2.5)), float(np.percentile(x, 97.5))]  # noqa: E731
+    a = 100 * (1 - ci_level) / 2
+    q = lambda x: [float(np.percentile(x, a)), float(np.percentile(x, 100 - a))]  # noqa: E731
     return {"n_pairs": len(common), "d_std": d(ds), "d_std_ci": q(bs),
             "d_ogaf": d(do), "d_ogaf_ci": q(bo),
             "delta": d(do) - d(ds), "delta_ci": q(bo - bs)}
@@ -368,7 +369,7 @@ def main() -> int:
         sizes = {n: len(s) for n, s in tuple_sets.items()}
         raise RuntimeError(f"ladder models were scored on different tuple sets: {sizes}; "
                            f"finish/redo generation so every model has the same items")
-    if len(present) >= 3:
+    if len(present) >= 3 and ladder.get("gate") != "paired_object":
         gt_key = "object_gt" if gate_gt == "object_region" else "ground_truth"
         gts = [float(per_model[n][gt_key].mean()) for n in present]
         rho = spearman(np.arange(len(present)), gts)
@@ -390,10 +391,52 @@ def main() -> int:
         results["within_model"][n] = {"spearman": r, "disagreement": 1.0 - r}
         print(f"  C3(a) {n:24s} Spearman(standard, OG-AF) = {r:+.3f}")
 
+    # ---- per-model gate + C3(b) for several corruptions (addendum A3) ---
+    if ladder.get("gate") == "paired_object":
+        lvl = float(ladder.get("ci_level", 0.95))
+        base = ladder["c3b_base"]
+        results["c3b_addendum"] = {}
+        for corr in ladder["c3b_corrupted"]:
+            if base not in per_model or corr not in per_model:
+                results["c3b_addendum"][corr] = {"verdict": "NOT RUN"}
+                continue
+            a, b = per_model[base], per_model[corr]
+            ia, ib = arrays[f"{base}_tuple_index"], arrays[f"{corr}_tuple_index"]
+            # Validity: the corrupted model must be measurably worse in
+            # object-region (physics) ground truth than the base model.
+            g = paired_contrast(a["object_gt"], b["object_gt"], a["object_gt"], b["object_gt"],
+                                ia, ib, ci_level=lvl)
+            A = dict(zip(ia.tolist(), a["object_gt"])); B = dict(zip(ib.tolist(), b["object_gt"]))
+            dg = np.array([B[t] - A[t] for t in sorted(set(A) & set(B))])
+            rng = np.random.default_rng(C.BOOTSTRAP_SEED)
+            bm = np.array([dg[rng.integers(0, len(dg), len(dg))].mean() for _ in range(10_000)])
+            al = 100 * (1 - lvl) / 2
+            gate = {"mean_diff": float(dg.mean()), "ci": [float(np.percentile(bm, al)),
+                                                          float(np.percentile(bm, 100 - al))],
+                    "d": g["d_std"]}
+            gate["passed"] = gate["ci"][0] > 0
+            pc = paired_contrast(a["standard"], b["standard"], a["ogaf"], b["ogaf"], ia, ib,
+                                 ci_level=lvl)
+            if not gate["passed"]:
+                pc["verdict"] = "VOID (corrupted model not measurably worse in physics)"
+            else:
+                sup = pc["d_ogaf_ci"][0] > 0 and pc["delta_ci"][0] > 0
+                ref = pc["delta_ci"][1] < 0
+                pc["verdict"] = "SUPPORTED" if sup else ("REFUTED" if ref else "INCONCLUSIVE")
+            pc["gate"] = gate
+            pc["ci_level"] = lvl
+            results["c3b_addendum"][corr] = pc
+            print(f"\n  {corr} vs {base}: physics gate dGT={gate['mean_diff']:+.5f} {gate['ci']} "
+                  f"{'PASS' if gate['passed'] else 'FAIL'}\n    d_std={pc['d_std']:+.3f} "
+                  f"{pc['d_std_ci']}  d_ogaf={pc['d_ogaf']:+.3f} {pc['d_ogaf_ci']}  "
+                  f"delta={pc['delta']:+.3f} {pc['delta_ci']}  ({100 * lvl:g}% CIs) -> {pc['verdict']}")
+
     # ---- C3(b) between-model --------------------------------------------
     results["between_model"] = {}
     ladder_ok = bool(results.get("ladder_monotone", {}).get("passed", False))
-    if not ladder_ok:
+    if ladder.get("gate") == "paired_object":
+        ladder_ok = False      # reported per model above; no ladder in this design
+    if not ladder_ok and ladder.get("gate") != "paired_object":
         # §9-H: if the ladder is not a ladder, between-model claims are void
         # and are NOT reported -- not computed-and-caveated.
         results["between_model"]["void"] = ("ladder not verified monotone; C3(b) is "
