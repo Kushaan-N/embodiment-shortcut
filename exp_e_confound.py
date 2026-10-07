@@ -84,7 +84,7 @@ def evaluate_all_conditions(run_dir: Path, *, geometries, conditions, num_worker
         stores = tidm.build_stores(geometries, [cond])
         if is_arch_a:
             d = (idd.ClipDataset(stores, "test", variant) if is_clip
-                 else idd.PairDataset(stores, "test", horizon))
+                 else idd.pair_dataset(stores, "test", variant))
             loader = idd.make_loader(d, batch, shuffle=False, num_workers=num_workers)
             meta = d.meta()
         else:
