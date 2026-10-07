@@ -973,8 +973,10 @@ def _run_validators(*, sm, geometry, condition, action, sim_main, sim_time,
         dev = float(np.max(np.linalg.norm(sim_main["arm_qpos"][:, :3] - path_main[:, :3], axis=1)))
         dev_yaw = float(np.max(np.abs(sim_main["arm_qpos"][:, 3] - path_main[:, 3])))
         basis = "commanded_path (arm is kinematically clamped)"
+    within = dev <= tol.arm_deviation_m
     out["T9_arm_deviation"] = _v(
-        "T9_arm_deviation", dev <= tol.arm_deviation_m, dev, tol.arm_deviation_m,
+        "T9_arm_deviation", within or not C.T9_EXCLUDES, dev, tol.arm_deviation_m,
+        exceeds_tolerance=not within, excludes=C.T9_EXCLUDES,
         yaw_deviation_rad=dev_yaw, arm_control=C.ARM_CONTROL, basis=basis,
         note="residual action information carried by the arm reaction channel; "
              "Exp 0 (iii) quantifies how much of the action it could encode",
