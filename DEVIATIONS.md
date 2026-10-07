@@ -114,3 +114,19 @@ uses 611 matched pairs. Reported, not a deviation of method.
   no production Architecture A item was ever resumed (0 restarts in the 30
   logs), so every reported IDM is an uninterrupted run. `resume.pt` now carries
   a config fingerprint and refuses a mismatched relaunch.
+
+## 2026-10-07 — Experiment K: the contact-free arm reference still had contact (bug fix, before any K data)
+
+- **What:** the first compliant-arm calibration (`calibrate_compliance.py`,
+  job 65363481) reported 0.00 mm arm deflection at every gain, including gains
+  too soft to track the path at all. `scene._simulate(disable_arm_object_contact=True)`
+  zeroed only the paddle's `contype`. MuJoCo also makes a contact when the
+  object's `contype` (4) matches the paddle's `conaffinity` (4), so the
+  "contact-free" reference still had contact and was identical to the real
+  rollout.
+- **Fix:** zero (and restore) both bitmasks. The paddle has no other contacts.
+- **Impact:** position-control mode only. The main study, H and H2 use the
+  kinematically clamped arm, which never builds this reference. The K.1 rule
+  is unchanged; the calibration is re-run with the fixed instrument before any
+  K corpus, IDM or statistic exists. The failed calibration's record is kept
+  in the job log.
