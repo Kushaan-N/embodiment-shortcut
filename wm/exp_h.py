@@ -323,11 +323,16 @@ def main() -> int:
     if ladder.get("addendum"):
         # A ladder registered by an addendum is sealed by THAT document's lock.
         add = C.REPO_ROOT / ladder["addendum"]
-        cal = C.RESULTS_ROOT / "exp_h2_calibration" / "results.json"
-        rep = prereg_lock.check([args.out / "results.json", cal], prereg_path=add)
+        # Only the artifacts THIS addendum governs.  (Listing H2's calibration
+        # for every addendum made the A3 lock fail: that file predates A3 by
+        # design, being an input A3 cites.)
+        arts = [args.out / "results.json"]
+        if ladder["addendum"] == "prereg_addendum_H2.md":
+            arts.append(C.RESULTS_ROOT / "exp_h2_calibration" / "results.json")
+        rep = prereg_lock.check(arts, prereg_path=add)
         print(rep.render(), "\n")
         if not rep.passed:
-            raise prereg_lock.PreregViolation(f"{add.name} lock failed; H2 is sealed")
+            raise prereg_lock.PreregViolation(f"{add.name} lock failed; this ladder is sealed")
     names = [m["name"] for m in ladder["models"]]
     dev = idm.device()
 
